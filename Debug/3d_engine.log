@@ -1,0 +1,22 @@
+﻿Build started 8/2/2017 7:56:13 PM.
+     1>Project "C:\Users\akn\Documents\Visual Studio 2015\Projects\3d_engine\3d_engine.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /I../glew/include/gl/ /I../glfw/include/GLFW/ /I../glm/ /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:strict /Zc:wchar_t /Zc:forScope /Zc:inline /Yu"stdafx.h" /Fp"Debug\3d_engine.pch" /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt mesh.cpp
+         mesh.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\akn\Documents\Visual Studio 2015\Projects\3d_engine\Debug\3d_engine.exe" /INCREMENTAL /NOLOGO /LIBPATH:../GLFW/Lib /LIBPATH:../glew/lib/Release/Win32 opengl32.lib glu32.lib glfw3dll.lib glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\akn\Documents\Visual Studio 2015\Projects\3d_engine\Debug\3d_engine.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\akn\Documents\Visual Studio 2015\Projects\3d_engine\Debug\3d_engine.lib" /MACHINE:X86 Debug\camera.obj
+         Debug\mesh.obj
+         Debug\engine.obj
+         Debug\main.obj
+         Debug\program.obj
+         Debug\shader.obj
+         Debug\stdafx.obj
+         Debug\texture.obj
+         Debug\uniform.obj
+         Debug\vec.obj
+         3d_engine.vcxproj -> C:\Users\akn\Documents\Visual Studio 2015\Projects\3d_engine\Debug\3d_engine.exe
+     1>Done Building Project "C:\Users\akn\Documents\Visual Studio 2015\Projects\3d_engine\3d_engine.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.86
