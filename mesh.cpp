@@ -75,18 +75,33 @@ imesh::~imesh()
 mesh::mesh()
 {
 	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
+	tex = 0;
+	spec = 0;
 }
 
-mesh::mesh(const std::string& filename)
+mesh::mesh(const std::string& objfile, const std::string& texfile, const std::string& diffusefile)
 {
 	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
-	load(filename);
+	tex = 0;
+	spec = 0;
+	loadobj(objfile);
+
+	if( texfile != "" )
+		tex = new texture(texfile);
+	
+	if( diffusefile != "")
+		spec = new texture(diffusefile);
+
+	init();
+
 }
 
 mesh::mesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::vec2> _uv, vector<glm::vec3> _colors)
 {
 	//buaradan
 	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
+	tex = 0;
+	spec = 0;
 	vertices = _vertices;
 	normals = _normals;
 	uv = _uv;
@@ -129,7 +144,7 @@ void mesh::init()
 
 
 
-void mesh::load(const std::string& filename)
+void mesh::loadobj(const std::string& filename)
 {
 	fstream f;
 	f.open(filename, std::fstream::in | std::fstream::binary);
@@ -213,25 +228,29 @@ void mesh::load(const std::string& filename)
 		{
 		}
 	}
-	init();
-}
 
+}
 
 
 std::string mesh::spname()
 {
-	if (uv.size() > 0)
+	if (uv.size() > 0 && tex != 0)
 		return "uv";
 	return "standartlight";
 }
 
 void mesh::draw()
 {
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex->vboid_texture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, spec->vboid_texture);
-
+	if (tex != NULL && tex->vboid_texture != NULL)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex->vboid_texture);
+	}
+	if (spec && spec->vboid_texture != 0)
+	{
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, spec->vboid_texture);
+	}
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
@@ -253,8 +272,6 @@ void mesh::draw()
 	}
 
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
 }
 
 lightsource::lightsource()
@@ -264,7 +281,9 @@ lightsource::lightsource()
 
 lightsource::lightsource(const std::string& filename)
 {
-	load(filename);
+	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
+	loadobj(filename);
+	init();
 }
 
 lightsource::lightsource(vector<glm::vec3> _vertices)

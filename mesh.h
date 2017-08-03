@@ -32,13 +32,16 @@ protected:
 
 public:
 	mesh();
-	mesh(const std::string& filename);
+	mesh(const std::string& objfile, const std::string& texfile = "", const std::string& diffusefile = "");
+
 	mesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals = {}, vector<glm::vec2> _uv = {}, vector<glm::vec3> _colors = {});
 	virtual ~mesh();
 
 	virtual void draw();
 	virtual std::string spname();
-	void load(const std::string& filename);
+	void loadobj(const std::string& filename);
+
+
 
 	vector<glm::vec3> vertices;
 	vector<glm::vec3> normals;

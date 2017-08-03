@@ -1,3 +1,13 @@
+#custom
+*.db
+*.opendb
+*.ilk
+*.tlog
+*.log
+*.pdb
+*.idb
+*.lastbuildstate
+
 # Prerequisites
 *.d
 

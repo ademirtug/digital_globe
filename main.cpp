@@ -57,19 +57,15 @@ int main()
 	eng.load_shaders("uv");
 
 
-	texture t("c2.bmp");
-	texture s("c2_spec.bmp");
-
 	//LOAD LIGHT
-	mesh m("textcube.txt");
-	m.tex = &t;
-	m.spec = &s;
-
-
-	lightsource l("textcube.txt");
+	mesh m("textcube.txt", "c2.bmp", "c2_spec.bmp");
+	//mesh m("teapot.txt");
+	eng.scene.meshes.push_back(&m);
+	
+	lightsource l("tcube.txt");
 
 	eng.lights.meshes.push_back(&l);
-	eng.scene.meshes.push_back(&m);
+	
 
 	eng.run();
 
