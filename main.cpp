@@ -59,13 +59,19 @@ int main()
 
 	//LOAD LIGHT
 	mesh m("textcube.txt", "c2.bmp", "c2_spec.bmp");
+	mesh m2("textcube.txt", "c2.bmp", "c2_spec.bmp");
+	mesh m3("textcube.txt", "c2.bmp", "c2_spec.bmp");
+
 	//mesh m("teapot.txt");
+	m.position = { -2, -5, 0 };
+	m2.position = { -10, -10, 0 };
 	eng.scene.meshes.push_back(&m);
+	eng.scene.meshes.push_back(&m2);
+	eng.scene.meshes.push_back(&m3);
 	
 	lightsource l("tcube.txt");
 
 	eng.lights.meshes.push_back(&l);
-	
 
 	eng.run();
 

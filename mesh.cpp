@@ -31,7 +31,6 @@ void arr2ind(float* data, int size, vector<glm::vec3>& vertices, vector<int>& in
 				f = true;
 				break;
 			}
-
 		}
 		if (!f) vertices.push_back(vx);
 	}
@@ -77,6 +76,7 @@ mesh::mesh()
 	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
 	tex = 0;
 	spec = 0;
+	//position = glm::vec3(0.0f);
 }
 
 mesh::mesh(const std::string& objfile, const std::string& texfile, const std::string& diffusefile)

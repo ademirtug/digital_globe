@@ -22,6 +22,8 @@ public:
 	
 	virtual std::string spname() { return ""; };
 	virtual void draw() {};
+
+	glm::vec3 position;
 };
 
 
@@ -61,9 +63,27 @@ public:
 	lightsource();
 	lightsource(const std::string& filename);
 	lightsource(vector<glm::vec3> _vertices);
+	
 	void draw();
-	std::string spname();
+	virtual std::string spname();
 };
+
+class directionallight : public lightsource
+{
+public:
+
+
+	std::string spname();
+
+};
+
+class pointlight : public lightsource
+{
+public:
+	std::string spname();
+
+};
+
 
 
 class vao
