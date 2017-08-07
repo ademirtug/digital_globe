@@ -57,7 +57,7 @@ int main()
 	eng.load_shaders("uv");
 
 
-
+	//lightsource l("textcube.txt");
 
 	eng.run();
 

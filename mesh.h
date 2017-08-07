@@ -22,8 +22,13 @@ public:
 	
 	virtual std::string spname() { return ""; };
 	virtual void draw() {};
-
+	virtual void loadobj(const std::string& filename) = 0;
+	
+	
+	GLuint vboid_vertices;
 	glm::vec3 position;
+	vector<glm::vec3> vertices;
+	
 };
 
 
@@ -31,7 +36,6 @@ class mesh : public imesh
 {
 protected:
 	virtual void init();
-
 public:
 	mesh();
 	mesh(const std::string& objfile, const std::string& texfile = "", const std::string& diffusefile = "");
@@ -44,8 +48,6 @@ public:
 	void loadobj(const std::string& filename);
 
 
-
-	vector<glm::vec3> vertices;
 	vector<glm::vec3> normals;
 	vector<glm::vec3> colors;
 	vector<glm::vec2> uv;
@@ -53,35 +55,37 @@ public:
 	texture* tex;
 	texture* spec;
 
-	GLuint vboid_vertices, vboid_normals, vboid_colors, vboid_uv;
+	GLuint vboid_normals, vboid_colors, vboid_uv;
 };
 
 void obj2mesh(std::string filename, mesh* m);
 
-class lightsource : public mesh
+class ilight : public imesh
 {
 public:
-	lightsource();
-	lightsource(const std::string& filename);
-	lightsource(vector<glm::vec3> _vertices);
+};
+
+
+class directionallight : public ilight
+{
+protected:
+	virtual void init() {};
+public:
+};
+
+class pointlight : public ilight
+{
+protected:
+	virtual void init();
+public:
+
+	pointlight();
+	pointlight(const std::string& filename);
+	pointlight(vector<glm::vec3> _vertices);
 	
 	void draw();
-	virtual std::string spname();
-};
-
-
-class directionallight : public lightsource
-{
-public:
-
-	std::string spname();
-
-};
-
-class pointlight : public lightsource
-{
-public:
-	std::string spname();
+	virtual std::string spname() { return ""; };
+	void loadobj(const std::string& filename);
 
 };
 
@@ -93,7 +97,7 @@ public:
 	std::vector<imesh*> meshes;
 		
 	
-	directionallight dirlight;
+	//directionallight dirlight;
 	std::vector<pointlight> plights;
 
 };

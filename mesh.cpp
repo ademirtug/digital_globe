@@ -47,8 +47,7 @@ void arr2ind(float* data, int size, vector<glm::vec3>& vertices, vector<int>& in
 		}
 	}
 }
-template<typename Out>
-void split(const std::string &s, char delim, Out result) {
+template<typename Out> void split(const std::string &s, char delim, Out result) {
 	std::stringstream ss;
 	ss.str(s);
 	std::string item;
@@ -96,6 +95,8 @@ mesh::mesh(const std::string& objfile, const std::string& texfile, const std::st
 
 }
 
+
+
 mesh::mesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::vec2> _uv, vector<glm::vec3> _colors)
 {
 	//buaradan
@@ -108,11 +109,10 @@ mesh::mesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::
 	colors = _colors;
 	init();
 }
-
-
 mesh::~mesh()
 {
 }
+
 
 void mesh::init()
 {
@@ -141,9 +141,6 @@ void mesh::init()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
-
-
-
 void mesh::loadobj(const std::string& filename)
 {
 	fstream f;
@@ -230,15 +227,12 @@ void mesh::loadobj(const std::string& filename)
 	}
 
 }
-
-
-std::string mesh::spname()
+string mesh::spname()
 {
 	if (uv.size() > 0 && tex != 0)
 		return "uv";
 	return "standartlight";
 }
-
 void mesh::draw()
 {
 	if (tex != NULL && tex->vboid_texture != NULL)
@@ -274,21 +268,23 @@ void mesh::draw()
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
 }
 
-lightsource::lightsource()
+
+pointlight::pointlight()
 {
-	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
+	vboid_vertices = 0;
 }
 
-lightsource::lightsource(const std::string& filename)
+pointlight::pointlight(const std::string& filename)
 {
-	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
+	throw("not implemented");
+	vboid_vertices = 0;
 	loadobj(filename);
 	init();
 }
 
-lightsource::lightsource(vector<glm::vec3> _vertices)
+pointlight::pointlight(vector<glm::vec3> _vertices)
 {
-	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
+	vboid_vertices = 0;
 	vertices = _vertices;
 
 	glBindVertexArray(eng.sc.vao_lights_id);
@@ -302,13 +298,43 @@ lightsource::lightsource(vector<glm::vec3> _vertices)
 }
 
 
-std::string lightsource::spname()
+void pointlight::loadobj(const string& filename)
 {
-	return "lightsource";
+	fstream f;
+	f.open(filename, std::fstream::in | std::fstream::binary);
+	if (!f.is_open())
+		return;
+
+	string line;
+	while (getline(f, line))
+	{
+		istringstream ss(line);
+		string cmd;
+		ss >> cmd;
+
+		if (cmd == "v")
+		{
+			float v1, v2, v3;
+			ss >> v1 >> v2 >> v3;
+			vertices.push_back({ v1, v2, v3 });
+		}
+	}
 }
 
 
-void lightsource::draw()
+void pointlight::init()
+{
+	glBindVertexArray(eng.sc.vao_lights_id);
+	glGenBuffers(1, &vboid_vertices);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void pointlight::draw()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
 
@@ -316,3 +342,78 @@ void lightsource::draw()
 	glEnableVertexAttribArray(0);
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
 }
+
+
+//lightsource::lightsource()
+//{
+//	vboid_vertices = 0;
+//}
+//
+//lightsource::lightsource(const std::string& filename)
+//{
+//	throw("not implemented");
+//	vboid_vertices = 0;
+//	loadobj(filename);
+//	init();
+//}
+//
+//lightsource::lightsource(vector<glm::vec3> _vertices)
+//{
+//	vboid_vertices = 0;
+//	vertices = _vertices;
+//
+//	glBindVertexArray(eng.sc.vao_lights_id);
+//	glGenBuffers(1, &vboid_vertices);
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
+//	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//	glBindVertexArray(0);
+//}
+
+
+//void lightsource::loadobj(const string& filename)
+//{
+//	fstream f;
+//	f.open(filename, std::fstream::in | std::fstream::binary);
+//	if (!f.is_open())
+//		return;
+//
+//	string line;
+//	while (getline(f, line))
+//	{
+//		istringstream ss(line);
+//		string cmd;
+//		ss >> cmd;
+//
+//		if (cmd == "v")
+//		{
+//			float v1, v2, v3;
+//			ss >> v1 >> v2 >> v3;
+//			vertices.push_back({ v1, v2, v3 });
+//		}
+//	}
+//}
+
+
+//void lightsource::init()
+//{
+//	glBindVertexArray(eng.sc.vao_lights_id);
+//	glGenBuffers(1, &vboid_vertices);
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
+//	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//	glBindVertexArray(0);
+//}
+//
+//void lightsource::draw()
+//{
+//	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
+//
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+//	glEnableVertexAttribArray(0);
+//	glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
+//}

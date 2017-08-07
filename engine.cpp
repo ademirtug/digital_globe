@@ -19,7 +19,6 @@ void mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
 	eng.cam->mouse_wheel_callback(window, xoffset, yoffset);
 }
 
-
 engine::engine()
 {
 }
@@ -135,7 +134,6 @@ void engine::run()
 		{
 			glUseProgram(programs[m->spname()]->get_id());
 			
-
 			programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
 			programs[m->spname()]->setuniform("view", cam->getview());
 			programs[m->spname()]->setuniform("projection", Projection);
@@ -145,11 +143,9 @@ void engine::run()
 			programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
 			programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
 
-
 			programs[m->spname()]->setuniform("light.constant", 1.0f);
 			programs[m->spname()]->setuniform("light.linear", 0.09f);
 			programs[m->spname()]->setuniform("light.quadratic", 0.032f);
-
 
 			programs[m->spname()]->setuniform("material.specular", 1);
 			programs[m->spname()]->setuniform("material.shininess",64.0f);
