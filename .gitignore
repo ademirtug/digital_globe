@@ -7,6 +7,9 @@
 *.pdb
 *.idb
 *.lastbuildstate
+*.opensdf
+*.sdf
+
 
 # Prerequisites
 *.d
