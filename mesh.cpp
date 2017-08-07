@@ -116,7 +116,7 @@ mesh::~mesh()
 
 void mesh::init()
 {
-	glBindVertexArray(eng.scene.id);
+	glBindVertexArray(eng.sc.vao_mesh_id);
 
 	glGenBuffers(1, &vboid_vertices);
 	glGenBuffers(1, &vboid_normals);
@@ -291,7 +291,7 @@ lightsource::lightsource(vector<glm::vec3> _vertices)
 	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
 	vertices = _vertices;
 
-	glBindVertexArray(eng.lights.id);
+	glBindVertexArray(eng.sc.vao_lights_id);
 	glGenBuffers(1, &vboid_vertices);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);

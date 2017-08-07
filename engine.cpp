@@ -60,8 +60,8 @@ bool engine::init(int width, int height)
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
 
-	glGenVertexArrays(1, &scene.id);
-	glGenVertexArrays(1, &lights.id);
+	glGenVertexArrays(1, &sc.vao_mesh_id);
+	glGenVertexArrays(1, &sc.vao_lights_id);
 
 	return true;
 }
@@ -130,8 +130,8 @@ void engine::run()
 		glm::vec3 cameraPos(viewModel[3]);
 
 		/////draw scene meshes
-		glBindVertexArray(scene.id);
-		for (auto m : scene.meshes)
+		glBindVertexArray(sc.vao_mesh_id);
+		for (auto m : sc.meshes)
 		{
 			glUseProgram(programs[m->spname()]->get_id());
 			
@@ -150,7 +150,6 @@ void engine::run()
 			programs[m->spname()]->setuniform("light.linear", 0.09f);
 			programs[m->spname()]->setuniform("light.quadratic", 0.032f);
 
-			
 
 			programs[m->spname()]->setuniform("material.specular", 1);
 			programs[m->spname()]->setuniform("material.shininess",64.0f);
@@ -165,24 +164,24 @@ void engine::run()
 		}
 		glBindVertexArray(0);
 
-		//draw light sources
-		glm::mat4 LModel = glm::mat4();
-		LModel = glm::translate(LModel, lightPos);
-		LModel = glm::scale(LModel, glm::vec3(0.2f));
+		////////////draw light sources
+		//////////glm::mat4 LModel = glm::mat4();
+		//////////LModel = glm::translate(LModel, lightPos);
+		//////////LModel = glm::scale(LModel, glm::vec3(0.2f));
 
-		glBindVertexArray(lights.id);
-		for (auto l : lights.meshes)
-		{
-			glUseProgram(programs[l->spname()]->get_id());
-			programs[l->spname()]->setuniform("model", LModel);
-			programs[l->spname()]->setuniform("view", cam->getview());
-			programs[l->spname()]->setuniform("projection", Projection);
+		//////////glBindVertexArray(sc.vao_lights_id);
+		//////////for (auto l : lights.meshes)
+		//////////{
+		//////////	glUseProgram(programs[l->spname()]->get_id());
+		//////////	programs[l->spname()]->setuniform("model", LModel);
+		//////////	programs[l->spname()]->setuniform("view", cam->getview());
+		//////////	programs[l->spname()]->setuniform("projection", Projection);
 
-			l->draw();
+		//////////	l->draw();
 
-			glUseProgram(0);
-		}
-		glBindVertexArray(0);
+		//////////	glUseProgram(0);
+		//////////}
+		//////////glBindVertexArray(0);
 
 
 		glfwSwapBuffers(window);

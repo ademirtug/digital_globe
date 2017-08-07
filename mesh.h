@@ -55,6 +55,7 @@ public:
 
 	GLuint vboid_vertices, vboid_normals, vboid_colors, vboid_uv;
 };
+
 void obj2mesh(std::string filename, mesh* m);
 
 class lightsource : public mesh
@@ -68,10 +69,10 @@ public:
 	virtual std::string spname();
 };
 
+
 class directionallight : public lightsource
 {
 public:
-
 
 	std::string spname();
 
@@ -85,14 +86,17 @@ public:
 };
 
 
-
-class vao
+class scene
 {
 public:
-	GLuint id;
+	GLuint vao_mesh_id, vao_lights_id;
 	std::vector<imesh*> meshes;
-};
+		
+	
+	directionallight dirlight;
+	std::vector<pointlight> plights;
 
+};
 
 
 #endif//__BUFFERS_H__

@@ -2,15 +2,14 @@
 #include "stdafx.h"
 #include "mesh.h"
 #include "camera.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+
 
 
 class engine
 {
 protected:
 	GLFWwindow* window;
-	std::map<GLuint, std::vector<GLuint> > buffers;
+	std::map<GLuint, std::vector<GLuint>> buffers;
 
 public:
 	engine();
@@ -19,13 +18,10 @@ public:
 	bool init(int width, int height);
 	void load_shaders(std::string name);
 
-
-	vao scene;
-	vao lights;
 	camera* cam;
+	scene sc;
 
 	std::map<std::string, program*> programs;
 
 	void run();
 };
-

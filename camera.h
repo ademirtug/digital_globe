@@ -38,10 +38,4 @@ public:
 
 
 
-
-
-
-
-
-
 #endif//__CAMERA_H__
