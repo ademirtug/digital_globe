@@ -57,7 +57,9 @@ int main()
 	eng.load_shaders("uv");
 
 
-	//lightsource l("textcube.txt");
+	pointlight pl("tcube.txt");
+	eng.sc.plights.push_back(pl);
+
 
 	eng.run();
 

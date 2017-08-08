@@ -60,9 +60,10 @@ public:
 
 void obj2mesh(std::string filename, mesh* m);
 
-class ilight : public imesh
+class ilight
 {
 public:
+	virtual void shine() {};
 };
 
 
@@ -73,7 +74,7 @@ protected:
 public:
 };
 
-class pointlight : public ilight
+class pointlight : public ilight, imesh
 {
 protected:
 	virtual void init();

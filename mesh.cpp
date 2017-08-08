@@ -268,7 +268,6 @@ void mesh::draw()
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
 }
 
-
 pointlight::pointlight()
 {
 	vboid_vertices = 0;
@@ -276,7 +275,6 @@ pointlight::pointlight()
 
 pointlight::pointlight(const std::string& filename)
 {
-	throw("not implemented");
 	vboid_vertices = 0;
 	loadobj(filename);
 	init();
@@ -297,13 +295,15 @@ pointlight::pointlight(vector<glm::vec3> _vertices)
 	glBindVertexArray(0);
 }
 
-
 void pointlight::loadobj(const string& filename)
 {
 	fstream f;
 	f.open(filename, std::fstream::in | std::fstream::binary);
 	if (!f.is_open())
 		return;
+
+	vector<glm::vec3> v;
+
 
 	string line;
 	while (getline(f, line))
@@ -315,12 +315,42 @@ void pointlight::loadobj(const string& filename)
 		if (cmd == "v")
 		{
 			float v1, v2, v3;
+
 			ss >> v1 >> v2 >> v3;
-			vertices.push_back({ v1, v2, v3 });
+			v.push_back({ v1, v2, v3 });
+		}
+		else if (cmd == "f")
+		{
+
+			while (!ss.eof())
+			{
+				string sect;
+				ss >> sect;
+
+				if (sect.find("/") != string::npos)
+				{
+					vector<string> rs = split(sect, '/');
+					int v1 = atoi(rs[0].c_str());
+
+					vertices.push_back(v[--v1]);
+				}
+				else
+				{
+					while (!ss.eof())
+					{
+						int v1;
+						ss >> v1;
+						vertices.push_back(v[--v1]);
+					}
+				}
+			}
+
+		}
+		else
+		{
 		}
 	}
 }
-
 
 void pointlight::init()
 {

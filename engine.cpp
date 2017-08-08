@@ -128,56 +128,63 @@ void engine::run()
 		glm::mat4 viewModel = inverse(cam->getview());
 		glm::vec3 cameraPos(viewModel[3]);
 
-		/////draw scene meshes
-		glBindVertexArray(sc.vao_mesh_id);
-		for (auto m : sc.meshes)
+
+		//draw light sources
+		glm::mat4 LModel = glm::mat4();
+		LModel = glm::translate(LModel, lightPos);
+		LModel = glm::scale(LModel, glm::vec3(0.2f));
+
+
+
+
+		glBindVertexArray(sc.vao_lights_id);
+		for (auto l : sc.plights)
 		{
-			glUseProgram(programs[m->spname()]->get_id());
-			
-			programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
-			programs[m->spname()]->setuniform("view", cam->getview());
-			programs[m->spname()]->setuniform("projection", Projection);
+			glUseProgram(programs["lightsource"]->get_id());
+			programs["lightsource"]->setuniform("model", LModel);
+			programs["lightsource"]->setuniform("view", cam->getview());
+			programs["lightsource"]->setuniform("projection", Projection);
 
-			programs[m->spname()]->setuniform("light.position", lightPos);
-			programs[m->spname()]->setuniform("light.ambient", {0.1f, 0.1f, 0.1f});
-			programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
-			programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
-
-			programs[m->spname()]->setuniform("light.constant", 1.0f);
-			programs[m->spname()]->setuniform("light.linear", 0.09f);
-			programs[m->spname()]->setuniform("light.quadratic", 0.032f);
-
-			programs[m->spname()]->setuniform("material.specular", 1);
-			programs[m->spname()]->setuniform("material.shininess",64.0f);
-			programs[m->spname()]->setuniform("material.diffuse", 0);
-			programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
-
-			programs[m->spname()]->setuniform("viewPos", cameraPos);
-
-			m->draw();
+			l.draw();
 
 			glUseProgram(0);
 		}
 		glBindVertexArray(0);
 
-		////////////draw light sources
-		//////////glm::mat4 LModel = glm::mat4();
-		//////////LModel = glm::translate(LModel, lightPos);
-		//////////LModel = glm::scale(LModel, glm::vec3(0.2f));
 
-		//////////glBindVertexArray(sc.vao_lights_id);
-		//////////for (auto l : lights.meshes)
-		//////////{
-		//////////	glUseProgram(programs[l->spname()]->get_id());
-		//////////	programs[l->spname()]->setuniform("model", LModel);
-		//////////	programs[l->spname()]->setuniform("view", cam->getview());
-		//////////	programs[l->spname()]->setuniform("projection", Projection);
 
-		//////////	l->draw();
 
-		//////////	glUseProgram(0);
-		//////////}
-		//////////glBindVertexArray(0);
+		///////draw scene meshes
+		//glBindVertexArray(sc.vao_mesh_id);
+		//for (auto m : sc.meshes)
+		//{
+		//	glUseProgram(programs[m->spname()]->get_id());
+		//	
+		//	programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
+		//	programs[m->spname()]->setuniform("view", cam->getview());
+		//	programs[m->spname()]->setuniform("projection", Projection);
+
+		//	programs[m->spname()]->setuniform("light.position", lightPos);
+		//	programs[m->spname()]->setuniform("light.ambient", {0.1f, 0.1f, 0.1f});
+		//	programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
+		//	programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
+
+		//	programs[m->spname()]->setuniform("light.constant", 1.0f);
+		//	programs[m->spname()]->setuniform("light.linear", 0.09f);
+		//	programs[m->spname()]->setuniform("light.quadratic", 0.032f);
+
+		//	programs[m->spname()]->setuniform("material.specular", 1);
+		//	programs[m->spname()]->setuniform("material.shininess",64.0f);
+		//	programs[m->spname()]->setuniform("material.diffuse", 0);
+		//	programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
+
+		//	programs[m->spname()]->setuniform("viewPos", cameraPos);
+
+		//	m->draw();
+
+		//	glUseProgram(0);
+		//}
+		//glBindVertexArray(0);
 
 
 		glfwSwapBuffers(window);
