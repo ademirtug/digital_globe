@@ -15,7 +15,6 @@ shader::~shader()
 }
 
 
-
 GLuint shader::compile(const std::string& source = "")
 {
 	if (source.length() < 1)

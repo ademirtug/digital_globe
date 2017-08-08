@@ -19,32 +19,6 @@ extern engine eng;
 
 
 
-vector<glm::vec3> gettri(string filename)
-{
-	vector<glm::vec3> v;
-
-	fstream f;
-	f.open(filename, std::fstream::in | std::fstream::binary);
-	if (!f.is_open())
-		return v;
-
-	string line;
-	while (getline(f, line))
-	{
-		istringstream ss(line);
-		string cmd;
-		ss >> cmd;
-
-		if (cmd == "v")
-		{
-			float v1, v2, v3;
-			ss >> v1 >> v2 >> v3;
-			v.push_back({ v1, v2, v3 });
-		}
-	}
-	return v;
-}
-
 int main()
 {
 	arcball_camera* cam = new arcball_camera();

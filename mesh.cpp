@@ -271,9 +271,17 @@ void mesh::draw()
 pointlight::pointlight()
 {
 	vboid_vertices = 0;
+	position = { 2.0f, 2.0f, -2.0f };
+	ambient = { 0.05f, 0.05f, 0.05f };
+	diffuse = { 0.8f, 0.8f, 0.8f };
+	specular = { 1.0f, 1.0f, 1.0f  };
+
+	constant = 1.0f;
+	linear = 0.09f;
+	quadratic = 0.032f;
 }
 
-pointlight::pointlight(const std::string& filename)
+pointlight::pointlight(const std::string& filename) :pointlight()
 {
 	vboid_vertices = 0;
 	loadobj(filename);

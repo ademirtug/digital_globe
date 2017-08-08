@@ -64,9 +64,10 @@ class ilight
 {
 public:
 	virtual void shine() {};
+	glm::vec3 ambient, diffuse, specular;
 };
 
-class pointlight : public ilight, imesh
+class pointlight : public ilight, public imesh
 {
 protected:
 	virtual void init();
@@ -79,29 +80,30 @@ public:
 	void draw();
 	virtual std::string spname() { return "standartlight"; };
 	void loadobj(const std::string& filename);
-
+	GLfloat constant, linear, quadratic;
 };
 
 
 class directionallight : public ilight
 {
 protected:
-	directionallight();
 	virtual void init() {};
-
-	glm::vec3 direction, ambient, diffuse, specular;
 public:
+	directionallight();
+	glm::vec3 direction;
+
 };
 
 
 class scene
 {
 public:
+	scene() {};
 	GLuint vao_mesh_id, vao_lights_id;
 	std::vector<imesh*> meshes;
 		
 	
-	//directionallight dirlight;
+	directionallight dirlight;
 	std::vector<pointlight> plights;
 
 };

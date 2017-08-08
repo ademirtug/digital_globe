@@ -124,15 +124,12 @@ void engine::run()
 	{
 		GLenum err = 0;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glm::vec3 lightPos(2.0f, 2.0f, -2.0f);
+
 		glm::mat4 viewModel = inverse(cam->getview());
 		glm::vec3 cameraPos(viewModel[3]);
 
 
-		//draw light sources
-		glm::mat4 LModel = glm::mat4();
-		LModel = glm::translate(LModel, lightPos);
-		LModel = glm::scale(LModel, glm::vec3(0.2f));
+
 
 
 
@@ -140,6 +137,12 @@ void engine::run()
 		glBindVertexArray(sc.vao_lights_id);
 		for (auto l : sc.plights)
 		{
+			//draw light sources
+			glm::mat4 LModel = glm::mat4();
+			LModel = glm::translate(LModel, l.position);
+			LModel = glm::scale(LModel, glm::vec3(0.2f));
+
+
 			glUseProgram(programs["lightsource"]->get_id());
 			programs["lightsource"]->setuniform("model", LModel);
 			programs["lightsource"]->setuniform("view", cam->getview());
@@ -166,20 +169,26 @@ void engine::run()
 			programs[m->spname()]->setuniform("viewPos", cameraPos);
 
 
+			programs[m->spname()]->setuniform("dirLight.direction", sc.dirlight.direction);
+			programs[m->spname()]->setuniform("dirLight.ambient", sc.dirlight.ambient);
+			programs[m->spname()]->setuniform("dirLight.diffuse", sc.dirlight.diffuse);
+			programs[m->spname()]->setuniform("dirLight.specular", sc.dirlight.specular);
 
-			//programs[m->spname()]->setuniform("light.position", lightPos);
-			//programs[m->spname()]->setuniform("light.ambient", {0.1f, 0.1f, 0.1f});
-			//programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
-			//programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
+			for (auto l : sc.plights)
+			{
+				programs[m->spname()]->setuniform("pointLights[0].position", l.position);
+				programs[m->spname()]->setuniform("pointLights[0].ambient",  l.ambient);
+				programs[m->spname()]->setuniform("pointLights[0].diffuse", l.diffuse);
+				programs[m->spname()]->setuniform("pointLights[0].specular", l.specular);
+				programs[m->spname()]->setuniform("pointLights[0].constant", l.constant);
+				programs[m->spname()]->setuniform("pointLights[0].linear", l.linear);
+				programs[m->spname()]->setuniform("pointLights[0].quadratic", l.quadratic);
+			}
 
-			//programs[m->spname()]->setuniform("light.constant", 1.0f);
-			//programs[m->spname()]->setuniform("light.linear", 0.09f);
-			//programs[m->spname()]->setuniform("light.quadratic", 0.032f);
-
-			//programs[m->spname()]->setuniform("material.specular", 1);
-			//programs[m->spname()]->setuniform("material.shininess",64.0f);
-			//programs[m->spname()]->setuniform("material.diffuse", 0);
-			//programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
+			programs[m->spname()]->setuniform("material.specular", 1);
+			programs[m->spname()]->setuniform("material.shininess",64.0f);
+			programs[m->spname()]->setuniform("material.diffuse", 0);
+			programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
 
 			
 
@@ -196,53 +205,4 @@ void engine::run()
 			cout << gluErrorString(err);
 	}
 	glfwTerminate();
-
-
-	//lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-	//lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-	//lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-	//lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-	//// point light 1
-	//lightingShader.setVec3("pointLights[0].position", pointLightPositions[0]);
-	//lightingShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-	//lightingShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-	//lightingShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-	//lightingShader.setFloat("pointLights[0].constant", 1.0f);
-	//lightingShader.setFloat("pointLights[0].linear", 0.09);
-	//lightingShader.setFloat("pointLights[0].quadratic", 0.032);
-	//// point light 2
-	//lightingShader.setVec3("pointLights[1].position", pointLightPositions[1]);
-	//lightingShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-	//lightingShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-	//lightingShader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-	//lightingShader.setFloat("pointLights[1].constant", 1.0f);
-	//lightingShader.setFloat("pointLights[1].linear", 0.09);
-	//lightingShader.setFloat("pointLights[1].quadratic", 0.032);
-	//// point light 3
-	//lightingShader.setVec3("pointLights[2].position", pointLightPositions[2]);
-	//lightingShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-	//lightingShader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
-	//lightingShader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-	//lightingShader.setFloat("pointLights[2].constant", 1.0f);
-	//lightingShader.setFloat("pointLights[2].linear", 0.09);
-	//lightingShader.setFloat("pointLights[2].quadratic", 0.032);
-	//// point light 4
-	//lightingShader.setVec3("pointLights[3].position", pointLightPositions[3]);
-	//lightingShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-	//lightingShader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
-	//lightingShader.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
-	//lightingShader.setFloat("pointLights[3].constant", 1.0f);
-	//lightingShader.setFloat("pointLights[3].linear", 0.09);
-	//lightingShader.setFloat("pointLights[3].quadratic", 0.032);
-	//// spotLight
-	//lightingShader.setVec3("spotLight.position", camera.Position);
-	//lightingShader.setVec3("spotLight.direction", camera.Front);
-	//lightingShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-	//lightingShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-	//lightingShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-	//lightingShader.setFloat("spotLight.constant", 1.0f);
-	//lightingShader.setFloat("spotLight.linear", 0.09);
-	//lightingShader.setFloat("spotLight.quadratic", 0.032);
-	//lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-	//lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
 }
