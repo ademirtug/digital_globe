@@ -66,14 +66,6 @@ public:
 	virtual void shine() {};
 };
 
-
-class directionallight : public ilight
-{
-protected:
-	virtual void init() {};
-public:
-};
-
 class pointlight : public ilight, imesh
 {
 protected:
@@ -85,9 +77,20 @@ public:
 	pointlight(vector<glm::vec3> _vertices);
 	
 	void draw();
-	virtual std::string spname() { return ""; };
+	virtual std::string spname() { return "standartlight"; };
 	void loadobj(const std::string& filename);
 
+};
+
+
+class directionallight : public ilight
+{
+protected:
+	directionallight();
+	virtual void init() {};
+
+	glm::vec3 direction, ambient, diffuse, specular;
+public:
 };
 
 

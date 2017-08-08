@@ -154,37 +154,40 @@ void engine::run()
 
 
 
-		///////draw scene meshes
-		//glBindVertexArray(sc.vao_mesh_id);
-		//for (auto m : sc.meshes)
-		//{
-		//	glUseProgram(programs[m->spname()]->get_id());
-		//	
-		//	programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
-		//	programs[m->spname()]->setuniform("view", cam->getview());
-		//	programs[m->spname()]->setuniform("projection", Projection);
+		/////draw scene meshes
+		glBindVertexArray(sc.vao_mesh_id);
+		for (auto m : sc.meshes)
+		{
+			glUseProgram(programs[m->spname()]->get_id());
+			
+			programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
+			programs[m->spname()]->setuniform("view", cam->getview());
+			programs[m->spname()]->setuniform("projection", Projection);
+			programs[m->spname()]->setuniform("viewPos", cameraPos);
 
-		//	programs[m->spname()]->setuniform("light.position", lightPos);
-		//	programs[m->spname()]->setuniform("light.ambient", {0.1f, 0.1f, 0.1f});
-		//	programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
-		//	programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
 
-		//	programs[m->spname()]->setuniform("light.constant", 1.0f);
-		//	programs[m->spname()]->setuniform("light.linear", 0.09f);
-		//	programs[m->spname()]->setuniform("light.quadratic", 0.032f);
 
-		//	programs[m->spname()]->setuniform("material.specular", 1);
-		//	programs[m->spname()]->setuniform("material.shininess",64.0f);
-		//	programs[m->spname()]->setuniform("material.diffuse", 0);
-		//	programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
+			//programs[m->spname()]->setuniform("light.position", lightPos);
+			//programs[m->spname()]->setuniform("light.ambient", {0.1f, 0.1f, 0.1f});
+			//programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
+			//programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
 
-		//	programs[m->spname()]->setuniform("viewPos", cameraPos);
+			//programs[m->spname()]->setuniform("light.constant", 1.0f);
+			//programs[m->spname()]->setuniform("light.linear", 0.09f);
+			//programs[m->spname()]->setuniform("light.quadratic", 0.032f);
 
-		//	m->draw();
+			//programs[m->spname()]->setuniform("material.specular", 1);
+			//programs[m->spname()]->setuniform("material.shininess",64.0f);
+			//programs[m->spname()]->setuniform("material.diffuse", 0);
+			//programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
 
-		//	glUseProgram(0);
-		//}
-		//glBindVertexArray(0);
+			
+
+			m->draw();
+
+			glUseProgram(0);
+		}
+		glBindVertexArray(0);
 
 
 		glfwSwapBuffers(window);

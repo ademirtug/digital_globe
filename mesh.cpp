@@ -374,6 +374,15 @@ void pointlight::draw()
 }
 
 
+
+directionallight::directionallight()
+{
+	direction = { -0.2f, -1.0f, -0.3f };
+	ambient = { 0.05f, 0.05f, 0.05f };
+	diffuse = { 0.4f, 0.4f, 0.4f };
+	specular = { 0.5f, 0.5f, 0.5f };
+}
+
 //lightsource::lightsource()
 //{
 //	vboid_vertices = 0;

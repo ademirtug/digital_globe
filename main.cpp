@@ -38,7 +38,6 @@ vector<glm::vec3> gettri(string filename)
 		if (cmd == "v")
 		{
 			float v1, v2, v3;
-
 			ss >> v1 >> v2 >> v3;
 			v.push_back({ v1, v2, v3 });
 		}
@@ -59,6 +58,13 @@ int main()
 
 	pointlight pl("tcube.txt");
 	eng.sc.plights.push_back(pl);
+
+	mesh m("textcube.txt");
+	m.tex = new texture("c2.bmp");
+	m.spec = new texture("c2_spec.bmp");
+
+
+	eng.sc.meshes.push_back(&m);
 
 
 	eng.run();
