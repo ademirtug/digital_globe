@@ -2,10 +2,10 @@
   vec.cpp
   texture.cpp
   shader.cpp
-  main.cpp
-  engine.cpp
   mesh.cpp
+  main.cpp
   light.cpp
+  engine.cpp
   camera.cpp
   Generating Code...
   3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2015\Projects\3d_engine\Debug\3d_engine.exe

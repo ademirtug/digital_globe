@@ -28,7 +28,6 @@ public:
 	GLuint vboid_vertices;
 	glm::vec3 position;
 	vector<glm::vec3> vertices;
-	
 };
 
 
