@@ -7,7 +7,7 @@ extern engine eng;
 pointlight::pointlight()
 {
 	vboid_vertices = 0;
-	position = { 2.0f, 2.0f, -2.0f };
+	position = { 2.0f, 2.0f, 2.0f };
 	ambient = { 0.05f, 0.05f, 0.05f };
 	diffuse = { 0.8f, 0.8f, 0.8f };
 	specular = { 1.0f, 1.0f, 1.0f };

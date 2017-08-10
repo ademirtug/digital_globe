@@ -26,7 +26,6 @@ int main()
 	eng.init(1024, 768);
 
 
-	eng.load_shaders("standart");
 	eng.load_shaders("standartlight");
 	eng.load_shaders("lightsource");
 	eng.load_shaders("uv");
@@ -35,12 +34,12 @@ int main()
 	pointlight pl("tcube.txt");
 	eng.sc.plights.push_back(pl);
 
-
+	//colormesh m("nano.txt");
 	texturemesh m("textcube.txt");
 	m.tex = new texture("c2.bmp");
 	m.spec = new texture("c2_spec.bmp");
 
-	
+
 	eng.sc.meshes.push_back(&m);
 	eng.run();
 

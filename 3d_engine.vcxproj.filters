@@ -79,12 +79,6 @@
     <None Include="data\lightsource.vert">
       <Filter>data</Filter>
     </None>
-    <None Include="data\standart.frag">
-      <Filter>data</Filter>
-    </None>
-    <None Include="data\standart.vert">
-      <Filter>data</Filter>
-    </None>
     <None Include="data\standartlight.frag">
       <Filter>data</Filter>
     </None>

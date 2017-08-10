@@ -157,27 +157,35 @@ void engine::run()
 			glUseProgram(programs[m->spname()]->get_id());
 			
 			programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
-			programs[m->spname()]->setuniform("view", cam->getview());
+			programs[m->spname()]->setuniform("view",  cam->getview());
 			programs[m->spname()]->setuniform("projection", Projection);
 			programs[m->spname()]->setuniform("viewPos", cameraPos);
-
 
 			programs[m->spname()]->setuniform("dirLight.direction", sc.dirlight.direction);
 			programs[m->spname()]->setuniform("dirLight.ambient", sc.dirlight.ambient);
 			programs[m->spname()]->setuniform("dirLight.diffuse", sc.dirlight.diffuse);
 			programs[m->spname()]->setuniform("dirLight.specular", sc.dirlight.specular);
 
-			for (auto l : sc.plights)
+			if (m->spname() == "uv")
 			{
-				programs[m->spname()]->setuniform("pointLights[0].position", l.position);
-				programs[m->spname()]->setuniform("pointLights[0].ambient",  l.ambient);
-				programs[m->spname()]->setuniform("pointLights[0].diffuse", l.diffuse);
-				programs[m->spname()]->setuniform("pointLights[0].specular", l.specular);
-				programs[m->spname()]->setuniform("pointLights[0].constant", l.constant);
-				programs[m->spname()]->setuniform("pointLights[0].linear", l.linear);
-				programs[m->spname()]->setuniform("pointLights[0].quadratic", l.quadratic);
+				for (auto l : sc.plights)
+				{
+					programs[m->spname()]->setuniform("pointLights[0].position", l.position);
+					programs[m->spname()]->setuniform("pointLights[0].ambient", l.ambient);
+					programs[m->spname()]->setuniform("pointLights[0].diffuse", l.diffuse);
+					programs[m->spname()]->setuniform("pointLights[0].specular", l.specular);
+					programs[m->spname()]->setuniform("pointLights[0].constant", l.constant);
+					programs[m->spname()]->setuniform("pointLights[0].linear", l.linear);
+					programs[m->spname()]->setuniform("pointLights[0].quadratic", l.quadratic);
+				}
 			}
-
+			else
+			{
+				programs[m->spname()]->setuniform("light.position", sc.plights[0].position);
+				programs[m->spname()]->setuniform("light.ambient", { 0.1f, 0.1f, 0.1f });
+				programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
+				programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
+			}
 			programs[m->spname()]->setuniform("material.specular", 1);
 			programs[m->spname()]->setuniform("material.shininess",64.0f);
 			programs[m->spname()]->setuniform("material.diffuse", 0);
