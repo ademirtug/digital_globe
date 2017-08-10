@@ -4,18 +4,8 @@
 #include "stdafx.h"
 #include "camera.h"
 
-
-
 using namespace std;
 extern engine eng;
-//vector<glm::vec3> arr2vec3(float* data, int size);
-//void arr2ind(float* data, int size, vector<glm::vec3>& vertices, vector<int>& indices);
-//
-//template<typename Out> void split(const std::string &s, char delim, Out result);
-//std::vector<std::string> split(const std::string &s, char delim);
-//
-//void obj2mesh(std::string filename, vector<glm::vec3>& vertices, vector<glm::vec3>& normals);
-//bool loadOBJ(const char * path, std::vector<glm::vec3> & out_vertices, std::vector<glm::vec2> & out_uvs, std::vector<glm::vec3> & out_normals);
 
 
 
