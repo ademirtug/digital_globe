@@ -2,8 +2,20 @@
 #include "stdafx.h"
 #include "mesh.h"
 #include "camera.h"
+#include "light.h"
+
+class scene
+{
+public:
+	scene() {};
+	GLuint vao_mesh_id, vao_lights_id;
+	std::vector<imesh*> meshes;
 
 
+	directionallight dirlight;
+	std::vector<pointlight> plights;
+
+};
 
 class engine
 {
@@ -25,3 +37,5 @@ public:
 
 	void run();
 };
+
+

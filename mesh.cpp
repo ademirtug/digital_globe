@@ -70,25 +70,168 @@ imesh::~imesh()
 	//delete yazmayı unutma
 }
 
-mesh::mesh()
+colormesh::colormesh()
 {
-	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
-	tex = 0;
-	spec = 0;
+	vboid_vertices = vboid_normals = vboid_colors = 0;
 	//position = glm::vec3(0.0f);
 }
 
-mesh::mesh(const std::string& objfile, const std::string& texfile, const std::string& diffusefile)
+colormesh::colormesh(const std::string& objfile)
 {
-	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
-	tex = 0;
-	spec = 0;
+	vboid_vertices = vboid_normals = vboid_colors = 0;
+
 	loadobj(objfile);
 
-	if( texfile != "" )
+	init();
+
+}
+
+colormesh::colormesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::vec3> _colors)
+{
+	//buaradan
+	vboid_vertices = vboid_normals = vboid_colors = 0;
+	vertices = _vertices;
+	normals = _normals;
+
+	colors = _colors;
+	init();
+}
+colormesh::~colormesh()
+{
+}
+
+
+void colormesh::init()
+{
+	glBindVertexArray(eng.sc.vao_mesh_id);
+
+	glGenBuffers(1, &vboid_vertices);
+	glGenBuffers(1, &vboid_normals);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+	if (normals.size() > 0)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, vboid_normals);
+		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void colormesh::loadobj(const std::string& filename)
+{
+	fstream f;
+	f.open(filename, std::fstream::in | std::fstream::binary);
+	if (!f.is_open())
+		return;
+
+	vector<glm::vec3> v;
+	vector<glm::vec3> vn;
+
+
+	string line;
+	while (getline(f, line))
+	{
+		istringstream ss(line);
+		string cmd;
+		ss >> cmd;
+
+		if (cmd == "v")
+		{
+			float v1, v2, v3;
+
+			ss >> v1 >> v2 >> v3;
+			v.push_back({ v1, v2, v3 });
+		}
+		else if (cmd == "vn")
+		{
+			float v1, v2, v3;
+
+			ss >> v1 >> v2 >> v3;
+			vn.push_back({ v1, v2, v3 });
+		}
+		else if (cmd == "f")
+		{
+
+			while (!ss.eof())
+			{
+				string sect;
+				ss >> sect;
+
+				if (sect.find("/") != string::npos)
+				{
+					vector<string> rs = split(sect, '/');
+					int v1 = atoi(rs[0].c_str());
+
+					vertices.push_back(v[--v1]);
+
+					if (rs.size() > 2 && rs[2].size() > 0)
+					{
+						//push normal
+						v1 = atoi(rs[2].c_str());
+						normals.push_back(vn[--v1]);
+					}
+				}
+				else
+				{
+					while (!ss.eof())
+					{
+						int v1;
+						ss >> v1;
+						vertices.push_back(v[--v1]);
+					}
+				}
+			}
+
+		}
+		else
+		{
+		}
+	}
+
+}
+string colormesh::spname()
+{
+	return "standartlight";
+}
+void colormesh::draw()
+{
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	if (normals.size() > 0)
+	{
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, vboid_normals);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	}
+
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+}
+
+
+
+texturemesh::texturemesh()
+{
+	vboid_vertices = vboid_normals = vboid_uv = 0;
+	tex = 0;
+	spec = 0;
+}
+
+texturemesh::texturemesh(const std::string& objfile, const std::string& texfile, const std::string& diffusefile) : texturemesh()
+{
+	loadobj(objfile);
+
+	if (texfile != "")
 		tex = new texture(texfile);
-	
-	if( diffusefile != "")
+
+	if (diffusefile != "")
 		spec = new texture(diffusefile);
 
 	init();
@@ -97,24 +240,20 @@ mesh::mesh(const std::string& objfile, const std::string& texfile, const std::st
 
 
 
-mesh::mesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::vec2> _uv, vector<glm::vec3> _colors)
+texturemesh::texturemesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::vec2> _uv) : texturemesh()
 {
-	//buaradan
-	vboid_vertices = vboid_normals = vboid_colors = vboid_uv = 0;
-	tex = 0;
-	spec = 0;
 	vertices = _vertices;
 	normals = _normals;
 	uv = _uv;
-	colors = _colors;
+
 	init();
 }
-mesh::~mesh()
+texturemesh::~texturemesh()
 {
 }
 
 
-void mesh::init()
+void texturemesh::init()
 {
 	glBindVertexArray(eng.sc.vao_mesh_id);
 
@@ -141,7 +280,7 @@ void mesh::init()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
-void mesh::loadobj(const std::string& filename)
+void texturemesh::loadobj(const std::string& filename)
 {
 	fstream f;
 	f.open(filename, std::fstream::in | std::fstream::binary);
@@ -227,13 +366,11 @@ void mesh::loadobj(const std::string& filename)
 	}
 
 }
-string mesh::spname()
+string texturemesh::spname()
 {
-	if (uv.size() > 0 && tex != 0)
-		return "uv";
-	return "standartlight";
+	return "uv";
 }
-void mesh::draw()
+void texturemesh::draw()
 {
 	if (tex != NULL && tex->vboid_texture != NULL)
 	{
@@ -262,134 +399,13 @@ void mesh::draw()
 		glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, vboid_uv);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		
+
 	}
 
-	glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
-}
-
-pointlight::pointlight()
-{
-	vboid_vertices = 0;
-	position = { 2.0f, 2.0f, -2.0f };
-	ambient = { 0.05f, 0.05f, 0.05f };
-	diffuse = { 0.8f, 0.8f, 0.8f };
-	specular = { 1.0f, 1.0f, 1.0f  };
-
-	constant = 1.0f;
-	linear = 0.09f;
-	quadratic = 0.032f;
-}
-
-pointlight::pointlight(const std::string& filename) :pointlight()
-{
-	vboid_vertices = 0;
-	loadobj(filename);
-	init();
-}
-
-pointlight::pointlight(vector<glm::vec3> _vertices)
-{
-	vboid_vertices = 0;
-	vertices = _vertices;
-
-	glBindVertexArray(eng.sc.vao_lights_id);
-	glGenBuffers(1, &vboid_vertices);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-void pointlight::loadobj(const string& filename)
-{
-	fstream f;
-	f.open(filename, std::fstream::in | std::fstream::binary);
-	if (!f.is_open())
-		return;
-
-	vector<glm::vec3> v;
-
-
-	string line;
-	while (getline(f, line))
-	{
-		istringstream ss(line);
-		string cmd;
-		ss >> cmd;
-
-		if (cmd == "v")
-		{
-			float v1, v2, v3;
-
-			ss >> v1 >> v2 >> v3;
-			v.push_back({ v1, v2, v3 });
-		}
-		else if (cmd == "f")
-		{
-
-			while (!ss.eof())
-			{
-				string sect;
-				ss >> sect;
-
-				if (sect.find("/") != string::npos)
-				{
-					vector<string> rs = split(sect, '/');
-					int v1 = atoi(rs[0].c_str());
-
-					vertices.push_back(v[--v1]);
-				}
-				else
-				{
-					while (!ss.eof())
-					{
-						int v1;
-						ss >> v1;
-						vertices.push_back(v[--v1]);
-					}
-				}
-			}
-
-		}
-		else
-		{
-		}
-	}
-}
-
-void pointlight::init()
-{
-	glBindVertexArray(eng.sc.vao_lights_id);
-	glGenBuffers(1, &vboid_vertices);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-void pointlight::draw()
-{
-	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 }
 
 
-
-directionallight::directionallight()
-{
-	direction = { -0.2f, -1.0f, -0.3f };
-	ambient = { 0.05f, 0.05f, 0.05f };
-	diffuse = { 0.4f, 0.4f, 0.4f };
-	specular = { 0.5f, 0.5f, 0.5f };
-}
 
 //lightsource::lightsource()
 //{

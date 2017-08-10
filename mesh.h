@@ -1,5 +1,5 @@
-#ifndef __BUFFERS_H__
-#define __BUFFERS_H__
+#ifndef __MESH_H__
+#define __MESH_H__
 
 #include "stdafx.h"
 #include <sstream>
@@ -32,16 +32,39 @@ public:
 };
 
 
-class mesh : public imesh
+class colormesh : public imesh
 {
 protected:
 	virtual void init();
 public:
-	mesh();
-	mesh(const std::string& objfile, const std::string& texfile = "", const std::string& diffusefile = "");
+	colormesh();
+	colormesh(const std::string& objfile);
+	colormesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals = {}, vector<glm::vec3> _colors = {});
+	virtual ~colormesh();
 
-	mesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals = {}, vector<glm::vec2> _uv = {}, vector<glm::vec3> _colors = {});
-	virtual ~mesh();
+	virtual void draw();
+	virtual std::string spname();
+	void loadobj(const std::string& filename);
+
+
+	vector<glm::vec3> normals;
+	vector<glm::vec3> colors;
+
+	GLuint vboid_normals, vboid_colors;
+};
+
+
+
+class texturemesh :public imesh
+{
+protected:
+	virtual void init();
+public:
+	texturemesh();
+	texturemesh(const std::string& objfile, const std::string& texfile = "", const std::string& diffusefile = "");
+
+	texturemesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals = {}, vector<glm::vec2> _uv = {});
+	virtual ~texturemesh();
 
 	virtual void draw();
 	virtual std::string spname();
@@ -55,58 +78,13 @@ public:
 	texture* tex;
 	texture* spec;
 
-	GLuint vboid_normals, vboid_colors, vboid_uv;
-};
-
-void obj2mesh(std::string filename, mesh* m);
-
-class ilight
-{
-public:
-	virtual void shine() {};
-	glm::vec3 ambient, diffuse, specular;
-};
-
-class pointlight : public ilight, public imesh
-{
-protected:
-	virtual void init();
-public:
-
-	pointlight();
-	pointlight(const std::string& filename);
-	pointlight(vector<glm::vec3> _vertices);
-	
-	void draw();
-	virtual std::string spname() { return "standartlight"; };
-	void loadobj(const std::string& filename);
-	GLfloat constant, linear, quadratic;
+	GLuint vboid_normals, vboid_uv;
 };
 
 
-class directionallight : public ilight
-{
-protected:
-	virtual void init() {};
-public:
-	directionallight();
-	glm::vec3 direction;
 
-};
+void obj2mesh(std::string filename, imesh* m);
 
 
-class scene
-{
-public:
-	scene() {};
-	GLuint vao_mesh_id, vao_lights_id;
-	std::vector<imesh*> meshes;
-		
-	
-	directionallight dirlight;
-	std::vector<pointlight> plights;
 
-};
-
-
-#endif//__BUFFERS_H__
+#endif//__MESH_H__

@@ -64,8 +64,8 @@ void arcball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double
 
 		for (;true;)
 		{
-			if (ry >= 2 * PI * 100)
-				ry -= 2 * PI * 100;
+			if (ry >= 2 * glm::pi<float>() * 100)
+				ry -= 2 * glm::pi<float>() * 100;
 			else break;
 		}
 

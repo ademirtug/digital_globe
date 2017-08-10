@@ -129,11 +129,6 @@ void engine::run()
 		glm::vec3 cameraPos(viewModel[3]);
 
 
-
-
-
-
-
 		glBindVertexArray(sc.vao_lights_id);
 		for (auto l : sc.plights)
 		{
@@ -153,8 +148,6 @@ void engine::run()
 			glUseProgram(0);
 		}
 		glBindVertexArray(0);
-
-
 
 
 		/////draw scene meshes
@@ -190,7 +183,6 @@ void engine::run()
 			programs[m->spname()]->setuniform("material.diffuse", 0);
 			programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
 
-			
 
 			m->draw();
 

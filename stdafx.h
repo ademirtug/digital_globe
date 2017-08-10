@@ -30,10 +30,7 @@
 
 
 #include "shader.h"
-#include "program.h"
-#include "uniform.h"
 #include "texture.h"
-#include "vec.h"
 #include "mesh.h"
 #include "engine.h"
 
