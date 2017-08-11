@@ -156,7 +156,7 @@ void engine::run()
 		{
 			glUseProgram(programs[m->spname()]->get_id());
 			
-			programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
+			programs[m->spname()]->setuniform("model", glm::scale(glm::translate(glm::mat4(1.0f), m->position),  glm::vec3(3)) );
 			programs[m->spname()]->setuniform("view",  cam->getview());
 			programs[m->spname()]->setuniform("projection", Projection);
 			programs[m->spname()]->setuniform("viewPos", cameraPos);

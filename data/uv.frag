@@ -58,6 +58,7 @@ void main()
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
     
+	//color = pow(color, vec3(1.0/2.2));
     FragColor = vec4(result, 1.0);
 }
 
@@ -85,11 +86,10 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float diff = max(dot(normal, lightDir), 0.0);
     
 	// specular shading
-    
-	
     vec3 halfwayDir = normalize(lightDir + viewDir);  
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
-
+	//vec3 reflectDir = reflect(-lightDir, normal);
+    //float spec = pow(max(dot(viewDir, reflectDir), 0.0), 8.0);
 		
 	// attenuation
     float distance = length(light.position - fragPos);
