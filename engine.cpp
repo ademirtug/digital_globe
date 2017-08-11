@@ -133,13 +133,8 @@ void engine::run()
 		for (auto l : sc.plights)
 		{
 			//draw light sources
-			glm::mat4 LModel = glm::mat4();
-			LModel = glm::translate(LModel, l.position);
-			LModel = glm::scale(LModel, glm::vec3(0.2f));
-
-
 			glUseProgram(programs["lightsource"]->get_id());
-			programs["lightsource"]->setuniform("model", LModel);
+			programs["lightsource"]->setuniform("model", glm::scale( glm::translate(glm::mat4(), l.position), glm::vec3(0.2f)));
 			programs["lightsource"]->setuniform("view", cam->getview());
 			programs["lightsource"]->setuniform("projection", Projection);
 
@@ -155,8 +150,9 @@ void engine::run()
 		for (auto m : sc.meshes)
 		{
 			glUseProgram(programs[m->spname()]->get_id());
-			
-			programs[m->spname()]->setuniform("model", glm::scale(glm::translate(glm::mat4(1.0f), m->position),  glm::vec3(3)) );
+
+
+			programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
 			programs[m->spname()]->setuniform("view",  cam->getview());
 			programs[m->spname()]->setuniform("projection", Projection);
 			programs[m->spname()]->setuniform("viewPos", cameraPos);
@@ -168,15 +164,15 @@ void engine::run()
 
 			if (m->spname() == "uv")
 			{
-				for (auto l : sc.plights)
+				for (int i = 0; i < sc.plights.size(); ++i)
 				{
-					programs[m->spname()]->setuniform("pointLights["+"0"+ "].position", l.position);
-					programs[m->spname()]->setuniform("pointLights[0].ambient", l.ambient);
-					programs[m->spname()]->setuniform("pointLights[0].diffuse", l.diffuse);
-					programs[m->spname()]->setuniform("pointLights[0].specular", l.specular);
-					programs[m->spname()]->setuniform("pointLights[0].constant", l.constant);
-					programs[m->spname()]->setuniform("pointLights[0].linear", l.linear);
-					programs[m->spname()]->setuniform("pointLights[0].quadratic", l.quadratic);
+					programs[m->spname()]->setuniform("pointLights["+ std::to_string(i) + "].position", sc.plights[i].position);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].ambient", sc.plights[i].ambient);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].diffuse", sc.plights[i].diffuse);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].specular", sc.plights[i].specular);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].constant", sc.plights[i].constant);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].linear", sc.plights[i].linear);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].quadratic", sc.plights[i].quadratic);
 				}
 			}
 			else
@@ -186,6 +182,7 @@ void engine::run()
 				programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
 				programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
 			}
+
 			programs[m->spname()]->setuniform("material.specular", 1);
 			programs[m->spname()]->setuniform("material.shininess",64.0f);
 			programs[m->spname()]->setuniform("material.diffuse", 0);
