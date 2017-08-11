@@ -170,7 +170,7 @@ void engine::run()
 			{
 				for (auto l : sc.plights)
 				{
-					programs[m->spname()]->setuniform("pointLights[0].position", l.position);
+					programs[m->spname()]->setuniform("pointLights["+"0"+ "].position", l.position);
 					programs[m->spname()]->setuniform("pointLights[0].ambient", l.ambient);
 					programs[m->spname()]->setuniform("pointLights[0].diffuse", l.diffuse);
 					programs[m->spname()]->setuniform("pointLights[0].specular", l.specular);
