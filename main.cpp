@@ -55,7 +55,7 @@ int main()
 
 
 	pointlight pl2("tcube.txt");
-	pl2.position = { -4.0, -2.0, 2.0 };
+	pl2.position = { 0.0, 2.0, -4.0 };
 	eng.sc.plights.push_back(pl2);
 
 	//colormesh cm("textcube.txt");
@@ -63,22 +63,15 @@ int main()
 	
 	
 	
-	texturemesh tm("textcube.txt");
-	tm.tex = new texture("c2.bmp");
-	tm.spec = new texture("c2_spec.bmp");
-	eng.sc.meshes.push_back(&tm);
+	//texturemesh tm("textcube.txt");
+	//tm.tex = new texture("c2.bmp");
+	//tm.spec = new texture("c2_spec.bmp");
+	//eng.sc.meshes.push_back(&tm);
 
 
-
-
-	//vector<glm::vec3> vfloor = arr2vec3(planeVertices, sizeof(planeVertices));
-	//vector<glm::vec3> vnormals = arr2vec3(planeNormals, sizeof(planeNormals));
-
-	//texturemesh floor(vfloor, vnormals, planeCoords);
-	//floor.tex = new texture("wood.bmp");
-
-
-	//eng.sc.meshes.push_back(&floor);
+	texturemesh floor("floor.txt");
+	floor.tex = new texture("wood.bmp");
+	eng.sc.meshes.push_back(&floor);
 
 
 	//colormesh cf("tcube.txt");

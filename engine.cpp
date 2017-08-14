@@ -58,6 +58,9 @@ bool engine::init(int width, int height)
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 	glGenVertexArrays(1, &sc.vao_mesh_id);
 	glGenVertexArrays(1, &sc.vao_lights_id);
@@ -164,7 +167,7 @@ void engine::run()
 
 			if (m->spname() == "uv")
 			{
-				for (int i = 0; i < sc.plights.size(); ++i)
+				for (unsigned int i = 0; i < sc.plights.size(); ++i)
 				{
 					programs[m->spname()]->setuniform("pointLights["+ std::to_string(i) + "].position", sc.plights[i].position);
 					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].ambient", sc.plights[i].ambient);
@@ -183,9 +186,9 @@ void engine::run()
 				programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
 			}
 
-			programs[m->spname()]->setuniform("material.specular", 1);
-			programs[m->spname()]->setuniform("material.shininess",64.0f);
-			programs[m->spname()]->setuniform("material.diffuse", 0);
+			programs[m->spname()]->setuniform("material.specular", 1.0f);
+			programs[m->spname()]->setuniform("material.shininess",32.0f);
+			programs[m->spname()]->setuniform("material.diffuse", 0.5f);
 			programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
 
 
