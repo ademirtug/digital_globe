@@ -156,7 +156,6 @@ void colormesh::loadobj(const std::string& filename)
 		}
 		else if (cmd == "f")
 		{
-
 			while (!ss.eof())
 			{
 				string sect;
