@@ -173,6 +173,8 @@
   <ItemGroup>
     <None Include="data\lightsource.frag" />
     <None Include="data\lightsource.vert" />
+    <None Include="data\lightspace.frag" />
+    <None Include="data\lightspace.vert" />
     <None Include="data\shadow.frag" />
     <None Include="data\shadow.vert" />
     <None Include="data\standartlight.frag" />

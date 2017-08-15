@@ -30,7 +30,7 @@ public:
 	void load_shaders(std::string name);
 
 	camera* cam;
-	scene sc;
+	scene* sc;
 
 	std::map<std::string, program*> programs;
 

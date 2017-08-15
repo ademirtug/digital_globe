@@ -97,5 +97,11 @@
     <None Include="data\shadow.vert">
       <Filter>data</Filter>
     </None>
+    <None Include="data\lightspace.frag">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\lightspace.vert">
+      <Filter>data</Filter>
+    </None>
   </ItemGroup>
 </Project>

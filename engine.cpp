@@ -62,8 +62,9 @@ bool engine::init(int width, int height)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-	glGenVertexArrays(1, &sc.vao_mesh_id);
-	glGenVertexArrays(1, &sc.vao_lights_id);
+	sc = new scene();
+	glGenVertexArrays(1, &sc->vao_mesh_id);
+	glGenVertexArrays(1, &sc->vao_lights_id);
 
 	return true;
 }
@@ -132,8 +133,8 @@ void engine::run()
 		glm::vec3 cameraPos(viewModel[3]);
 
 
-		glBindVertexArray(sc.vao_lights_id);
-		for (auto l : sc.plights)
+		glBindVertexArray(sc->vao_lights_id);
+		for (auto l : sc->plights)
 		{
 			//draw light sources
 			glUseProgram(programs["lightsource"]->get_id());
@@ -149,8 +150,8 @@ void engine::run()
 
 
 		/////draw scene meshes
-		glBindVertexArray(sc.vao_mesh_id);
-		for (auto m : sc.meshes)
+		glBindVertexArray(sc->vao_mesh_id);
+		for (auto m : sc->meshes)
 		{
 			glUseProgram(programs[m->spname()]->get_id());
 
@@ -160,27 +161,27 @@ void engine::run()
 			programs[m->spname()]->setuniform("projection", Projection);
 			programs[m->spname()]->setuniform("viewPos", cameraPos);
 
-			programs[m->spname()]->setuniform("dirLight.direction", sc.dirlight.direction);
-			programs[m->spname()]->setuniform("dirLight.ambient", sc.dirlight.ambient);
-			programs[m->spname()]->setuniform("dirLight.diffuse", sc.dirlight.diffuse);
-			programs[m->spname()]->setuniform("dirLight.specular", sc.dirlight.specular);
+			programs[m->spname()]->setuniform("dirLight.direction", sc->dirlight.direction);
+			programs[m->spname()]->setuniform("dirLight.ambient", sc->dirlight.ambient);
+			programs[m->spname()]->setuniform("dirLight.diffuse", sc->dirlight.diffuse);
+			programs[m->spname()]->setuniform("dirLight.specular", sc->dirlight.specular);
 
 			if (m->spname() == "uv")
 			{
-				for (unsigned int i = 0; i < sc.plights.size(); ++i)
+				for (unsigned int i = 0; i < sc->plights.size(); ++i)
 				{
-					programs[m->spname()]->setuniform("pointLights["+ std::to_string(i) + "].position", sc.plights[i].position);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].ambient", sc.plights[i].ambient);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].diffuse", sc.plights[i].diffuse);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].specular", sc.plights[i].specular);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].constant", sc.plights[i].constant);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].linear", sc.plights[i].linear);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].quadratic", sc.plights[i].quadratic);
+					programs[m->spname()]->setuniform("pointLights["+ std::to_string(i) + "].position", sc->plights[i].position);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].ambient", sc->plights[i].ambient);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].diffuse", sc->plights[i].diffuse);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].specular", sc->plights[i].specular);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].constant", sc->plights[i].constant);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].linear", sc->plights[i].linear);
+					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].quadratic", sc->plights[i].quadratic);
 				}
 			}
 			else
 			{
-				programs[m->spname()]->setuniform("light.position", sc.plights[0].position);
+				programs[m->spname()]->setuniform("light.position", sc->plights[0].position);
 				programs[m->spname()]->setuniform("light.ambient", { 0.1f, 0.1f, 0.1f });
 				programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
 				programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
@@ -225,7 +226,6 @@ scene::scene()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
 
 
 	glGenFramebuffers(1, &fbo_depth_map);

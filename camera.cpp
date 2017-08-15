@@ -35,7 +35,7 @@ glm::mat4 arcball_camera::getview()
 	//if (counter % 1000 == 0)
 	//	cout << "pitch:" << ry/100 << endl << "yaw: " << rx/100<<endl;
 
-	return glm::translate(glm::mat4(), glm::vec3(0, 0, -cdist)) * glm::eulerAngleXY(-(float)ry/100, (float)rx/100);
+	return glm::translate(glm::mat4(), glm::vec3(0, -2, -cdist)) * glm::eulerAngleXY(-(float)ry/100, (float)rx/100);
 }
 
 

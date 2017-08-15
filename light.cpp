@@ -29,7 +29,7 @@ pointlight::pointlight(vector<glm::vec3> _vertices)
 	vboid_vertices = 0;
 	vertices = _vertices;
 
-	glBindVertexArray(eng.sc.vao_lights_id);
+	glBindVertexArray(eng.sc->vao_lights_id);
 	glGenBuffers(1, &vboid_vertices);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
@@ -98,7 +98,7 @@ void pointlight::loadobj(const string& filename)
 
 void pointlight::init()
 {
-	glBindVertexArray(eng.sc.vao_lights_id);
+	glBindVertexArray(eng.sc->vao_lights_id);
 	glGenBuffers(1, &vboid_vertices);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);

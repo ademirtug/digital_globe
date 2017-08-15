@@ -47,36 +47,38 @@ int main()
 	eng.load_shaders("standartlight");
 	eng.load_shaders("lightsource");
 	eng.load_shaders("uv");
+	eng.load_shaders("lightspace");
 	
 
 	pointlight pl("tcube.txt");
 	pl.position = { 2.0, 2.0, 2.0 };
-	eng.sc.plights.push_back(pl);
+	eng.sc->plights.push_back(pl);
 
 
-	pointlight pl2("tcube.txt");
-	pl2.position = { 0.0, 2.0, -4.0 };
-	eng.sc.plights.push_back(pl2);
+	//pointlight pl2("tcube.txt");
+	//pl2.position = { 0.0, 2.0, -4.0 };
+	//eng.sc->plights.push_back(pl2);
 
-	//colormesh cm("textcube.txt");
-	//eng.sc.meshes.push_back(&cm);
+	colormesh cm("textcube.txt");
+	cm.position = { 0.0, 1.0, -2.0 };
+	eng.sc->meshes.push_back(&cm);
 	
 	
 	
 	//texturemesh tm("textcube.txt");
 	//tm.tex = new texture("c2.bmp");
 	//tm.spec = new texture("c2_spec.bmp");
-	//eng.sc.meshes.push_back(&tm);
+	//eng.sc->meshes.push_back(&tm);
 
 
 	texturemesh floor("floor.txt");
 	floor.tex = new texture("wood.bmp");
-	eng.sc.meshes.push_back(&floor);
+	eng.sc->meshes.push_back(&floor);
 
 
 	//colormesh cf("tcube.txt");
 	//cf.position = { 2.0, 7.0, 2.0 };
-	//eng.sc.meshes.push_back(&cf);
+	//eng.sc->meshes.push_back(&cf);
 
 	eng.run();
 
