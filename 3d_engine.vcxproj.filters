@@ -91,5 +91,11 @@
     <None Include="data\uv.vert">
       <Filter>data</Filter>
     </None>
+    <None Include="data\shadow.frag">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\shadow.vert">
+      <Filter>data</Filter>
+    </None>
   </ItemGroup>
 </Project>

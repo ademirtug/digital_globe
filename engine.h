@@ -7,14 +7,13 @@
 class scene
 {
 public:
-	scene() {};
-	GLuint vao_mesh_id, vao_lights_id;
+	scene();
+	GLuint vao_mesh_id, vao_lights_id, fbo_depth_map,vbo_depth_map;
 	std::vector<imesh*> meshes;
-
+	unsigned int shadow_w, shadow_h;
 
 	directionallight dirlight;
 	std::vector<pointlight> plights;
-
 };
 
 class engine
