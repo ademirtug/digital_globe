@@ -19,6 +19,7 @@
 *.lo
 *.o
 *.obj
+*.suo
 
 # Precompiled Headers
 *.gch
