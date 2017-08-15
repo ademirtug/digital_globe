@@ -123,10 +123,14 @@ void engine::run()
 {
 	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 	
+	glUseProgram(programs["shadow"]->get_id());
+	programs["shadow"]->setuniform("depthMap", 0);
+
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0)
 	{
 		GLenum err = 0;
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 viewModel = inverse(cam->getview());

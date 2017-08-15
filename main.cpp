@@ -48,6 +48,7 @@ int main()
 	eng.load_shaders("lightsource");
 	eng.load_shaders("uv");
 	eng.load_shaders("lightspace");
+	eng.load_shaders("shadow");
 	
 
 	pointlight pl("tcube.txt");
