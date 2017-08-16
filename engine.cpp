@@ -118,14 +118,11 @@ void engine::run()
 	glGenTextures(1, &sc->vbo_depth_map);
 
 	glBindTexture(GL_TEXTURE_2D, sc->vbo_depth_map);
-
-
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, sc->shadow_w, sc->shadow_h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
 
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, sc->fbo_depth_map);
@@ -140,9 +137,8 @@ void engine::run()
 	programs["shadowmapping"]->setuniform("shadowMap", 1);
 	
 
-
-	glUseProgram(programs["debugdepth"]->get_id());
-	programs["debugdepth"]->setuniform("depthMap", 0);
+	//glUseProgram(programs["debugdepth"]->get_id());
+	//programs["debugdepth"]->setuniform("depthMap", 0);
 
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0)
