@@ -91,16 +91,22 @@
     <None Include="data\uv.vert">
       <Filter>data</Filter>
     </None>
-    <None Include="data\shadow.frag">
+    <None Include="data\shadowmapping.frag">
       <Filter>data</Filter>
     </None>
-    <None Include="data\shadow.vert">
+    <None Include="data\shadowmapping.vert">
       <Filter>data</Filter>
     </None>
-    <None Include="data\lightspace.frag">
+    <None Include="data\depth.frag">
       <Filter>data</Filter>
     </None>
-    <None Include="data\lightspace.vert">
+    <None Include="data\depth.vert">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\debugdepth.vert">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\debugdepth.frag">
       <Filter>data</Filter>
     </None>
   </ItemGroup>
