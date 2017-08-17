@@ -14,15 +14,15 @@ int main()
 	eng.init(1024, 768);
 
 
-	eng.load_shaders("standartlight");
 	eng.load_shaders("lightsource");
 	eng.load_shaders("uv");
-	eng.load_shaders("depth");
-	eng.load_shaders("shadowmapping");
+	eng.load_shaders("pointshadow");
+	eng.load_shaders("pointshadowdepth");
+	eng.load_shaders("standartlight");
 	
 
 	pointlight pl("tcube.txt");
-	pl.position = { 2.0, 2.0, 2.0 };
+	pl.position = { 2.0f, 2.0f, 2.0f };
 	eng.sc->plights.push_back(pl);
 
 

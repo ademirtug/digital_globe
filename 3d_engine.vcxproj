@@ -171,12 +171,13 @@
     <ClCompile Include="vec.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\depth.frag" />
-    <None Include="data\depth.vert" />
     <None Include="data\lightsource.frag" />
     <None Include="data\lightsource.vert" />
-    <None Include="data\shadowmapping.frag" />
-    <None Include="data\shadowmapping.vert" />
+    <None Include="data\pointshadow.frag" />
+    <None Include="data\pointshadow.vert" />
+    <None Include="data\pointshadowdepth.frag" />
+    <None Include="data\pointshadowdepth.geo" />
+    <None Include="data\pointshadowdepth.vert" />
     <None Include="data\standartlight.frag" />
     <None Include="data\standartlight.vert" />
     <None Include="data\uv.frag" />
