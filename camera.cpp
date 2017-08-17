@@ -15,7 +15,7 @@ double lastx, lasty;
 double rx = 0;
 double ry = 0;
 double mydiff = 0;
-
+extern engine eng;
 
 arcball_camera::arcball_camera()
 {
@@ -35,6 +35,7 @@ glm::mat4 arcball_camera::getview()
 	//if (counter % 1000 == 0)
 	//	cout << "pitch:" << ry/100 << endl << "yaw: " << rx/100<<endl;
 
+	//return glm::lookAt(eng.sc->plights[0].position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 	return glm::translate(glm::mat4(), glm::vec3(0, -2, -cdist)) * glm::eulerAngleXY(-(float)ry/100, (float)rx/100);
 }
 

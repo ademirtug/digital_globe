@@ -135,10 +135,6 @@ void engine::run()
 	glUseProgram(programs["shadowmapping"]->get_id());	
 	programs["shadowmapping"]->setuniform("diffuseTexture", 0);
 	programs["shadowmapping"]->setuniform("shadowMap", 1);
-	
-
-	//glUseProgram(programs["debugdepth"]->get_id());
-	//programs["debugdepth"]->setuniform("depthMap", 0);
 
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0)
@@ -149,8 +145,6 @@ void engine::run()
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
 
 
 		//// 1. render depth of scene to texture (from light's perspective)
@@ -186,9 +180,6 @@ void engine::run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-
-
-
 		// 2. render scene as normal using the generated depth/shadow map  
 		// --------------------------------------------------------------
 
@@ -222,81 +213,13 @@ void engine::run()
 			programs["shadowmapping"]->setuniform("lightSpaceMatrix", lightSpaceMatrix);
 
 			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D,sc->fbo_depth_map);
+			glBindTexture(GL_TEXTURE_2D,sc->vbo_depth_map);
 			
 			m->draw();
 
 			glUseProgram(0);
 		}
 		glBindVertexArray(0);
-
-
-		////////BURASI ORJİNAL KISIM
-		//glBindVertexArray(sc->vao_lights_id);
-		//for (auto l : sc->plights)
-		//{
-		//	//draw light sources
-		//	glUseProgram(programs["lightsource"]->get_id());
-		//	programs["lightsource"]->setuniform("model", glm::scale( glm::translate(glm::mat4(), l.position), glm::vec3(0.2f)));
-		//	programs["lightsource"]->setuniform("view", cam->getview());
-		//	programs["lightsource"]->setuniform("projection", Projection);
-
-		//	l.draw();
-
-		//	glUseProgram(0);
-		//}
-		//glBindVertexArray(0);
-
-		///////draw scene meshes
-		//glBindVertexArray(sc->vao_mesh_id);
-		//for (auto m : sc->meshes)
-		//{
-		//	glUseProgram(programs[m->spname()]->get_id());
-
-
-		//	programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
-		//	programs[m->spname()]->setuniform("view",  cam->getview());
-		//	programs[m->spname()]->setuniform("projection", Projection);
-		//	programs[m->spname()]->setuniform("viewPos", cameraPos);
-
-		//	programs[m->spname()]->setuniform("dirLight.direction", sc->dirlight.direction);
-		//	programs[m->spname()]->setuniform("dirLight.ambient", sc->dirlight.ambient);
-		//	programs[m->spname()]->setuniform("dirLight.diffuse", sc->dirlight.diffuse);
-		//	programs[m->spname()]->setuniform("dirLight.specular", sc->dirlight.specular);
-
-		//	if (m->spname() == "uv")
-		//	{
-		//		for (unsigned int i = 0; i < sc->plights.size(); ++i)
-		//		{
-		//			programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].position", sc->plights[i].position);
-		//			programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].ambient", sc->plights[i].ambient);
-		//			programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].diffuse", sc->plights[i].diffuse);
-		//			programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].specular", sc->plights[i].specular);
-		//			programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].constant", sc->plights[i].constant);
-		//			programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].linear", sc->plights[i].linear);
-		//			programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].quadratic", sc->plights[i].quadratic);
-		//		}
-		//	}
-		//	else
-		//	{
-		//		programs[m->spname()]->setuniform("light.position", sc->plights[0].position);
-		//		programs[m->spname()]->setuniform("light.ambient", { 0.1f, 0.1f, 0.1f });
-		//		programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
-		//		programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
-		//	}
-
-		//	programs[m->spname()]->setuniform("material.specular", 1.0f);
-		//	programs[m->spname()]->setuniform("material.shininess",32.0f);
-		//	programs[m->spname()]->setuniform("material.diffuse", 0.5f);
-		//	programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
-
-
-		//	m->draw();
-
-		//	glUseProgram(0);
-		//}
-		//glBindVertexArray(0);
-
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
