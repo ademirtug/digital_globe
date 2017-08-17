@@ -378,7 +378,7 @@ void texturemesh::draw()
 	}
 	if (spec && spec->vboid_texture != 0)
 	{
-		glActiveTexture(GL_TEXTURE1);
+		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, spec->vboid_texture);
 	}
 

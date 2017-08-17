@@ -7,36 +7,6 @@
 using namespace std;
 extern engine eng;
 
-float planeVertices[] = {
-	10.0f, -0.5f,  10.0f,   
-	-10.0f, -0.5f,  10.0f,   
-	-10.0f, -0.5f, -10.0f,    
-
-	10.0f, -0.5f,  10.0f,    
-	-10.0f, -0.5f, -10.0f,     
-	10.0f, -0.5f, -10.0f  
-};
-
-
-float planeNormals[] = { 
-	0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f, 
-0.0f, 1.0f, 0.0f, 
-0.0f, 1.0f, 0.0f };
-
-
-
-vector<glm::vec2> planeCoords = { 
-	{10.0f,  0.0f},
-	{0.0f,  0.0f},
-	{0.0f, 10.0f},
-	{10.0f,  0.0f},
-	{0.0f, 10.0f},
-	{10.0f, 10.0f} };
-
-
 int main()
 {
 	arcball_camera* cam = new arcball_camera();
@@ -53,7 +23,7 @@ int main()
 	
 
 	pointlight pl("tcube.txt");
-	pl.position = { 2.0, 3.0, 2.0 };
+	pl.position = { 2.0, 4.0, 2.0 };
 	eng.sc->plights.push_back(pl);
 
 
