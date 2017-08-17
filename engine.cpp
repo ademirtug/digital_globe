@@ -123,6 +123,8 @@ void engine::run()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, sc->fbo_depth_map);
@@ -166,13 +168,13 @@ void engine::run()
 
 
 		glBindVertexArray(sc->vao_mesh_id);
-		glCullFace(GL_FRONT);
+		//glCullFace(GL_FRONT);
 		for (auto m : sc->meshes)
 		{
 			programs["depth"]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
 			m->draw();
 		}
-		glCullFace(GL_BACK); 
+		//glCullFace(GL_BACK); 
 		glBindVertexArray(0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, 1024, 768);
@@ -233,6 +235,6 @@ void engine::run()
 scene::scene()
 {
 	//bunu texture sınıfından türeme shadow map yap
-	shadow_w = 10240;
-	shadow_h = 10240;
+	shadow_w = 1024;
+	shadow_h = 1024;
 }

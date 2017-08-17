@@ -49,6 +49,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
         
     return shadow;
 }
+
 void main()
 {           
     vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;

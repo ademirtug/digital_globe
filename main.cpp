@@ -22,7 +22,7 @@ int main()
 	
 
 	pointlight pl("tcube.txt");
-	pl.position = { 3.0, 2.0, 2.0 };
+	pl.position = { 2.0, 2.0, 2.0 };
 	eng.sc->plights.push_back(pl);
 
 
