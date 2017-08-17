@@ -103,11 +103,5 @@
     <None Include="data\depth.vert">
       <Filter>data</Filter>
     </None>
-    <None Include="data\debugdepth.vert">
-      <Filter>data</Filter>
-    </None>
-    <None Include="data\debugdepth.frag">
-      <Filter>data</Filter>
-    </None>
   </ItemGroup>
 </Project>

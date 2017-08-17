@@ -171,8 +171,6 @@
     <ClCompile Include="vec.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\debugdepth.frag" />
-    <None Include="data\debugdepth.vert" />
     <None Include="data\depth.frag" />
     <None Include="data\depth.vert" />
     <None Include="data\lightsource.frag" />

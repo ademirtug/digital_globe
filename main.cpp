@@ -17,13 +17,12 @@ int main()
 	eng.load_shaders("standartlight");
 	eng.load_shaders("lightsource");
 	eng.load_shaders("uv");
-	eng.load_shaders("debugdepth");
 	eng.load_shaders("depth");
 	eng.load_shaders("shadowmapping");
 	
 
 	pointlight pl("tcube.txt");
-	pl.position = { 2.0, 4.0, 2.0 };
+	pl.position = { 3.0, 2.0, 2.0 };
 	eng.sc->plights.push_back(pl);
 
 

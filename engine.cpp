@@ -165,17 +165,16 @@ void engine::run()
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 
-		/////draw scene meshes
 		glBindVertexArray(sc->vao_mesh_id);
+		glCullFace(GL_FRONT);
 		for (auto m : sc->meshes)
 		{
 			programs["depth"]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
 			m->draw();
 		}
+		glCullFace(GL_BACK); 
 		glBindVertexArray(0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		// reset viewport
 		glViewport(0, 0, 1024, 768);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -234,6 +233,6 @@ void engine::run()
 scene::scene()
 {
 	//bunu texture sınıfından türeme shadow map yap
-	shadow_w = 1024;
-	shadow_h = 1024;
+	shadow_w = 10240;
+	shadow_h = 10240;
 }
