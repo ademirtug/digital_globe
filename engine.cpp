@@ -151,7 +151,8 @@ void engine::run()
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	// attach depth texture as FBO's depth buffer
+
+
 	glBindFramebuffer(GL_FRAMEBUFFER, sc->fbo_depth_map);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, sc->vbo_depthcube_map, 0);
 	glDrawBuffer(GL_NONE);
@@ -163,23 +164,17 @@ void engine::run()
 	programs["pointshadow"]->setuniform("diffuseTexture", 0);
 	programs["pointshadow"]->setuniform("depthMap", 1);
 
-	
-
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0)
 	{
 		GLenum err = 0;
 		glm::mat4 viewModel = inverse(cam->getview());
 		glm::vec3 cameraPos(viewModel[3]);
-		//sc->plights[0].position.z = sin(glfwGetTime() * 0.5) * 3.0;
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-
-		// 0. create depth cubemap transformation matrices
-		// -----------------------------------------------
 		float near_plane = 1.0f;
 		float far_plane = 25.0f;
 		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)1024 / (float)1024, near_plane, far_plane);
@@ -192,19 +187,18 @@ void engine::run()
 		shadowTransforms.push_back(shadowProj * glm::lookAt(sc->plights[0].position, sc->plights[0].position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 
 
-		// 1. render scene to depth cubemap
-		// --------------------------------
 		glViewport(0, 0, 1024, 1024);
 		glBindFramebuffer(GL_FRAMEBUFFER, sc->fbo_depth_map);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(programs["pointshadowdepth"]->get_id());
-		//programs["pointshadows"]->setuniform("diffuseTexture", 0);
 		
 		for (unsigned int i = 0; i < 6; ++i)
 			programs["pointshadowdepth"]->setuniform("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+
 		programs["pointshadowdepth"]->setuniform("far_plane", far_plane);
 		programs["pointshadowdepth"]->setuniform("lightPos", sc->plights[0].position);
+		programs["pointshadowdepth"]->setuniform("reverse_normals", 0);
 
 		for (auto m : sc->meshes)
 		{
@@ -215,12 +209,25 @@ void engine::run()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-		// 2. render scene as normal 
-		// -------------------------
 		glViewport(0, 0, 1024, 768);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		/////draw scene meshes
+
+		glBindVertexArray(sc->vao_lights_id);
+		for (auto l : sc->plights)
+		{
+			glUseProgram(programs["lightsource"]->get_id());
+			programs["lightsource"]->setuniform("model", glm::scale(glm::translate(glm::mat4(), l.position), glm::vec3(0.2f)));
+			programs["lightsource"]->setuniform("view", cam->getview());
+			programs["lightsource"]->setuniform("projection", Projection);
+
+			l.draw();
+
+			glUseProgram(0);
+		}
+		glBindVertexArray(0);
+
+
 		glBindVertexArray(sc->vao_mesh_id);
 		for (auto m : sc->meshes)
 		{
@@ -232,6 +239,8 @@ void engine::run()
 			programs["pointshadow"]->setuniform("viewPos", cameraPos);
 			programs["pointshadow"]->setuniform("lightPos", sc->plights[0].position );
 			programs["pointshadow"]->setuniform("shadows", 1);
+			programs["pointshadow"]->setuniform("far_plane", far_plane);
+
 
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, sc->vbo_depthcube_map);
