@@ -1,3 +1,13 @@
-﻿  main.cpp
-  3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2015\Projects\3d_engine\Debug\3d_engine.exe
-  3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2015\Projects\3d_engine\Debug\3d_engine.pdb (Full PDB)
+﻿  stdafx.cpp
+  vec.cpp
+  texture.cpp
+  shader.cpp
+  main.cpp
+  engine.cpp
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\engine.cpp(167): warning C4018: '<': signed/unsigned mismatch
+  mesh.cpp
+  light.cpp
+  camera.cpp
+  Generating Code...
+  3d_engine.vcxproj -> C:\Users\akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.exe
+  3d_engine.vcxproj -> C:\Users\akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.pdb (Partial PDB)
