@@ -14,6 +14,13 @@ public:
 };
 
 
+class bitmap : public texture
+{};
+
+
+class shadowmap : public texture
+{};
+
 
 
 

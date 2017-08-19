@@ -7,14 +7,13 @@
 class scene
 {
 public:
-	scene() {};
-	GLuint vao_mesh_id, vao_lights_id;
+	scene();
+	GLuint vao_mesh_id, vao_lights_id, fbo_depth_map,vbo_depthcube_map;
 	std::vector<imesh*> meshes;
-
+	unsigned int shadow_w, shadow_h;
 
 	directionallight dirlight;
 	std::vector<pointlight> plights;
-
 };
 
 class engine
@@ -31,7 +30,7 @@ public:
 	void load_shaders(std::string name);
 
 	camera* cam;
-	scene sc;
+	scene* sc;
 
 	std::map<std::string, program*> programs;
 

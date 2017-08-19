@@ -7,36 +7,6 @@
 using namespace std;
 extern engine eng;
 
-float planeVertices[] = {
-	10.0f, -0.5f,  10.0f,   
-	-10.0f, -0.5f,  10.0f,   
-	-10.0f, -0.5f, -10.0f,    
-
-	10.0f, -0.5f,  10.0f,    
-	-10.0f, -0.5f, -10.0f,     
-	10.0f, -0.5f, -10.0f  
-};
-
-
-float planeNormals[] = { 
-	0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f, 
-0.0f, 1.0f, 0.0f, 
-0.0f, 1.0f, 0.0f };
-
-
-
-vector<glm::vec2> planeCoords = { 
-	{10.0f,  0.0f},
-	{0.0f,  0.0f},
-	{0.0f, 10.0f},
-	{10.0f,  0.0f},
-	{0.0f, 10.0f},
-	{10.0f, 10.0f} };
-
-
 int main()
 {
 	arcball_camera* cam = new arcball_camera();
@@ -44,46 +14,42 @@ int main()
 	eng.init(1024, 768);
 
 
-	eng.load_shaders("standartlight");
 	eng.load_shaders("lightsource");
 	eng.load_shaders("uv");
+	eng.load_shaders("pointshadow");
+	eng.load_shaders("pointshadowdepth");
+	eng.load_shaders("standartlight");
 	
 
 	pointlight pl("tcube.txt");
-	pl.position = { 2.0, 2.0, 2.0 };
-	eng.sc.plights.push_back(pl);
+	pl.position = { 2.0f, 3.0f, 2.0f };
+	eng.sc->plights.push_back(pl);
 
 
-	pointlight pl2("tcube.txt");
-	pl2.position = { -4.0, -2.0, 2.0 };
-	eng.sc.plights.push_back(pl2);
+	//pointlight pl2("tcube.txt");
+	//pl2.position = { 0.0, 2.0, -4.0 };
+	//eng.sc->plights.push_back(pl2);
 
 	//colormesh cm("textcube.txt");
-	//eng.sc.meshes.push_back(&cm);
+	//cm.position = { 0.0, 1.0, -2.0 };
+	//eng.sc->meshes.push_back(&cm);
 	
-	
-	
+
 	texturemesh tm("textcube.txt");
+	tm.position = { 0.0, 1.0, -2.0 };
 	tm.tex = new texture("c2.bmp");
-	tm.spec = new texture("c2_spec.bmp");
-	eng.sc.meshes.push_back(&tm);
+	//tm.spec = new texture("c2_spec.bmp");
+	eng.sc->meshes.push_back(&tm);
 
 
-
-
-	//vector<glm::vec3> vfloor = arr2vec3(planeVertices, sizeof(planeVertices));
-	//vector<glm::vec3> vnormals = arr2vec3(planeNormals, sizeof(planeNormals));
-
-	//texturemesh floor(vfloor, vnormals, planeCoords);
-	//floor.tex = new texture("wood.bmp");
-
-
-	//eng.sc.meshes.push_back(&floor);
+	texturemesh floor("floor.txt");
+	floor.tex = new texture("wood.bmp");
+	eng.sc->meshes.push_back(&floor);
 
 
 	//colormesh cf("tcube.txt");
 	//cf.position = { 2.0, 7.0, 2.0 };
-	//eng.sc.meshes.push_back(&cf);
+	//eng.sc->meshes.push_back(&cf);
 
 	eng.run();
 

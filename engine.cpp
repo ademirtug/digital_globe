@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 
 using namespace std;
@@ -38,11 +38,9 @@ bool engine::init(int width, int height)
 
 	glfwMakeContextCurrent(window);
 
-
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetCursorPosCallback(window, cursor_pos_callback);
 	glfwSetScrollCallback(window, mouse_wheel_callback);
-
 	
 	if (glewInit() != GLEW_OK)
 		return false;
@@ -53,14 +51,16 @@ bool engine::init(int width, int height)
 	glfwPollEvents();
 	glfwSetCursorPos(window, 1024 / 2, 768 / 2);
 
-
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glGenVertexArrays(1, &sc.vao_mesh_id);
-	glGenVertexArrays(1, &sc.vao_lights_id);
+	sc = new scene();
+	glGenVertexArrays(1, &sc->vao_mesh_id);
+	glGenVertexArrays(1, &sc->vao_lights_id);
 
 	return true;
 }
@@ -68,6 +68,8 @@ void engine::load_shaders(std::string name)
 {
 	program* sp = new program();
 	
+
+	//frag shader
 	ifstream frag("./data/" + name + ".frag");
 	string source = "";
 	string line = "";
@@ -85,9 +87,9 @@ void engine::load_shaders(std::string name)
 	source = line = "";
 
 	if (sp->attach_shader(&fsh) != GL_NO_ERROR)
-		cout << "attach failed";
+		cout << "frag attach failed";
 
-
+	//vert shader
 	ifstream vertex("./data/" + name + ".vert");
 
 	if (vertex.is_open())
@@ -103,15 +105,32 @@ void engine::load_shaders(std::string name)
 	source = line = "";
 
 	if (sp->attach_shader(&vsh) != GL_NO_ERROR)
-		cout << "attach failed";
+		cout << "vert attach failed";
+
+
+	//geo shader
+	ifstream geo("./data/" + name + ".geo");
+	if (geo.is_open())
+	{
+		while (std::getline(geo, line))
+			source += line + "\n";
+
+
+		shader gsh(GL_GEOMETRY_SHADER);
+		if (gsh.compile(source) == GL_FALSE)
+			cout << "geo failed";
+
+		source = line = "";
+
+		if (sp->attach_shader(&gsh) != GL_NO_ERROR)
+			cout << "geo attach failed";
+	}
 
 
 	if (sp->link() != GL_NO_ERROR)
 		cout << "link failed";
 
-	
 	programs[name] = sp;
-
 }
 
 
@@ -119,22 +138,86 @@ void engine::run()
 {
 	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 	
+	
+	glGenFramebuffers(1, &sc->fbo_depth_map);
+	glGenTextures(1, &sc->vbo_depthcube_map);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, sc->vbo_depthcube_map);
+	for (unsigned int i = 0; i < 6; ++i)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, sc->shadow_w, sc->shadow_h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, sc->fbo_depth_map);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, sc->vbo_depthcube_map, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	glUseProgram(programs["pointshadow"]->get_id());
+	programs["pointshadow"]->setuniform("diffuseTexture", 0);
+	programs["pointshadow"]->setuniform("depthMap", 1);
+
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0)
 	{
 		GLenum err = 0;
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		glm::mat4 viewModel = inverse(cam->getview());
 		glm::vec3 cameraPos(viewModel[3]);
 
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glBindVertexArray(sc.vao_lights_id);
-		for (auto l : sc.plights)
+
+		float near_plane = 1.0f;
+		float far_plane = 25.0f;
+		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)1024 / (float)1024, near_plane, far_plane);
+		std::vector<glm::mat4> shadowTransforms;
+		shadowTransforms.push_back(shadowProj * glm::lookAt(sc->plights[0].position, sc->plights[0].position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(sc->plights[0].position, sc->plights[0].position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(sc->plights[0].position, sc->plights[0].position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(sc->plights[0].position, sc->plights[0].position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(sc->plights[0].position, sc->plights[0].position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(sc->plights[0].position, sc->plights[0].position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+
+
+		glViewport(0, 0, 1024, 1024);
+		glBindFramebuffer(GL_FRAMEBUFFER, sc->fbo_depth_map);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		glUseProgram(programs["pointshadowdepth"]->get_id());
+		
+		for (unsigned int i = 0; i < 6; ++i)
+			programs["pointshadowdepth"]->setuniform("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+
+		programs["pointshadowdepth"]->setuniform("far_plane", far_plane);
+		programs["pointshadowdepth"]->setuniform("lightPos", sc->plights[0].position);
+		programs["pointshadowdepth"]->setuniform("reverse_normals", 0);
+
+		for (auto m : sc->meshes)
 		{
-			//draw light sources
+			programs["pointshadowdepth"]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
+			m->draw();
+		}
+		glBindVertexArray(0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+		glViewport(0, 0, 1024, 768);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+		glBindVertexArray(sc->vao_lights_id);
+		for (auto l : sc->plights)
+		{
 			glUseProgram(programs["lightsource"]->get_id());
-			programs["lightsource"]->setuniform("model", glm::scale( glm::translate(glm::mat4(), l.position), glm::vec3(0.2f)));
+			programs["lightsource"]->setuniform("model", glm::scale(glm::translate(glm::mat4(), l.position), glm::vec3(0.2f)));
 			programs["lightsource"]->setuniform("view", cam->getview());
 			programs["lightsource"]->setuniform("projection", Projection);
 
@@ -145,56 +228,28 @@ void engine::run()
 		glBindVertexArray(0);
 
 
-		/////draw scene meshes
-		glBindVertexArray(sc.vao_mesh_id);
-		for (auto m : sc.meshes)
+		glBindVertexArray(sc->vao_mesh_id);
+		for (auto m : sc->meshes)
 		{
-			glUseProgram(programs[m->spname()]->get_id());
+			glUseProgram(programs["pointshadow"]->get_id());
+			programs["pointshadow"]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
+			programs["pointshadow"]->setuniform("view", cam->getview());
+			programs["pointshadow"]->setuniform("projection", Projection);
+			
+			programs["pointshadow"]->setuniform("viewPos", cameraPos);
+			programs["pointshadow"]->setuniform("lightPos", sc->plights[0].position );
+			programs["pointshadow"]->setuniform("shadows", 1);
+			programs["pointshadow"]->setuniform("far_plane", far_plane);
 
 
-			programs[m->spname()]->setuniform("model", glm::translate(glm::mat4(1.0f), m->position));
-			programs[m->spname()]->setuniform("view",  cam->getview());
-			programs[m->spname()]->setuniform("projection", Projection);
-			programs[m->spname()]->setuniform("viewPos", cameraPos);
-
-			programs[m->spname()]->setuniform("dirLight.direction", sc.dirlight.direction);
-			programs[m->spname()]->setuniform("dirLight.ambient", sc.dirlight.ambient);
-			programs[m->spname()]->setuniform("dirLight.diffuse", sc.dirlight.diffuse);
-			programs[m->spname()]->setuniform("dirLight.specular", sc.dirlight.specular);
-
-			if (m->spname() == "uv")
-			{
-				for (int i = 0; i < sc.plights.size(); ++i)
-				{
-					programs[m->spname()]->setuniform("pointLights["+ std::to_string(i) + "].position", sc.plights[i].position);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].ambient", sc.plights[i].ambient);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].diffuse", sc.plights[i].diffuse);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].specular", sc.plights[i].specular);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].constant", sc.plights[i].constant);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].linear", sc.plights[i].linear);
-					programs[m->spname()]->setuniform("pointLights[" + std::to_string(i) + "].quadratic", sc.plights[i].quadratic);
-				}
-			}
-			else
-			{
-				programs[m->spname()]->setuniform("light.position", sc.plights[0].position);
-				programs[m->spname()]->setuniform("light.ambient", { 0.1f, 0.1f, 0.1f });
-				programs[m->spname()]->setuniform("light.diffuse", { 0.7f, 0.7f, 0.7f });
-				programs[m->spname()]->setuniform("light.specular", { 1.0f, 1.0f, 1.0f });
-			}
-
-			programs[m->spname()]->setuniform("material.specular", 1);
-			programs[m->spname()]->setuniform("material.shininess",64.0f);
-			programs[m->spname()]->setuniform("material.diffuse", 0);
-			programs[m->spname()]->setuniform("material.color", {1.0f, 0.5f, 0.31f});
-
-
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, sc->vbo_depthcube_map);
+			
 			m->draw();
 
 			glUseProgram(0);
 		}
 		glBindVertexArray(0);
-
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -202,4 +257,13 @@ void engine::run()
 			cout << gluErrorString(err);
 	}
 	glfwTerminate();
+}
+
+
+
+scene::scene()
+{
+	//bunu texture sınıfından türeme shadow map yap
+	shadow_w = 1024;
+	shadow_h = 1024;
 }

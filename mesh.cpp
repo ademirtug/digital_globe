@@ -103,7 +103,7 @@ colormesh::~colormesh()
 
 void colormesh::init()
 {
-	glBindVertexArray(eng.sc.vao_mesh_id);
+	glBindVertexArray(eng.sc->vao_mesh_id);
 
 	glGenBuffers(1, &vboid_vertices);
 	glGenBuffers(1, &vboid_normals);
@@ -156,7 +156,6 @@ void colormesh::loadobj(const std::string& filename)
 		}
 		else if (cmd == "f")
 		{
-
 			while (!ss.eof())
 			{
 				string sect;
@@ -255,7 +254,7 @@ texturemesh::~texturemesh()
 
 void texturemesh::init()
 {
-	glBindVertexArray(eng.sc.vao_mesh_id);
+	glBindVertexArray(eng.sc->vao_mesh_id);
 
 	glGenBuffers(1, &vboid_vertices);
 	glGenBuffers(1, &vboid_normals);
@@ -425,7 +424,7 @@ void texturemesh::draw()
 //	vboid_vertices = 0;
 //	vertices = _vertices;
 //
-//	glBindVertexArray(eng.sc.vao_lights_id);
+//	glBindVertexArray(eng.sc->vao_lights_id);
 //	glGenBuffers(1, &vboid_vertices);
 //
 //	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
@@ -462,7 +461,7 @@ void texturemesh::draw()
 
 //void lightsource::init()
 //{
-//	glBindVertexArray(eng.sc.vao_lights_id);
+//	glBindVertexArray(eng.sc->vao_lights_id);
 //	glGenBuffers(1, &vboid_vertices);
 //
 //	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);

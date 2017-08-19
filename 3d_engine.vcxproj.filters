@@ -79,16 +79,31 @@
     <None Include="data\lightsource.vert">
       <Filter>data</Filter>
     </None>
-    <None Include="data\standartlight.frag">
-      <Filter>data</Filter>
-    </None>
-    <None Include="data\standartlight.vert">
-      <Filter>data</Filter>
-    </None>
     <None Include="data\uv.frag">
       <Filter>data</Filter>
     </None>
     <None Include="data\uv.vert">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\pointshadow.frag">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\pointshadow.vert">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\pointshadowdepth.frag">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\pointshadowdepth.geo">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\pointshadowdepth.vert">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\standartlight.frag">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\standartlight.vert">
       <Filter>data</Filter>
     </None>
   </ItemGroup>
