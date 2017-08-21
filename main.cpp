@@ -42,7 +42,7 @@ int main()
 	eng.sc->meshes.push_back(&tm);
 
 
-	texturemesh floor("floor.txt");
+	texturemesh floor("plane.txt");
 	floor.tex = new texture("wood.bmp");
 	eng.sc->meshes.push_back(&floor);
 
