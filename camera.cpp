@@ -19,7 +19,7 @@ extern engine eng;
 
 arcball_camera::arcball_camera()
 {
-	cdist = 5;
+	cdist = 15;
 }
 
 arcball_camera::~arcball_camera()
