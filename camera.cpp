@@ -8,7 +8,6 @@
 #include <math.h>
 
 double lrx = 0;
-int counter = 1;
 
 bool rdown = false;
 double lastx, lasty;
@@ -19,11 +18,12 @@ extern engine eng;
 
 arcball_camera::arcball_camera()
 {
-	cdist = 15;
+	cdist = 5;
 }
 
 arcball_camera::~arcball_camera()
-{}
+{
+}
 
 
 glm::mat4 arcball_camera::getview()
@@ -31,12 +31,25 @@ glm::mat4 arcball_camera::getview()
 	cdist += mydiff / 5;
 	mydiff = 0;
 
-	counter++;
-	//if (counter % 1000 == 0)
-	//	cout << "pitch:" << ry/100 << endl << "yaw: " << rx/100<<endl;
+	glm::mat4 ViewTranslate = glm::translate(
+		glm::mat4(1.0f),
+		glm::vec3(0, 0, -cdist) );
+	
+	glm::mat4 ViewRotateX = glm::rotate(
+		ViewTranslate,
+		(float)ry / 100,
+		glm::vec3(-1.0f, 0.0f, 0.0f)
+	);
+	
+	glm::mat4 View = glm::rotate(
+		ViewRotateX,
+		(float)rx / 100,
+		glm::vec3(0.0f, 1.0f, 0.0f)
+	);
 
-	//return glm::lookAt(eng.sc->plights[0].position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-	return glm::translate(glm::mat4(), glm::vec3(0, -2, -cdist)) * glm::eulerAngleXY(-(float)ry/100, (float)rx/100);
+	return View;
+
+
 }
 
 
@@ -79,6 +92,8 @@ void arcball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double
 
 		lastx = xpos;
 		lasty = ypos;
+
+
 	}
 }
 void arcball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
