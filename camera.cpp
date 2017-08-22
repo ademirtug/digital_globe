@@ -48,8 +48,6 @@ glm::mat4 arcball_camera::getview()
 	);
 
 	return View;
-
-
 }
 
 
