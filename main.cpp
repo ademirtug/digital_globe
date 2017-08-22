@@ -36,7 +36,7 @@ int main()
 	
 
 	texturemesh tm("textcube.txt");
-	tm.position = { 0.0, 1.0, -2.0 };
+	tm.position = { 0.0, 1.0, 0.0 };
 	tm.tex = new texture("c2.bmp");
 	//tm.spec = new texture("c2_spec.bmp");
 	eng.sc->meshes.push_back(&tm);
