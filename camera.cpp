@@ -145,17 +145,11 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 			else break;
 		}
 
-		//if (ry > PI * 100)
 		rx -= lastx - xpos;
-		//else
-		//	rx -= lastx - xpos;
-
 		ry = n ? -ry : ry;
 
 		lastx = xpos;
 		lasty = ypos;
-
-
 	}
 }
 void qball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
