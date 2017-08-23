@@ -14,8 +14,9 @@ bool rdown = false;
 double lastx, lasty;
 double rx = 0;
 double ry = 0;
-double mydiff = 0;
+double mydiff = 0.000001;
 extern engine eng;
+glm::quat currot(1.0, 0, 0, 0);
 
 arcball_camera::arcball_camera()
 {
@@ -47,6 +48,12 @@ glm::mat4 arcball_camera::getview()
 
 	return View;
 }
+
+glm::vec3 arcball_camera::getpos()
+{
+	return inverse(getview())[3];
+}
+
 void arcball_camera::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
@@ -57,6 +64,7 @@ void arcball_camera::mouse_button_callback(GLFWwindow* window, int button, int a
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
 	{
 		rdown = false;
+		currot = glm::angleAxis(glm::radians((float)ry / 100), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 }
 void arcball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
@@ -107,13 +115,20 @@ glm::mat4 qball_camera::getview()
 	cdist += mydiff / 5;
 	mydiff = 0;
 
-	glm::quat viewq = glm::quat(1, 0,0,0);
-	glm::mat4 viewm = glm::mat4_cast(viewq);
-	viewm = glm::translate(viewm, glm::vec3(0, -3, -cdist) );
+	glm::quat xrot = glm::angleAxis(glm::radians((float)ry / 10), glm::vec3(1.0f, -3.0, -cdist));
+	glm::mat4 viewm = glm::mat4_cast(xrot);
+	viewm = glm::translate(viewm, glm::vec3(0, -3, -cdist));
+
+	//viewm = glm::lookAt(glm::vec3(0, 0, -cdist), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0, 1, 0));
+
 
 	return viewm;
 }
 
+glm::vec3 qball_camera::getpos()
+{
+	return inverse(getview())[3];
+}
 
 
 void qball_camera::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -138,12 +153,12 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 		ry = abs(ry);
 
 
-		for (; true;)
-		{
-			if (ry >= 2 * glm::pi<float>() * 100)
-				ry -= 2 * glm::pi<float>() * 100;
-			else break;
-		}
+		//for (; true;)
+		//{
+		//	if (ry >= 2 * glm::pi<float>() * 100)
+		//		ry -= 2 * glm::pi<float>() * 100;
+		//	else break;
+		//}
 
 		rx -= lastx - xpos;
 		ry = n ? -ry : ry;
