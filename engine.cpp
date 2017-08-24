@@ -195,6 +195,7 @@ void engine::run()
 		glm::mat4 viewModel = inverse(cam->getview());
 		glm::vec3 cameraPos(viewModel[3]);
 		sc->plights[0].position.z = sin(glfwGetTime() * 0.5) * 3.0;
+		//sc->plights[0].position.y = 2 + sin(glfwGetTime() * 0.5) * 1.0;
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

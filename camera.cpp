@@ -11,7 +11,7 @@
 double lrx = 0;
 
 bool rdown = false;
-double lastx, lasty;
+double lastx, lasty, xs, ys, xe, ye;
 double rx = 0;
 double ry = 0;
 double mydiff = 0.000001;
@@ -30,23 +30,13 @@ glm::mat4 arcball_camera::getview()
 	cdist += mydiff / 5;
 	mydiff = 0;
 
-	glm::mat4 ViewTranslate = glm::translate(
-		glm::mat4(1.0f),
-		glm::vec3(0, 0, -cdist) );
+	glm::mat4 v = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -cdist) );
 	
-	glm::mat4 ViewRotateX = glm::rotate(
-		ViewTranslate,
-		(float)ry / 100,
-		glm::vec3(-1.0f, 0.0f, 0.0f)
-	);
+	v = glm::rotate( v, (float)ry / 100, glm::vec3(-1.0f, 0.0f, 0.0f));
 	
-	glm::mat4 View = glm::rotate(
-		ViewRotateX,
-		(float)rx / 100,
-		glm::vec3(0.0f, 1.0f, 0.0f)
-	);
+	v = glm::rotate(v, (float)rx / 100, glm::vec3(0.0f, 1.0f, 0.0f));
 
-	return View;
+	return v;
 }
 
 glm::vec3 arcball_camera::getpos()
@@ -76,25 +66,12 @@ void arcball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double
 		bool n = ry < 0 ? true : false;
 		ry = abs(ry);
 
-
-		for (;true;)
-		{
-			if (ry >= 2 * glm::pi<float>() * 100)
-				ry -= 2 * glm::pi<float>() * 100;
-			else break;
-		}
-
-		//if (ry > PI * 100)
-			rx -= lastx - xpos;
-		//else
-		//	rx -= lastx - xpos;
+		rx -= lastx - xpos;
 	
 		ry = n ? -ry : ry;
 
 		lastx = xpos;
 		lasty = ypos;
-
-
 	}
 }
 void arcball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -109,19 +86,32 @@ qball_camera::~qball_camera()
 {
 }
 
+int ct = 0;
+glm::quat oldrot = glm::quat(1,0,0,0);
 
 glm::mat4 qball_camera::getview()
 {
 	cdist += mydiff / 5;
 	mydiff = 0;
 
-	glm::quat xrot = glm::angleAxis(glm::radians((float)ry / 10), glm::vec3(1.0f, -3.0, -cdist));
-	glm::mat4 viewm = glm::mat4_cast(xrot);
-	viewm = glm::translate(viewm, glm::vec3(0, -3, -cdist));
 
-	//viewm = glm::lookAt(glm::vec3(0, 0, -cdist), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0, 1, 0));
+	glm::mat4 viewm = glm::translate(glm::mat4(1.0f), glm::vec3(0, -3, -cdist));
+	glm::vec3 mouseaxis = glm::normalize(glm::vec3(xe - xs, ye - ys, 0));
+	glm::vec3 rightaxis = glm::normalize(glm::cross(mouseaxis, glm::vec3(0, 1, 0)));
+	glm::vec3 rotaxis = glm::normalize(glm::cross(mouseaxis, rightaxis));
 
 
+	if (ct > 1000)
+	{
+		ct = 0;
+		cout << "x:" << rotaxis.x << " y:" << rotaxis.y << " z:" << rotaxis.z << endl;
+	}
+	else ct++;
+
+
+	glm::quat xrot = glm::angleAxis( glm::radians( glm::length(glm::vec3(xe - xs, ye - ys, 0))/ 10 ) , rotaxis);
+
+	viewm = glm::mat4_cast(xrot);
 	return viewm;
 }
 
@@ -136,7 +126,8 @@ void qball_camera::mouse_button_callback(GLFWwindow* window, int button, int act
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
 	{
 		rdown = true;
-		glfwGetCursorPos(window, &lastx, &lasty);
+		glfwGetCursorPos(window, &xs, &ys);
+
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
 	{
@@ -147,24 +138,7 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 {
 	if (rdown)
 	{
-		ry += lasty - ypos;
-
-		bool n = ry < 0 ? true : false;
-		ry = abs(ry);
-
-
-		//for (; true;)
-		//{
-		//	if (ry >= 2 * glm::pi<float>() * 100)
-		//		ry -= 2 * glm::pi<float>() * 100;
-		//	else break;
-		//}
-
-		rx -= lastx - xpos;
-		ry = n ? -ry : ry;
-
-		lastx = xpos;
-		lasty = ypos;
+		glfwGetCursorPos(window, &xe, &ye);
 	}
 }
 void qball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
