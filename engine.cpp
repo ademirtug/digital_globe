@@ -54,7 +54,9 @@ bool engine::init(int width, int height)
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+	
 	glEnable(GL_CULL_FACE);
+	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -164,13 +166,36 @@ void engine::run()
 	programs["pointshadow"]->setuniform("diffuseTexture", 0);
 	programs["pointshadow"]->setuniform("depthMap", 1);
 
+	double timer = 0;
+	double timer2 = glfwGetTime();
+	int fps = 0;
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0)
 	{
+		double diff = glfwGetTime() - timer;
+
+		if (diff > 0.00)
+		{
+			timer = glfwGetTime();
+			fps++;
+			if ((glfwGetTime() - timer2) > 1.0)
+			{
+				std::stringstream ss;
+				ss << "3d_engine - fps: " << fps;
+
+				glfwSetWindowTitle(window, ss.str().c_str());
+				timer2 = glfwGetTime();
+				fps = 0;
+			}
+		}
+		else
+			continue;
+
 		GLenum err = 0;
 		glm::mat4 viewModel = inverse(cam->getview());
 		glm::vec3 cameraPos(viewModel[3]);
 		sc->plights[0].position.z = sin(glfwGetTime() * 0.5) * 3.0;
+		//sc->plights[0].position.y = 2 + sin(glfwGetTime() * 0.5) * 1.0;
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -241,7 +266,6 @@ void engine::run()
 			programs["pointshadow"]->setuniform("lightPos", sc->plights[0].position );
 			programs["pointshadow"]->setuniform("shadows", 1);
 			programs["pointshadow"]->setuniform("far_plane", far_plane);
-
 
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, sc->vbo_depthcube_map);
