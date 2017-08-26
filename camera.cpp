@@ -8,32 +8,29 @@
 #include <glm/gtx/quaternion.hpp>
 #include <math.h>
 
-double lrx = 0;
-
 bool rdown = false;
 double lastx, lasty, xs, ys, xe, ye;
 double rx = 0;
 double ry = 0;
 double mydiff = 0.000001;
 extern engine eng;
-glm::quat currot(1.0, 0, 0, 0);
 
 arcball_camera::arcball_camera()
 {
-	cdist = 5;
+	cdist = 25;
 }
 arcball_camera::~arcball_camera()
 {
 }
 glm::mat4 arcball_camera::getview()
-{ 
+{
 	cdist += mydiff / 5;
 	mydiff = 0;
 
-	glm::mat4 v = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -cdist) );
-	
-	v = glm::rotate( v, (float)ry / 100, glm::vec3(-1.0f, 0.0f, 0.0f));
-	
+	glm::mat4 v = glm::translate(glm::mat4(1.0f), glm::vec3(0, -3, -cdist));
+
+	v = glm::rotate(v, (float)ry / 100, glm::vec3(-1.0f, 0.0f, 0.0f));
+
 	v = glm::rotate(v, (float)rx / 100, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	return v;
@@ -54,7 +51,6 @@ void arcball_camera::mouse_button_callback(GLFWwindow* window, int button, int a
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
 	{
 		rdown = false;
-		currot = glm::angleAxis(glm::radians((float)ry / 100), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 }
 void arcball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
@@ -67,7 +63,7 @@ void arcball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double
 		ry = abs(ry);
 
 		rx -= lastx - xpos;
-	
+
 		ry = n ? -ry : ry;
 
 		lastx = xpos;
@@ -87,7 +83,6 @@ qball_camera::~qball_camera()
 }
 
 int ct = 0;
-glm::quat oldrot = glm::quat(1,0,0,0);
 
 glm::mat4 qball_camera::getview()
 {
@@ -95,9 +90,15 @@ glm::mat4 qball_camera::getview()
 	mydiff = 0;
 
 
-	glm::mat4 viewm = glm::translate(glm::mat4(1.0f), glm::vec3(0, -3, -cdist));
-	glm::vec3 mouseaxis = glm::normalize(glm::vec3(xe - xs, ye - ys, 0));
-	glm::vec3 rightaxis = glm::normalize(glm::cross(mouseaxis, glm::vec3(0, 1, 0)));
+	glm::vec3 campos(0, -3, -cdist);
+	glm::vec3 camright = glm::normalize(glm::cross(glm::normalize(campos), glm::vec3(0, 1, 0)));
+	glm::vec3 camup = glm::normalize(glm::cross(glm::normalize(campos), camright));
+
+
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), campos);
+
+	glm::vec3 mouseaxis = glm::normalize(glm::vec3(xs - xe, ys - ye, 0));
+	glm::vec3 rightaxis = glm::normalize(glm::cross(mouseaxis, camup));
 	glm::vec3 rotaxis = glm::normalize(glm::cross(mouseaxis, rightaxis));
 
 
@@ -109,10 +110,10 @@ glm::mat4 qball_camera::getview()
 	else ct++;
 
 
-	glm::quat xrot = glm::angleAxis( glm::radians( glm::length(glm::vec3(xe - xs, ye - ys, 0))/ 10 ) , rotaxis);
+	glm::quat xrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(xe - xs, ye - ys, 0))), rotaxis);
 
-	viewm = glm::mat4_cast(xrot);
-	return viewm;
+	view = glm::mat4_cast(xrot);
+	return view;
 }
 
 glm::vec3 qball_camera::getpos()
