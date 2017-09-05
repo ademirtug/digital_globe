@@ -192,7 +192,8 @@ void engine::run()
 			continue;
 
 		GLenum err = 0;
-		glm::mat4 viewModel = inverse(cam->getview());
+		glm::mat4 view = cam->getview();
+		glm::mat4 viewModel = inverse(view);
 		glm::vec3 cameraPos(viewModel[3]);
 		sc->plights[0].position.z = sin(glfwGetTime() * 0.5) * 3.0;
 		//sc->plights[0].position.y = 2 + sin(glfwGetTime() * 0.5) * 1.0;
@@ -244,7 +245,7 @@ void engine::run()
 		{
 			glUseProgram(programs["lightsource"]->get_id());
 			programs["lightsource"]->setuniform("model", glm::scale(glm::translate(glm::mat4(), l.position), glm::vec3(0.2f)));
-			programs["lightsource"]->setuniform("view", cam->getview());
+			programs["lightsource"]->setuniform("view", view);
 			programs["lightsource"]->setuniform("projection", Projection);
 
 			l.draw();
