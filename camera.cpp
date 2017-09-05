@@ -15,6 +15,9 @@ double ry = 0;
 double mydiff = 0.000001;
 extern engine eng;
 
+
+glm::mat4 rot_mat = glm::mat4(1.0f);
+
 arcball_camera::arcball_camera()
 {
 	cdist = 25;
@@ -27,13 +30,14 @@ glm::mat4 arcball_camera::getview()
 	cdist += mydiff / 5;
 	mydiff = 0;
 
-	glm::mat4 v = glm::translate(glm::mat4(1.0f), glm::vec3(0, -3, -cdist));
 
-	v = glm::rotate(v, (float)ry / 100, glm::vec3(-1.0f, 0.0f, 0.0f));
+	glm::mat4 r = glm::mat4(1.0f);
 
-	v = glm::rotate(v, (float)rx / 100, glm::vec3(0.0f, 1.0f, 0.0f));
-
-	return v;
+	r = glm::translate(r, glm::vec3(0, 0, -cdist));
+	
+	r = r*rot_mat;
+	return r;
+	
 }
 
 glm::vec3 arcball_camera::getpos()
@@ -57,23 +61,36 @@ void arcball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double
 {
 	if (rdown)
 	{
-		ry += lasty - ypos;
+		float newx = xpos;
+		float newy = ypos;
+		float dx = newx - lastx;
+		float dy = newy - lasty;
 
-		bool n = ry < 0 ? true : false;
-		ry = abs(ry);
+		glm::mat4 drot_matrix = glm::mat4(1.0f);
+		drot_matrix = glm::rotate(drot_matrix, dx / 100, glm::vec3(0.0f, 1.0f, 0.0f));
+		drot_matrix = glm::rotate(drot_matrix, dy / 100, glm::vec3(1.0f, 0.0f, 0.0f));
 
-		rx -= lastx - xpos;
+		rot_mat = drot_matrix * rot_mat;
 
-		ry = n ? -ry : ry;
-
-		lastx = xpos;
-		lasty = ypos;
+		lastx = newx;
+		lasty = newy;
 	}
 }
 void arcball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	mydiff = -yoffset;
 }
+
+
+
+
+
+
+
+
+
+
+
 qball_camera::qball_camera()
 {
 	cdist = 5;
