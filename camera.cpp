@@ -20,7 +20,7 @@ glm::mat4 rot_mat = glm::mat4(1.0f);
 
 arcball_camera::arcball_camera()
 {
-	cdist = 25;
+	cdist = 5;
 }
 arcball_camera::~arcball_camera()
 {
@@ -65,8 +65,8 @@ void arcball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double
 		float dy = newy - lasty;
 
 		glm::mat4 drot_matrix = glm::mat4(1.0f);
-		drot_matrix = glm::rotate(drot_matrix, dx / 100, glm::vec3(0.0f, 1.0f, 0.0f));
-		drot_matrix = glm::rotate(drot_matrix, dy / 100, glm::vec3(1.0f, 0.0f, 0.0f));
+		drot_matrix = glm::rotate(drot_matrix, dx / 300, glm::vec3(0.0f, 1.0f, 0.0f));
+		drot_matrix = glm::rotate(drot_matrix, dy / 300, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		rot_mat = drot_matrix * rot_mat;
 
@@ -80,18 +80,6 @@ void arcball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, do
 }
 
 
-
-<<<<<<< HEAD
-=======
-
-
-
-
-
-
-
-
->>>>>>> 55d7e52d15180dfb2c5e7a4e8ae03754bb1935f8
 qball_camera::qball_camera()
 {
 	cdist = 5;

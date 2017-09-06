@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-﻿  camera.cpp
-=======
-<<<<<<< HEAD
-﻿  main.cpp
-  3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.exe
-  3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.pdb (Partial PDB)
-=======
 ﻿  engine.cpp
-c:\users\akn\documents\visual studio 2017\projects\3d_engine\engine.cpp(198): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
->>>>>>> 55d7e52d15180dfb2c5e7a4e8ae03754bb1935f8
   3d_engine.vcxproj -> C:\Users\akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.exe
   3d_engine.vcxproj -> C:\Users\akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.pdb (Partial PDB)
->>>>>>> cff7eeb5738131af758d477ce5e9e692df053efa
