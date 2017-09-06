@@ -176,7 +176,7 @@ void engine::run()
 	{
 		double diff = glfwGetTime() - timer;
 
-		if (diff > (1.0f / maxfps) )
+		if (diff > 0/*(1.0f / maxfps)*/ )
 		{
 			timer = glfwGetTime();
 			fps++;
