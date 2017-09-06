@@ -1,6 +1,5 @@
 # Blender v2.78 (sub 0) OBJ File: 'earth.blend'
-# www.blender.org
-mtllib earth.mtl
+
 o Sphere
 v 0.000000 0.980785 -0.195090
 v 0.000000 0.956940 -0.290285

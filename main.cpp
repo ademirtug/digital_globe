@@ -23,18 +23,11 @@ int main()
 	
 
 	pointlight pl("tcube.txt");
-	pl.position = { 2.0f, 2.0f, 2.0f };
+	pl.position = { 2.0f, 3.0f, 2.0f };
 	eng.sc->plights.push_back(pl);
 
 
-	//pointlight pl2("tcube.txt");
-	//pl2.position = { 0.0, 2.0, -4.0 };
-	//eng.sc->plights.push_back(pl2);
 
-	//colormesh cm("textcube.txt");
-	//cm.position = { 0.0, 1.0, -2.0 };
-	//eng.sc->meshes.push_back(&cm);
-	
 
 	//texturemesh tm("textcube.txt");
 	//tm.position = { 0.0, 1.0, 0.0 };
