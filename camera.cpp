@@ -76,7 +76,6 @@ void arcball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, do
 
 
 
-
 qball_camera::qball_camera()
 {
 	cdist = 5;

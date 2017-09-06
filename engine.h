@@ -33,6 +33,7 @@ public:
 	scene* sc;
 
 	std::map<std::string, program*> programs;
+	int maxfps;
 
 	void run();
 };

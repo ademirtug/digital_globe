@@ -64,6 +64,8 @@ bool engine::init(int width, int height)
 	glGenVertexArrays(1, &sc->vao_mesh_id);
 	glGenVertexArrays(1, &sc->vao_lights_id);
 
+	maxfps = 25;
+
 	return true;
 }
 void engine::load_shaders(std::string name)
@@ -174,7 +176,7 @@ void engine::run()
 	{
 		double diff = glfwGetTime() - timer;
 
-		if (diff > 0.00)
+		if (diff > (1.0f / maxfps) )
 		{
 			timer = glfwGetTime();
 			fps++;
