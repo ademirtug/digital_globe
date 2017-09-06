@@ -1,14 +1,19 @@
-<<<<<<< HEAD
-﻿  camera.cpp
-=======
-<<<<<<< HEAD
-﻿  main.cpp
+﻿  stdafx.cpp
+  vec.cpp
+  texture.cpp
+  shader.cpp
+  main.cpp
+  engine.cpp
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\engine.cpp(198): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  mesh.cpp
+  light.cpp
+  camera.cpp
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(56): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(57): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(58): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(59): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(120): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(121): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
   3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.exe
   3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.pdb (Partial PDB)
-=======
-﻿  engine.cpp
-c:\users\akn\documents\visual studio 2017\projects\3d_engine\engine.cpp(198): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
->>>>>>> 55d7e52d15180dfb2c5e7a4e8ae03754bb1935f8
-  3d_engine.vcxproj -> C:\Users\akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.exe
-  3d_engine.vcxproj -> C:\Users\akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.pdb (Partial PDB)
->>>>>>> cff7eeb5738131af758d477ce5e9e692df053efa
