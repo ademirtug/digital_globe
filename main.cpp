@@ -9,8 +9,8 @@ extern engine eng;
 
 int main()
 {
-	//qball_camera* cam = new qball_camera();
-	arcball_camera* cam = new arcball_camera();
+	qball_camera* cam = new qball_camera();
+	//arcball_camera* cam = new arcball_camera();
 	eng.cam = cam;
 	eng.init(1024, 768);
 	eng.maxfps = 25;
