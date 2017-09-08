@@ -141,3 +141,65 @@ void qball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, doub
 {
 	mydiff = -yoffset;
 }
+
+
+
+eu_orbit_camera::eu_orbit_camera()
+{
+	cdist = 5;
+}
+
+eu_orbit_camera::~eu_orbit_camera()
+{}
+
+
+glm::mat4 eu_orbit_camera::getview()
+{
+	cdist += mydiff / 5;
+	mydiff = 0;
+	return glm::translate(glm::mat4(), glm::vec3(0, 0, -cdist)) * glm::eulerAngleXY(-(float)ry / 100, (float)rx / 100);
+}
+
+glm::vec3 eu_orbit_camera::getpos()
+{
+	return inverse(getview())[3];
+}
+
+void eu_orbit_camera::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	{
+		rdown = true;
+		glfwGetCursorPos(window, &lastx, &lasty);
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
+	{
+		rdown = false;
+	}
+}
+void eu_orbit_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (rdown)
+	{
+		ry += lasty - ypos;
+
+		bool n = ry < 0 ? true : false;
+		ry = abs(ry);
+
+		for (; true;)
+		{
+			if (ry >= 2 * glm::pi<float>() * 100)
+				ry -= 2 * glm::pi<float>() * 100;
+			else break;
+		}
+		rx -= lastx - xpos;
+		ry = n ? -ry : ry;
+
+		lastx = xpos;
+		lasty = ypos;
+	}
+}
+void eu_orbit_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	mydiff = -yoffset;
+}

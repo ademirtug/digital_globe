@@ -73,7 +73,6 @@ imesh::~imesh()
 colormesh::colormesh()
 {
 	vboid_vertices = vboid_normals = vboid_colors = 0;
-	//position = glm::vec3(0.0f);
 }
 
 colormesh::colormesh(const std::string& objfile)
@@ -88,7 +87,6 @@ colormesh::colormesh(const std::string& objfile)
 
 colormesh::colormesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::vec3> _colors)
 {
-	//buaradan
 	vboid_vertices = vboid_normals = vboid_colors = 0;
 	vertices = _vertices;
 	normals = _normals;
@@ -403,79 +401,3 @@ void texturemesh::draw()
 
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 }
-
-
-
-//lightsource::lightsource()
-//{
-//	vboid_vertices = 0;
-//}
-//
-//lightsource::lightsource(const std::string& filename)
-//{
-//	throw("not implemented");
-//	vboid_vertices = 0;
-//	loadobj(filename);
-//	init();
-//}
-//
-//lightsource::lightsource(vector<glm::vec3> _vertices)
-//{
-//	vboid_vertices = 0;
-//	vertices = _vertices;
-//
-//	glBindVertexArray(eng.sc->vao_lights_id);
-//	glGenBuffers(1, &vboid_vertices);
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
-//	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, 0);
-//	glBindVertexArray(0);
-//}
-
-
-//void lightsource::loadobj(const string& filename)
-//{
-//	fstream f;
-//	f.open(filename, std::fstream::in | std::fstream::binary);
-//	if (!f.is_open())
-//		return;
-//
-//	string line;
-//	while (getline(f, line))
-//	{
-//		istringstream ss(line);
-//		string cmd;
-//		ss >> cmd;
-//
-//		if (cmd == "v")
-//		{
-//			float v1, v2, v3;
-//			ss >> v1 >> v2 >> v3;
-//			vertices.push_back({ v1, v2, v3 });
-//		}
-//	}
-//}
-
-
-//void lightsource::init()
-//{
-//	glBindVertexArray(eng.sc->vao_lights_id);
-//	glGenBuffers(1, &vboid_vertices);
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
-//	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, 0);
-//	glBindVertexArray(0);
-//}
-//
-//void lightsource::draw()
-//{
-//	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
-//
-//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-//	glEnableVertexAttribArray(0);
-//	glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
-//}

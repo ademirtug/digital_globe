@@ -1,4 +1,9 @@
-﻿  engine.cpp
-c:\users\akn\documents\visual studio 2017\projects\3d_engine\engine.cpp(200): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+﻿  camera.cpp
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(56): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(57): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(58): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(59): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(119): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\visual studio 2017\projects\3d_engine\camera.cpp(120): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.exe
   3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.pdb (Partial PDB)

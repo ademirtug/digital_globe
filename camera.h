@@ -50,6 +50,19 @@ public:
 };
 
 
+class eu_orbit_camera : public camera
+{
+public:
+	double cdist;
+	eu_orbit_camera();
+	~eu_orbit_camera();
+
+	glm::mat4 getview();
+	glm::vec3 getpos();
+	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+	void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos);
+	void mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset);
+};
 
 
 
