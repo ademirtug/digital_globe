@@ -9,27 +9,24 @@ extern engine eng;
 
 int main()
 {
-	qball_camera* cam = new qball_camera();
+	//qball_camera* cam = new qball_camera();
 	//arcball_camera* cam = new arcball_camera();
-	//eu_orbit_camera* cam = new eu_orbit_camera();
+	eu_orbit_camera* cam = new eu_orbit_camera();
 
 
 	eng.cam = cam;
 	eng.init(1024, 768);
 	eng.maxfps = 25;
 
-
 	eng.load_shaders("lightsource");
 	eng.load_shaders("uv");
 	eng.load_shaders("pointshadow");
 	eng.load_shaders("pointshadowdepth");
 	eng.load_shaders("standartlight");
-	
 
 	pointlight pl("tcube.txt");
 	pl.position = { 2.0f, 2.5f, 2.0f };
 	eng.sc->plights.push_back(pl);
-
 
 	//texturemesh tm("textcube.txt");
 	//tm.position = { 0.0, 1.0, 0.0 };

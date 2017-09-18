@@ -168,7 +168,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="texture.cpp" />
-    <ClCompile Include="vec.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data\lightsource.frag" />
