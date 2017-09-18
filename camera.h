@@ -20,7 +20,6 @@ public:
 };
 
 
-
 class arcball_camera : public camera
 {
 public:

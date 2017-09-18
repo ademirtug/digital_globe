@@ -64,157 +64,19 @@ std::vector<std::string> split(const std::string &s, char delim) {
 
 imesh::imesh()
 {
+	scale = glm::vec4(1.0f);
 }
 imesh::~imesh()
 {
 	//delete yazmayı unutma
 }
 
-colormesh::colormesh()
+glm::mat4 imesh::model()
 {
-	vboid_vertices = vboid_normals = vboid_colors = 0;
+	return glm::scale(glm::translate(glm::mat4(), position), scale);
 }
 
-colormesh::colormesh(const std::string& objfile)
-{
-	vboid_vertices = vboid_normals = vboid_colors = 0;
-
-	loadobj(objfile);
-
-	init();
-
-}
-
-colormesh::colormesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::vec3> _colors)
-{
-	vboid_vertices = vboid_normals = vboid_colors = 0;
-	vertices = _vertices;
-	normals = _normals;
-
-	colors = _colors;
-	init();
-}
-colormesh::~colormesh()
-{
-}
-
-
-void colormesh::init()
-{
-	glBindVertexArray(eng.sc->vao_mesh_id);
-
-	glGenBuffers(1, &vboid_vertices);
-	glGenBuffers(1, &vboid_normals);
-
-
-	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-
-	if (normals.size() > 0)
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, vboid_normals);
-		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-void colormesh::loadobj(const std::string& filename)
-{
-	fstream f;
-	f.open(filename, std::fstream::in | std::fstream::binary);
-	if (!f.is_open())
-		return;
-
-	vector<glm::vec3> v;
-	vector<glm::vec3> vn;
-
-
-	string line;
-	while (getline(f, line))
-	{
-		istringstream ss(line);
-		string cmd;
-		ss >> cmd;
-
-		if (cmd == "v")
-		{
-			float v1, v2, v3;
-
-			ss >> v1 >> v2 >> v3;
-			v.push_back({ v1, v2, v3 });
-		}
-		else if (cmd == "vn")
-		{
-			float v1, v2, v3;
-
-			ss >> v1 >> v2 >> v3;
-			vn.push_back({ v1, v2, v3 });
-		}
-		else if (cmd == "f")
-		{
-			while (!ss.eof())
-			{
-				string sect;
-				ss >> sect;
-
-				if (sect.find("/") != string::npos)
-				{
-					vector<string> rs = split(sect, '/');
-					int v1 = atoi(rs[0].c_str());
-
-					vertices.push_back(v[--v1]);
-
-					if (rs.size() > 2 && rs[2].size() > 0)
-					{
-						//push normal
-						v1 = atoi(rs[2].c_str());
-						normals.push_back(vn[--v1]);
-					}
-				}
-				else
-				{
-					while (!ss.eof())
-					{
-						int v1;
-						ss >> v1;
-						vertices.push_back(v[--v1]);
-					}
-				}
-			}
-
-		}
-		else
-		{
-		}
-	}
-
-}
-string colormesh::spname()
-{
-	return "standartlight";
-}
-void colormesh::draw()
-{
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	if (normals.size() > 0)
-	{
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, vboid_normals);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	}
-
-	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-}
-
-
-
-texturemesh::texturemesh()
+texturemesh::texturemesh() : imesh()
 {
 	vboid_vertices = vboid_normals = vboid_uv = 0;
 	tex = 0;
@@ -365,9 +227,9 @@ void texturemesh::loadobj(const std::string& filename)
 }
 string texturemesh::spname()
 {
-	return "uv";
+	return "texturemesh";
 }
-void texturemesh::draw()
+void texturemesh::draw(glm::mat4 view, glm::mat4 projection)
 {
 	if (tex != NULL && tex->vboid_texture != NULL)
 	{
@@ -398,6 +260,53 @@ void texturemesh::draw()
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	}
+	glm::mat4 m = model();
+	glUseProgram(eng.sc->programs["texturemesh"]->get_id());
+	eng.sc->programs["texturemesh"]->setuniform("model", model());
+	eng.sc->programs["texturemesh"]->setuniform("view", view);
+	eng.sc->programs["texturemesh"]->setuniform("projection", projection);
+
+	//eng.sc->programs["texturemesh"]->setuniform("viewPos", eng.cam->getpos());
+	//eng.sc->programs["texturemesh"]->setuniform("material.diffuse", 0);
+	//eng.sc->programs["texturemesh"]->setuniform("material.specular", spec != 0 ? 1 : 0 );
+	//eng.sc->programs["texturemesh"]->setuniform("material.colors_on", ((tex != 0 || spec != 0) ? 0.0f : 1.0f));
+	//eng.sc->programs["texturemesh"]->setuniform("material.color", {0.0f, 0.5f, 0.0f});
+	//eng.sc->programs["texturemesh"]->setuniform("material.shininess", 32.0f);
+	
+
+	//int c = 0;
+	//for (auto l : eng.sc->plights)
+	//{
+	//	eng.sc->programs["texturemesh"]->setuniform("pointLights[" + to_string(c) + "].position", l.position);
+	//	eng.sc->programs["texturemesh"]->setuniform("pointLights[" + to_string(c) + "].ambient", l.ambient);
+	//	eng.sc->programs["texturemesh"]->setuniform("pointLights[" + to_string(c) + "].diffuse", l.diffuse);
+	//	eng.sc->programs["texturemesh"]->setuniform("pointLights[" + to_string(c) + "].specular", l.specular);
+	//	eng.sc->programs["texturemesh"]->setuniform("pointLights[" + to_string(c) + "].constant", l.constant);
+	//	eng.sc->programs["texturemesh"]->setuniform("pointLights[" + to_string(c) + "].linear", l.linear);
+	//	eng.sc->programs["texturemesh"]->setuniform("pointLights[" + to_string(c) + "].quadratic", l.quadratic);
+	//	c++;
+	//}
+
+
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+	
+
+	if (tex != NULL && tex->vboid_texture != NULL)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	if (spec && spec->vboid_texture != 0)
+	{
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+}
+void texturemesh::shadowdraw()
+{
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vboid_vertices);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 }

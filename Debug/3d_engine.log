@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 ﻿  main.cpp
   3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.exe
   3d_engine.vcxproj -> C:\Users\Akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.pdb (Partial PDB)
+=======
+﻿  mesh.cpp
+  3d_engine.vcxproj -> C:\Users\akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.exe
+  3d_engine.vcxproj -> C:\Users\akn\Documents\Visual Studio 2017\Projects\3d_engine\Debug\3d_engine.pdb (Partial PDB)
+>>>>>>> eb856081674f4e144bbe36036fa48a3814ebaf25

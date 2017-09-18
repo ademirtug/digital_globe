@@ -21,36 +21,20 @@ public:
 	virtual ~imesh();
 	
 	virtual std::string spname() { return ""; };
-	virtual void draw() {};
+	virtual void draw(glm::mat4 view, glm::mat4 projection) {};
+	virtual void shadowdraw() {};
+
 	virtual void loadobj(const std::string& filename) = 0;
+	virtual glm::mat4 model();
 	
 	
 	GLuint vboid_vertices;
 	glm::vec3 position;
+	glm::vec3 scale;
 	vector<glm::vec3> vertices;
+	
 };
 
-
-class colormesh : public imesh
-{
-protected:
-	virtual void init();
-public:
-	colormesh();
-	colormesh(const std::string& objfile);
-	colormesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals = {}, vector<glm::vec3> _colors = {});
-	virtual ~colormesh();
-
-	virtual void draw();
-	virtual std::string spname();
-	void loadobj(const std::string& filename);
-
-
-	vector<glm::vec3> normals;
-	vector<glm::vec3> colors;
-
-	GLuint vboid_normals, vboid_colors;
-};
 
 
 
@@ -65,8 +49,9 @@ public:
 	texturemesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals = {}, vector<glm::vec2> _uv = {});
 	virtual ~texturemesh();
 
-	virtual void draw();
-	virtual std::string spname();
+	void draw(glm::mat4 view, glm::mat4 projection);
+	void shadowdraw();
+	std::string spname();
 	void loadobj(const std::string& filename);
 
 
