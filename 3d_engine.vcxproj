@@ -149,6 +149,7 @@
     <ClInclude Include="light.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="engine.h" />
+    <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -160,6 +161,7 @@
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="scene.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -171,17 +173,13 @@
     <ClCompile Include="vec.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\lightsource.frag" />
-    <None Include="data\lightsource.vert" />
-    <None Include="data\pointshadow.frag" />
-    <None Include="data\pointshadow.vert" />
+    <None Include="data\pointlight.frag" />
+    <None Include="data\pointlight.vert" />
     <None Include="data\pointshadowdepth.frag" />
     <None Include="data\pointshadowdepth.geo" />
     <None Include="data\pointshadowdepth.vert" />
-    <None Include="data\standartlight.frag" />
-    <None Include="data\standartlight.vert" />
-    <None Include="data\uv.frag" />
-    <None Include="data\uv.vert" />
+    <None Include="data\texturemesh.frag" />
+    <None Include="data\texturemesh.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

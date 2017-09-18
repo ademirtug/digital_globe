@@ -13,8 +13,8 @@ pointlight::pointlight()
 	specular = { 1.0f, 1.0f, 1.0f };
 
 	constant = 1.0f;
-	linear = 0.09f;
-	quadratic = 0.032f;
+	linear = 0.0009f;
+	quadratic = 0.00032f;
 }
 
 pointlight::pointlight(const std::string& filename) :pointlight()

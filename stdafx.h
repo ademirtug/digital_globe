@@ -32,6 +32,9 @@
 #include "shader.h"
 #include "texture.h"
 #include "mesh.h"
+#include "camera.h"
+#include "light.h"
+#include "scene.h"
 #include "engine.h"
 
 

@@ -42,6 +42,9 @@
     <ClInclude Include="light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -71,24 +74,21 @@
     <ClCompile Include="light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\lightsource.frag">
+    <None Include="data\pointlight.frag">
       <Filter>data</Filter>
     </None>
-    <None Include="data\lightsource.vert">
+    <None Include="data\pointlight.vert">
       <Filter>data</Filter>
     </None>
-    <None Include="data\uv.frag">
+    <None Include="data\texturemesh.frag">
       <Filter>data</Filter>
     </None>
-    <None Include="data\uv.vert">
-      <Filter>data</Filter>
-    </None>
-    <None Include="data\pointshadow.frag">
-      <Filter>data</Filter>
-    </None>
-    <None Include="data\pointshadow.vert">
+    <None Include="data\texturemesh.vert">
       <Filter>data</Filter>
     </None>
     <None Include="data\pointshadowdepth.frag">
@@ -98,12 +98,6 @@
       <Filter>data</Filter>
     </None>
     <None Include="data\pointshadowdepth.vert">
-      <Filter>data</Filter>
-    </None>
-    <None Include="data\standartlight.frag">
-      <Filter>data</Filter>
-    </None>
-    <None Include="data\standartlight.vert">
       <Filter>data</Filter>
     </None>
   </ItemGroup>

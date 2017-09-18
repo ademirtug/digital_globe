@@ -118,6 +118,9 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 	{
 		float dx = xpos - lastx;
 		float dy = ypos - lasty;
+
+		if (dx == 0 && dy == 0)
+			return;
 		
 		glm::vec3 mouseaxis = glm::normalize(glm::vec3(-dx, dy, 0));
 		glm::vec3 up = mouseaxis;
@@ -130,7 +133,6 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 		glm::vec3 rotaxis = glm::normalize(glm::cross(mouseaxis, rightaxis));
 
 		glm::quat newrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(dx, dy, 0))/5), rotaxis);
-		
 		currot = newrot * currot;
 
 		lastx = xpos;
@@ -146,7 +148,7 @@ void qball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, doub
 
 eu_orbit_camera::eu_orbit_camera()
 {
-	cdist = 5;
+	cdist = 15;
 }
 
 eu_orbit_camera::~eu_orbit_camera()
