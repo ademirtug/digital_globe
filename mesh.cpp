@@ -426,7 +426,7 @@ pointcloud::pointcloud() : imesh()
 	shininess = 32.0f;
 	diffuse = 0;
 	specular = 1;
-	pointsize = 3;
+	pointsize = 5;
 }
 pointcloud::pointcloud(const std::string& objfile) : pointcloud()
 {

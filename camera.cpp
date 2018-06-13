@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "camera.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/euler_angles.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtx/euler_angles.hpp"
+#include "glm/gtx/quaternion.hpp"
 #include <math.h>
 
 bool rdown = false;
@@ -75,7 +75,7 @@ void arcball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, do
 
 qball_camera::qball_camera()
 {
-	cdist = 5;
+	cdist = 2 * 6.371f;
 }
 qball_camera::~qball_camera()
 {
