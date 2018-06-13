@@ -10,7 +10,7 @@ class ilight
 {
 public:
 	virtual void shine() {};
-	glm::vec3 ambient, diffuse, specular;
+	glm::vec3 ambient, diffuse, specular, color;
 };
 
 class pointlight : public ilight, public imesh
@@ -26,7 +26,14 @@ public:
 	void draw();
 	virtual std::string spname() { return "standartlight"; };
 	void loadobj(const std::string& filename);
+	string generate_fragshader(scene* sc);
+	string generate_vertshader(scene* sc);
+	std::vector<glm::mat4> getshadowtransforms();
+
 	GLfloat constant, linear, quadratic;
+	shadowcubemap sm;
+	float near_plane, far_plane;
+
 };
 
 
@@ -36,8 +43,14 @@ protected:
 	virtual void init() {};
 public:
 	directionallight();
-	glm::vec3 direction;
 
+	string generate_fragshader(scene* sc);
+	string generate_vertshader(scene* sc);
+
+	float near_plane, far_plane;
+	glm::vec3 direction;
+	shadowmap sm;
+	glm::mat4 projection, space, view;
 };
 
 

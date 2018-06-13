@@ -36,8 +36,7 @@ glm::vec3 arcball_camera::getpos()
 {
 	return inverse(getview())[3];
 }
-void arcball_camera::mouse_button_callback(GLFWwindow* window, int button,
-	int action, int mods)
+void arcball_camera::mouse_button_callback(GLFWwindow* window, int button,	int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
 	{
@@ -72,8 +71,6 @@ void arcball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, do
 {
 	mydiff = -yoffset;
 }
-
-
 
 
 qball_camera::qball_camera()
@@ -203,5 +200,5 @@ void eu_orbit_camera::cursor_pos_callback(GLFWwindow* window, double xpos, doubl
 }
 void eu_orbit_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	mydiff = -yoffset;
+	mydiff = 10 * -yoffset;
 }

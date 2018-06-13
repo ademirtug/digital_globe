@@ -9,63 +9,64 @@ extern engine eng;
 
 int main()
 {
-	//qball_camera* cam = new qball_camera();
-	//arcball_camera* cam = new arcball_camera();
-	eu_orbit_camera* cam = new eu_orbit_camera();
-
+	qball_camera *cam = new qball_camera();
 
 	eng.cam = cam;
 	eng.init(1024, 768);
-<<<<<<< HEAD
-	eng.maxfps = 25;
+	eng.maxfps =750;
+	//eng.sc->enable_dirlight = false;
 
-	eng.load_shaders("lightsource");
-	eng.load_shaders("uv");
-	eng.load_shaders("pointshadow");
-	eng.load_shaders("pointshadowdepth");
-	eng.load_shaders("standartlight");
-=======
-	eng.maxfps = 500;
->>>>>>> eb856081674f4e144bbe36036fa48a3814ebaf25
 
-	pointlight pl("tcube.txt");
+	int lines = 50;
+	float r = 3.0f;
 	
-	pl.position = { 2.0f, 2.5f, 2.0f };
-<<<<<<< HEAD
-	eng.sc->plights.push_back(pl);
+	glm::vec3** globe = new glm::vec3*[lines];
+	for(int i = 0; i < lines; ++i)
+		globe[i] = new glm::vec3[lines];
 
-	//texturemesh tm("textcube.txt");
-	//tm.position = { 0.0, 1.0, 0.0 };
-	//tm.tex = new texture("c2.bmp");
-	//tm.spec = new texture("c2_spec.bmp");
-	//eng.sc->meshes.push_back(&tm);
+	vector<glm::vec3> vertices;
+	pointcloud pc;
 
-	//texturemesh tm2("textcube.txt");
-	//tm2.position = { 0.0, 1.0, 3.0 };
-	//tm2.tex = new texture("c2.bmp");
-	//tm2.spec = new texture("c2_spec.bmp");
-	//eng.sc->meshes.push_back(&tm2);
-=======
-	pl.scale = glm::vec3(0.2f);
+	for (size_t i = 0; i < lines; i++)
+	{
+		float lat = ((2*glm::half_pi<float>() / lines)*i);
+
+		for (size_t j = 0; j< lines; j++)
+		{
+			float lon = ((2*glm::pi<float>() / lines)*j);
+
+			float x = r * sin(lon) * cos(lat);
+			float y = r * sin(lon) * sin(lat);
+			float z = r * cos(lon);
+			glm::vec3 pt = {x, y, z};
+			globe[i][j] = pt;
+			pc.addpoint(pt);
+			
+		}
+	}
+
+	for (size_t i = 0; i < lines-1; i++)
+	{
+		for (size_t j = 0; j< lines - 1; j++)
+		{
+			glm::vec3 pt1 = globe[i][j];
+			glm::vec3 pt2 = globe[i][j+1];
+			glm::vec3 pt3 = globe[i+1][j];
+
+			vertices.push_back(pt1);
+			vertices.push_back(pt2);
+			vertices.push_back(pt3);
+		}
+	}
+
+
+	pc.init();
+	pc.position = { 0.0, 0.0, 0.0 };
+	eng.sc->meshes.push_back(&pc);
 	
->>>>>>> eb856081674f4e144bbe36036fa48a3814ebaf25
-
-	eng.sc->plights.push_back(pl);
-
-	texturemesh tm("textcube.txt");
-	tm.position = { 0.0, 1.0, 0.0 };
-	tm.tex = new texture("c2.bmp");
-	tm.spec = new texture("c2_spec.bmp");
-	eng.sc->meshes.push_back(&tm);
-
-
-	texturemesh floor("plane.txt");
-	floor.tex = new texture("wood.bmp");
-	eng.sc->meshes.push_back(&floor);
 
 	eng.sc->generate_shaders();
 	eng.run();
-
 
 	glfwTerminate();
 	return 0;

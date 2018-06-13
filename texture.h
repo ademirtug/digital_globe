@@ -19,7 +19,26 @@ class bitmap : public texture
 
 
 class shadowmap : public texture
-{};
+{
+public:
+	shadowmap();
+	void init();
+
+	int width, height;
+	GLuint fbo_depthmap;
+
+};
+
+class shadowcubemap : public texture
+{
+public:
+	shadowcubemap();
+	void init();
+	
+	int width, height;
+	GLuint fbo_depthmap;
+
+};
 
 
 

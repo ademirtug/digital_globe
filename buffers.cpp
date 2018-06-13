@@ -17,7 +17,6 @@ mesh::mesh(const float* _data, GLuint sizei)
 	GLenum err = 0;;
 	if (err != GL_NO_ERROR)
 		std::cout << gluErrorString(err);
-
 }
 
 mesh::~mesh()

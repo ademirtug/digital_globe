@@ -1,22 +1,16 @@
-﻿#include "stdafx.h"
+﻿ #include "stdafx.h"
 #include "texture.h"
-
-
 
 
 texture::texture()
 {
 	vboid_texture = 0;
 }
-
-
 texture::texture(const std::string& filename)
 {
 	vboid_texture = 0;
 	load(filename);
 }
-
-
 void texture::load(const std::string& filename)
 {
 	unsigned int w, h, datastart, imgsize;
@@ -65,4 +59,75 @@ void texture::load(const std::string& filename)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+}
+
+
+
+//shadowmap
+shadowmap::shadowmap()
+{
+	width = 1024;
+	height = 1024;
+	vboid_texture = 0;
+	fbo_depthmap = 0;
+	init();
+}
+void shadowmap::init()
+{
+	glGenFramebuffers(1, &fbo_depthmap);
+
+	glGenTextures(1, &vboid_texture);
+
+	glBindTexture(GL_TEXTURE_2D, vboid_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo_depthmap);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, vboid_texture, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+
+
+//shadowcubemap
+shadowcubemap::shadowcubemap()
+{
+	width = 1024;
+	height = 1024;
+	vboid_texture = 0;
+	fbo_depthmap = 0;
+	init();
+}
+
+void shadowcubemap::init()
+{
+	glGenFramebuffers(1, &fbo_depthmap);
+
+	glGenTextures(1, &vboid_texture);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, vboid_texture);
+	for (unsigned int i = 0; i < 6; ++i)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo_depthmap);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, vboid_texture, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
