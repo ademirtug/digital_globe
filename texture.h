@@ -9,13 +9,15 @@ public:
 	texture(const std::string& filename);
 	void load(const std::string& filename);
 
-
 	GLuint vboid_texture;
 };
 
 
 class bitmap : public texture
-{};
+{
+
+};
+
 
 
 class shadowmap : public texture
@@ -26,8 +28,8 @@ public:
 
 	int width, height;
 	GLuint fbo_depthmap;
-
 };
+
 
 class shadowcubemap : public texture
 {
@@ -37,12 +39,6 @@ public:
 	
 	int width, height;
 	GLuint fbo_depthmap;
-
 };
-
-
-
-
-
 
 #endif//__TEXTURE_H__ 
