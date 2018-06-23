@@ -1,23 +1,2 @@
-﻿  stdafx.cpp
-  texture.cpp
-  shader.cpp
-  scene.cpp
-c:\users\akn\documents\github\3d_engine\scene.cpp(93): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  mesh.cpp
-  main.cpp
-c:\users\akn\documents\github\3d_engine\main.cpp(51): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\main.cpp(55): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\main.cpp(70): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\main.cpp(72): warning C4018: '<': signed/unsigned mismatch
-  light.cpp
-  engine.cpp
-  camera.cpp
-c:\users\akn\documents\github\3d_engine\camera.cpp(55): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(56): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(57): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(58): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(116): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(117): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  buffers.cpp
-  Generating Code...
-LINK : fatal error LNK1104: cannot open file 'glew32.lib'
+﻿  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
+  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)
