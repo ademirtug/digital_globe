@@ -29,16 +29,16 @@ int main()
 	//eng.sc->enable_dirlight = false;
 
 
-	int lines = 150;
 	float r = 6.371f;
 	float a = 6.3567523f;
 	float b = 6.3781370f;
 	float h = 0.0f;
+	int num_lat = 9;
+	int num_long = 18;
 
-	
-	glm::vec3** globe = new glm::vec3*[lines+1];
-	for(int i = 0; i < lines+1; ++i)
-		globe[i] = new glm::vec3[lines+1];
+	glm::vec3** globe = new glm::vec3*[91];
+	for (int i = 0; i < 91; ++i)
+		globe[i] = new glm::vec3[181];
 
 
 	vector<glm::vec3> vertices;
@@ -47,33 +47,32 @@ int main()
 	pointcloud pc;
 
 
-	//oblate spheroid
-	for (size_t i = 0; i < lines + 1; i++)
+	for (size_t i = 0; i < num_lat + 1; i++)
 	{
-		float lon = ((2 * glm::pi<float>() / lines)*i);
+		float lat = (( glm::pi<float>() / num_lat)*i);
 
-		for (size_t j = 0; j<lines + 1; j++)
+		for (size_t j = 0; j<num_long + 1; j++)
 		{
-			float lat = ((2 * glm::pi<float>() / lines)*j);
+			float lon = ((2 * glm::pi<float>() / num_long)*j);
 
-			float x = (N(lat, a, b) + h) * cos(lat) * cos(lon);
+			float x = (N(lon, a, b) + h) * cos(lon) * cos(lat);
 
-			float y = (N(lat, a, b) + h) * cos(lat) * sin(lon);
+			float y = (N(lon, a, b) + h) * cos(lon) * sin(lat);
 
-			float z = (((b*b) / (a*a)) * N(lat, a, b) + h) * sin(lat);
+			float z = (((b*b) / (a*a)) * N(lat, a, b) + h) * sin(lon);
 
 			glm::vec3 pt = { x, y, z };
-			globe[j][i] = pt;
+			globe[i][j] = pt;
 			pc.addpoint(pt);
 		}
 	}
-	for (size_t i = 0; i < lines; i++)
+	for (size_t i = 0; i < num_lat; i++)
 	{
-		for (size_t j = 0; j< lines; j++)
+		for (size_t j = 0; j< num_long; j++)
 		{
-			glm::vec3 pt1 = globe[i + 1][j];
-			glm::vec3 pt2 = globe[i][j + 1];
-			glm::vec3 pt3 = globe[i][j];
+			glm::vec3 pt1 = globe[i][j];
+			glm::vec3 pt2 = globe[i+1][j];
+			glm::vec3 pt3 = globe[i][j+1];
 
 			vertices.push_back(pt1);
 			vertices.push_back(pt2);
@@ -85,9 +84,9 @@ int main()
 			normals.push_back(calc_normal(pt3, pt1, pt2));
 
 
-			glm::vec3 pt4 = globe[i][j + 1];
-			glm::vec3 pt5 = globe[i + 1][j];
-			glm::vec3 pt6 = globe[i + 1][j + 1];
+			glm::vec3 pt4 = globe[i+1][j];
+			glm::vec3 pt5 = globe[i + 1][j + 1];
+			glm::vec3 pt6 = globe[i][j + 1];
 			vertices.push_back(pt4);
 			vertices.push_back(pt5);
 			vertices.push_back(pt6);
@@ -97,6 +96,7 @@ int main()
 			normals.push_back(calc_normal(pt6, pt4, pt5));
 		}
 	}
+
 
 	//////sphere
 	////for (size_t i = 0; i < lines +1; i++)
@@ -138,15 +138,15 @@ int main()
 	////		normals.push_back(calc_normal(pt6, pt4, pt5));
 	////	}
 	////}
-	//pc.init();
-	//pc.position = { 0.0, 0.0, 0.0 };
-	//eng.sc->meshes.push_back(&pc);
+
 	
 	colormesh cm(vertices, normals);
 	cm.position = { 0.0, 0.0, 0.0 };
 	eng.sc->meshes.push_back(&cm);
 
-
+	//pc.init();
+	//pc.position = { 0.0, 0.0, 0.0 };
+	//eng.sc->meshes.push_back(&pc);
 
 	eng.sc->generate_shaders();
 	eng.run();

@@ -24,8 +24,10 @@ public:
 	virtual std::string spname() { return ""; };
 	virtual void draw(glm::mat4 view, glm::mat4 projection) {};
 	virtual void shadowdraw() {};
+	virtual std::string generate_geoshader(scene* sc) { return ""; };
 	virtual std::string generate_fragshader(scene* sc) { return ""; };
 	virtual std::string generate_vertshader(scene* sc) { return ""; };
+	
 
 	virtual void loadobj(const std::string& filename) = 0;
 	virtual glm::mat4 model();
@@ -52,6 +54,7 @@ public:
 	void draw(glm::mat4 view, glm::mat4 projection);
 	void shadowdraw();
 	void loadobj(const std::string& filename);
+	std::string generate_geoshader(scene* sc);
 	std::string generate_fragshader(scene* sc);
 	std::string generate_vertshader(scene* sc);
 

@@ -286,6 +286,15 @@ void scene::generate_shaders()
 		{
 			program* sp = new program();
 
+			////geo shader
+			//shader gsh(GL_GEOMETRY_SHADER);
+			//if (gsh.compile(m->generate_geoshader(this)) == GL_FALSE)
+			//	cout << "geo failed";
+
+			//if (sp->attach_shader(&gsh) != GL_NO_ERROR)
+			//	cout << "geo attach failed";
+
+
 			//frag shader
 			shader fsh(GL_FRAGMENT_SHADER);
 			if (fsh.compile(m->generate_fragshader(this)) == GL_FALSE)

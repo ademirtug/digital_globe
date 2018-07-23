@@ -172,7 +172,7 @@ string pointlight::generate_vertshader(scene* sc)
 
 directionallight::directionallight()
 {
-	direction = { -2.0f, 4.0f, -1.0f };
+	direction = { -2.0f, 5.0f, -1.0f };
 	ambient = { 0.3f, 0.3f, 0.3f };
 	diffuse = { 0.7f, 0.7f, 0.7f };
 	specular = { 0.7f, 0.7f, 0.7f };

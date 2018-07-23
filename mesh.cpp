@@ -233,6 +233,41 @@ void colormesh::shadowdraw()
 
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 }
+
+string colormesh::generate_geoshader(scene* sc)
+{
+	string shader = ""
+		"#version 330\n"
+		"layout(triangles) in;\n"
+		"layout(line_strip, max_vertices = 8) out;\n"
+		"float normal_length = 0.2;\n"
+		"uniform mat4 gxl3d_ModelViewProjectionMatrix;\n "
+
+		//"in vec3 gsFragPos;\n"
+		//"in vec3 gsNormal;\n"
+		//"in vec2 gsTexCoords;\n"
+
+		//"out vec3 FragPos;\n"
+		//"out vec3 Normal;\n"
+		//"out vec2 TexCoords;\n"
+		""
+		""
+		""
+		"void main()\n"
+		"{\n"
+		//"	FragPos = gsFragPos;\n"
+		//"	Normal = gsNormal;\n"
+		//"	TexCoords = gsTexCoords;\n"
+		"}\n"
+		
+		
+		"";
+
+
+
+	return shader;
+}
+
 string colormesh::generate_fragshader(scene* sc)
 {
 	string shader = "#version 330 core\n"
@@ -331,8 +366,8 @@ string colormesh::generate_fragshader(scene* sc)
 			"	float currentDepth = projCoords.z;\n"
 			"	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);\n"
 			"	float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;\n"
-
-			"	return shadow;\n"
+				
+			"	return 0.0;\n"
 			"}\n"
 
 			"vec3 CalcDirLight(DirLight light, vec3 normal, vec3 fragPos, vec3 viewDir)\n"
