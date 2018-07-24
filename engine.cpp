@@ -56,11 +56,8 @@ bool engine::init(int width, int height)
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	sc = new scene();
 	glGenVertexArrays(1, &sc->vao_mesh_id);
 	glGenVertexArrays(1, &sc->vao_lights_id);
