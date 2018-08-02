@@ -1,7 +1,4 @@
-﻿// 3d_engine.cpp : Defines the entry point for the console application.
-//
-
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "camera.h"
 
 using namespace std;
@@ -16,7 +13,7 @@ glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
 
 float N(float phi, float a, float b)
 {
-	return (a*a) / sqrt(  (a*a)*cos(phi)*cos(phi)  +  (b*b)*sin(phi)*sin(phi));
+	return (a*a) / sqrt((a*a)*cos(phi)*cos(phi) + (b*b)*sin(phi)*sin(phi));
 }
 
 int main()
@@ -25,16 +22,16 @@ int main()
 
 	eng.cam = cam;
 	eng.init(1024, 768);
-	eng.maxfps =25;
+	eng.maxfps = 25;
 	//eng.sc->enable_dirlight = false;
 
 
-	float r = 6.371f;
+	float r = 6.371f; 
 	float a = 6.3567523f;
 	float b = 6.3781370f;
 	float h = 0.0f;
-	float num_lat = 90;
-	float num_long = 180;
+	float num_lat = 9;
+	float num_long = 18;
 
 	glm::vec3** globe = new glm::vec3*[num_lat + 1];
 	for (int i = 0; i < num_lat + 1; ++i)
@@ -53,8 +50,8 @@ int main()
 
 		for (size_t j = 0; j<num_long + 1; j++)
 		{
-
 			float lon = ((2 * glm::pi<float>() / num_long)*j);
+
 
 			float x = (N(lat, a, b) + h) * cos(lat) * cos(lon);
 
@@ -62,29 +59,11 @@ int main()
 
 			float z = (((b*b) / (a*a)) * N(lon, a, b) + h) * sin(lat);
 
-
 			glm::vec3 pt = { x, y, z };
 			globe[i][j] = pt;
 			pc.addpoint(pt);
 		}
 	}
-
-	//for (size_t i = 0; i < num_lat+1; i++)
-	//{
-	//	float lon = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>()/2;
-	//	for (size_t j = 0; j<num_long+1; j++)
-	//	{
-	//		
-	//		float lat = ((2 * glm::pi<float>() / num_long)*j);
-	//		float x = (N(lon, a, b) + h) * cos(lon) * cos(lat);
-	//		float y = (N(lon, a, b) + h) * cos(lon) * sin(lat);
-	//		float z = (((b*b) / (a*a)) * N(lat, a, b) + h) * sin(lon);
-	//		glm::vec3 pt = { x, y, z };
-	//		globe[i][j] = pt;
-	//		pc.addpoint(pt);
-	//	}
-	//}
-
 
 
 	for (size_t i = 0; i < num_lat; i++)
@@ -99,11 +78,9 @@ int main()
 			vertices.push_back(pt2);
 			vertices.push_back(pt3);
 
-
 			normals.push_back(calc_normal(pt1, pt2, pt3));
 			normals.push_back(calc_normal(pt2, pt3, pt1));
 			normals.push_back(calc_normal(pt3, pt1, pt2));
-
 
 			glm::vec3 pt4 = globe[i+1][j];
 			glm::vec3 pt5 = globe[i + 1][j + 1];
