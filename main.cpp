@@ -4,14 +4,15 @@
 using namespace std;
 extern engine eng;
 
-class ellipsoid
+class spheroid
 {
 public:
 	float num_lat, num_long;
 	glm::vec3 radii;
+	vector<glm::vec3> vertices;
+	vector<glm::vec3> normals;
 
-
-	ellipsoid(double _x, double _y, double _z)
+	spheroid(double _x, double _y, double _z)
 	{
 		radii.x = _x;
 		radii.y = _y;
@@ -21,16 +22,23 @@ public:
 
 
 	}
-	ellipsoid(glm::vec3 xyz) : ellipsoid(xyz.x, xyz.y, xyz.z)
+
+	spheroid(glm::vec3 xyz) : spheroid(xyz.x, xyz.y, xyz.z)
 	{
 	}
+
 	vector<glm::vec3> generate_vertices()
 	{
+
+		pointcloud pc;
+		float r = 6371000.0f;
+		float a = 6356752.3f;
+		float b = 6378137.0f;
+		float h = 0.0f;
+
 		glm::vec3** globe = new glm::vec3*[num_lat + 1];
 		for (int i = 0; i < num_lat + 1; ++i)
 			globe[i] = new glm::vec3[num_long + 1];
-
-
 	}
 };
 
@@ -41,9 +49,36 @@ glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
 }
 
 
+//float N(float phi, float a, float b)
+//{
+//	return (a*a) / sqrt((a*a)*cos(phi)*cos(phi) + (b*b)*sin(phi)*sin(phi));
+//}
+
+
 float N(float phi, float a, float b)
 {
-	return (a*a) / sqrt((a*a)*cos(phi)*cos(phi) + (b*b)*sin(phi)*sin(phi));
+	double e2 = 1 - ((b*b) / (a*a));
+
+	return a / sqrt(1 - e2 * sin(phi)*sin(phi));
+}
+
+void calc()
+{
+	double b = 6356752.3f;
+	double a = 6378137.0f;
+	double num_lat = 180;
+	double num_long = 360;
+	double e2 = 1 - ((b*b) / (a*a));
+
+	double lat = ((glm::pi<double>() / num_lat) * 50);
+	double lon = ((2 * glm::pi<double>() / num_long) * 50);
+
+	double x = N(lat, a, b) * cos(lat) * cos(lon);
+
+	double y = N(lat, a, b) * cos(lat) * sin(lon);
+
+	double z = ((b*b) / (a*a)) * N(lat, a, b) * sin(lat);
+
 }
 
 int main()
@@ -56,14 +91,14 @@ int main()
 	//eng.sc->enable_dirlight = false;
 	//cam->cdist = 7000000;
 
-
+	//spheroid earth;
 
 	float r = 6371000.0f; 
-	float a = 6356752.3f;
-	float b = 6378137.0f;
-	float h = 0.0f;
-	float num_lat = 9 * 3;
-	float num_long = 18 * 3;
+	float b = 6356752.3f;
+	float a = 6378137.0f;
+	float num_lat = 18;
+	float num_long = 36;
+	float e2 = 1 - ((b*b) / (a*a));
 
 	glm::vec3** globe = new glm::vec3*[num_lat + 1];
 	for (int i = 0; i < num_lat + 1; ++i)
@@ -76,6 +111,9 @@ int main()
 	pointcloud pc;
 
 
+
+	calc();
+
 	for (size_t i = 0; i < num_lat + 1; i++)
 	{
 		float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
@@ -84,11 +122,11 @@ int main()
 		{
 			float lon = ((2 * glm::pi<float>() / num_long)*j);
 
-			float x = (N(lat, a, b) + h) * cos(lat) * cos(lon);
+			float x = N(lat, a, b) * cos(lat) * cos(lon);
 
-			float y = (N(lat, a, b) + h) * cos(lat) * sin(lon);
+			float y = N(lat, a, b) * cos(lat) * sin(lon);
 
-			float z = (((b*b) / (a*a)) * N(lon, a, b) + h) * sin(lat);
+			float z = (1 - e2) * N(lat, a, b) * sin(lat);
 
 			glm::vec3 pt = { x, y, z };
 			globe[i][j] = pt;
@@ -102,8 +140,8 @@ int main()
 		for (size_t j = 0; j< num_long; j++)
 		{
 			glm::vec3 pt1 = globe[i][j];
-			glm::vec3 pt2 = globe[i+1][j];
-			glm::vec3 pt3 = globe[i][j+1];
+			glm::vec3 pt2 = globe[i + 1][j];
+			glm::vec3 pt3 = globe[i][j + 1];
 
 			vertices.push_back(pt1);
 			vertices.push_back(pt2);
@@ -113,7 +151,7 @@ int main()
 			normals.push_back(calc_normal(pt2, pt3, pt1));
 			normals.push_back(calc_normal(pt3, pt1, pt2));
 
-			glm::vec3 pt4 = globe[i+1][j];
+			glm::vec3 pt4 = globe[i + 1][j];
 			glm::vec3 pt5 = globe[i + 1][j + 1];
 			glm::vec3 pt6 = globe[i][j + 1];
 
