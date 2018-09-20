@@ -19,6 +19,7 @@ public:
 	std::map<std::string, program*> programs;
 
 	bool enable_dirlight;
+	float width, height;
 };
 
 

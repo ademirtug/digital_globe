@@ -72,10 +72,25 @@ void arcball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, do
 	mydiff = -yoffset;
 }
 
+float toRadians(float degree)
+{
+	return degree * (glm::pi<float>() / 180);
+}
+
+float getAltitude(float mapzoom) {
+	//this equation is a transformation of the angular size equation solving for D. See: http://en.wikipedia.org/wiki/Forced_perspective
+	float googleearthaltitude;
+	float firstPartOfEq = (float)(.05 * ((591657550.5 / (pow(2, (mapzoom - 1)))) / 2));//amount displayed is .05 meters and map scale =591657550.5/(Math.pow(2,(mapzoom-1))))
+																					   //this bit ^ essentially gets the h value in the angular size eq then divides it by 2
+	googleearthaltitude = (firstPartOfEq) * ((float)(cos(toRadians(85.362 / 2))) / (float)(sin(toRadians(85.362 / 2))));//85.362 is angle which google maps displays on a 5cm wide screen
+	return googleearthaltitude;
+}
+
 
 qball_camera::qball_camera()
 {
-	cdist = 2 * 6.371f;
+	zoomlevel = 2;
+	cdist = getAltitude(zoomlevel);
 }
 qball_camera::~qball_camera()
 {
@@ -84,8 +99,7 @@ qball_camera::~qball_camera()
 glm::quat currot(1, 0, 0, 0);
 glm::mat4 qball_camera::getview()
 {
-	cdist += mydiff / 5;
-	mydiff = 0;
+	cdist = 6378137.0f + getAltitude(zoomlevel);
 
 	return (glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -cdist)) * glm::mat4_cast(currot));
 }
@@ -138,7 +152,11 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 }
 void qball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	mydiff = -yoffset;
+	zoomlevel += yoffset;
+	zoomlevel = zoomlevel < 2 ? 2 : zoomlevel;
+	zoomlevel = zoomlevel > 19 ? 19 : zoomlevel;
+
+	//mydiff = -yoffset;
 }
 
 

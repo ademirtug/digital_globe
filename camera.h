@@ -39,6 +39,7 @@ class qball_camera : public camera
 {
 public:
 	double cdist;
+	int zoomlevel;
 	qball_camera();
 	~qball_camera();
 

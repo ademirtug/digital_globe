@@ -7,6 +7,8 @@ scene::scene()
 {
 	//bunu texture sýnýfýndan türeme shadow map yap
 	enable_dirlight = true;
+	width = 1024.0f;
+	height = 768.0f;
 }
 
 
@@ -36,65 +38,14 @@ void scene::draw()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	if (plights.size() > 0)
-	{
-		glViewport(0, 0, plights[0].sm.width, plights[0].sm.height);
-		glBindFramebuffer(GL_FRAMEBUFFER, plights[0].sm.fbo_depthmap);
-		glClear(GL_DEPTH_BUFFER_BIT);
-
-		std::vector<glm::mat4> shadowTransforms = plights[0].getshadowtransforms();
-
-
-		glUseProgram(programs["pointshadowdepth"]->get_id());
-
-		for (unsigned int i = 0; i < 6; ++i)
-			programs["pointshadowdepth"]->setuniform("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
-
-		programs["pointshadowdepth"]->setuniform("far_plane", plights[0].far_plane);
-		programs["pointshadowdepth"]->setuniform("lightPos", plights[0].position);
-
-
-		for (auto m : meshes)
-		{
-			programs["pointshadowdepth"]->setuniform("model", m->model());
-			m->shadowdraw();
-		}
-
-		glBindVertexArray(0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	}
-
-
 	//NORMAL ÇÝZÝM
-	glViewport(0, 0, 1024, 768);
+	glViewport(0, 0, width, height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(45.0f, width/height, 100.0f, 16000000.0f);
 	glm::mat4 view = eng.cam->getview();
 	glm::vec3 cameraPos = eng.cam->getpos();
-
-
-	if (plights.size() > 0)
-	{
-		glBindVertexArray(vao_lights_id);
-		for (auto l : plights)
-		{
-			glUseProgram(programs["pointlight"]->get_id());
-			programs["pointlight"]->setuniform("model", l.model());
-			programs["pointlight"]->setuniform("view", view);
-			programs["pointlight"]->setuniform("projection", projection);
-
-			l.draw();
-			glUseProgram(0);
-		}
-		glBindVertexArray(0);
-
-
-		plights[0].position.z = sin(glfwGetTime() * 0.5) * 3.0;
-	}
-
-
-
+	
 	glBindVertexArray(vao_mesh_id);
 	for (auto m : meshes)
 	{
@@ -103,8 +54,6 @@ void scene::draw()
 
 		if (enable_dirlight)
 		{
-			
-
 			programs[m->spname()]->setuniform("dirLight.direction", dirlight.direction);
 			programs[m->spname()]->setuniform("dirLight.ambient", dirlight.ambient);
 			programs[m->spname()]->setuniform("dirLight.diffuse", dirlight.diffuse);
@@ -118,32 +67,6 @@ void scene::draw()
 			programs[m->spname()]->setuniform("dldepthMap", 3);
 		}
 	
-		if (plights.size() > 0)
-		{
-			int c = 0;
-			for (auto l : plights)
-			{
-				programs[m->spname()]->setuniform("pointLights[" + to_string(c) + "].color", l.color);
-				programs[m->spname()]->setuniform("pointLights[" + to_string(c) + "].position", l.position);
-
-				programs[m->spname()]->setuniform("pointLights[" + to_string(c) + "].ambient", l.ambient);
-				programs[m->spname()]->setuniform("pointLights[" + to_string(c) + "].diffuse", l.diffuse);
-				programs[m->spname()]->setuniform("pointLights[" + to_string(c) + "].specular", l.specular);
-
-				programs[m->spname()]->setuniform("pointLights[" + to_string(c) + "].constant", l.constant);
-				programs[m->spname()]->setuniform("pointLights[" + to_string(c) + "].linear", l.linear);
-				programs[m->spname()]->setuniform("pointLights[" + to_string(c) + "].quadratic", l.quadratic);
-
-				c++;
-			}
-
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, plights[0].sm.vboid_texture);
-
-			programs[m->spname()]->setuniform("far_plane", plights[0].far_plane);
-			programs[m->spname()]->setuniform("pldepthMap", 3);
-		}
-
 		m->draw(view, projection);
 
 		glUseProgram(0);

@@ -285,66 +285,6 @@ string colormesh::generate_fragshader(scene* sc)
 		"uniform vec3 viewPos;\n"
 		"uniform Material material;\n";
 
-	if (sc->plights.size() > 0)
-	{
-		shader += "struct PointLight {\n"
-			"	vec3 position;\n"
-			"	vec3 color;\n"
-			"\n"
-			"	float constant;\n"
-			"	float linear;\n"
-			"	float quadratic;\n"
-			"\n"
-			"	vec3 ambient;\n"
-			"	vec3 diffuse;\n"
-			"	vec3 specular;\n"
-			"};\n"
-
-			"uniform samplerCube pldepthMap;\n"
-			"uniform PointLight pointLights[" + to_string(sc->plights.size()) + "];\n"
-			"uniform float far_plane;\n"
-
-			"float PointLightShadowCalculation(PointLight light, vec3 fragPos, vec3 lightDir, vec3 normal)\n"
-			"{\n"
-			"	vec3 fragToLight = fragPos - light.position;\n"
-			"	float closestDepth = texture(pldepthMap, fragToLight).r;\n"
-			"	closestDepth *= far_plane;\n"
-			"	float currentDepth = length(fragToLight);\n"
-			"	float bias = max(0.1 * (1.0 - dot(normal, lightDir)), 0.005); \n"
-			"	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;\n"
-			"	return shadow;\n"
-			"}\n"
-
-			"vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)\n"
-			"{\n"
-			"	// ambient\n"
-			"	vec3 ambient = light.ambient * light.color;\n"
-			"	vec3 objectColor = vec3(1.0, 0.5, 0.31);\n"
-
-			"	// diffuse \n"
-			"	vec3 lightDir = normalize(light.position - fragPos);\n"
-			"	float diff = max(dot(normal, lightDir), 0.0);\n"
-			"	vec3 diffuse = light.diffuse * diff * light.color;\n" 
-
-			"	// specular\n"
-			"	vec3 reflectDir = reflect(-lightDir, normal);\n"
-			"	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);\n"
-			"	vec3 specular = light.specular * spec * light.color;\n"
-
-			"	// attenuation\n"
-			"	float distance = length(light.position - fragPos);\n"
-			"	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));\n"
-
-			"	ambient *= attenuation;\n"
-			"	diffuse *= attenuation;\n"
-			"	specular *= attenuation;\n"
-
-			"	float shadow = PointLightShadowCalculation(light, fragPos, lightDir, normal); \n"
-			"	vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));\n"
-			"	return lighting * objectColor;\n"
-			"}\n";
-	}
-
 	if (sc->enable_dirlight)
 	{
 		shader += "struct DirLight {\n"
@@ -398,11 +338,6 @@ string colormesh::generate_fragshader(scene* sc)
 		"	vec3 viewDir = normalize(viewPos - FragPos);\n"
 		"	vec3 result = vec3(0, 0, 0);\n";
 	int i = 0;
-	for each (pointlight l	in sc->plights)
-	{
-		shader += "	result += CalcPointLight(pointLights[" + to_string(i) + "], norm, FragPos, viewDir); \n";
-		++i;
-	}
 	if (sc->enable_dirlight)
 	{
 		shader += "	result += CalcDirLight(dirLight, norm, FragPos, viewDir);\n";
@@ -410,8 +345,9 @@ string colormesh::generate_fragshader(scene* sc)
 	shader += "	FragColor = vec4(result, 1.0); }\n";
 
 	return shader;
-
 }
+
+
 string colormesh::generate_vertshader(scene* sc)
 {
 	string shader = "#version 330 core\n"
@@ -612,66 +548,6 @@ string pointcloud::generate_fragshader(scene* sc)
 		"uniform vec3 viewPos;\n"
 		"uniform Material material;\n";
 
-	if (sc->plights.size() > 0)
-	{
-		shader += "struct PointLight {\n"
-			"	vec3 position;\n"
-			"	vec3 color;\n"
-			"\n"
-			"	float constant;\n"
-			"	float linear;\n"
-			"	float quadratic;\n"
-			"\n"
-			"	vec3 ambient;\n"
-			"	vec3 diffuse;\n"
-			"	vec3 specular;\n"
-			"};\n"
-
-			"uniform samplerCube pldepthMap;\n"
-			"uniform PointLight pointLights[" + to_string(sc->plights.size()) + "];\n"
-			"uniform float far_plane;\n"
-
-			"float PointLightShadowCalculation(PointLight light, vec3 fragPos, vec3 lightDir, vec3 normal)\n"
-			"{\n"
-			"	vec3 fragToLight = fragPos - light.position;\n"
-			"	float closestDepth = texture(pldepthMap, fragToLight).r;\n"
-			"	closestDepth *= far_plane;\n"
-			"	float currentDepth = length(fragToLight);\n"
-			"	float bias = max(0.1 * (1.0 - dot(normal, lightDir)), 0.005); \n"
-			"	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;\n"
-			"	return shadow;\n"
-			"}\n"
-
-			"vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)\n"
-			"{\n"
-			"	// ambient\n"
-			"	vec3 ambient = light.ambient * light.color;\n"
-			"	vec3 objectColor = vec3(1.0, 0.5, 0.31);\n"
-
-			"	// diffuse \n"
-			"	vec3 lightDir = normalize(light.position - fragPos);\n"
-			"	float diff = max(dot(normal, lightDir), 0.0);\n"
-			"	vec3 diffuse = light.diffuse * diff * light.color;\n"
-
-			"	// specular\n"
-			"	vec3 reflectDir = reflect(-lightDir, normal);\n"
-			"	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);\n"
-			"	vec3 specular = light.specular * spec * light.color;\n"
-
-			"	// attenuation\n"
-			"	float distance = length(light.position - fragPos);\n"
-			"	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));\n"
-
-			"	ambient *= attenuation;\n"
-			"	diffuse *= attenuation;\n"
-			"	specular *= attenuation;\n"
-
-			"	float shadow = PointLightShadowCalculation(light, fragPos, lightDir, normal); \n"
-			"	vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));\n"
-			"	return lighting * objectColor;\n"
-			"}\n";
-	}
-
 	if (sc->enable_dirlight)
 	{
 		shader += "struct DirLight {\n"
@@ -724,12 +600,6 @@ string pointcloud::generate_fragshader(scene* sc)
 		"	vec3 norm = normalize(Normal);\n"
 		"	vec3 viewDir = normalize(viewPos - FragPos);\n"
 		"	vec3 result = vec3(0, 0, 0);\n";
-	int i = 0;
-	for each (pointlight l	in sc->plights)
-	{
-		shader += "	result += CalcPointLight(pointLights[" + to_string(i) + "], norm, FragPos, viewDir); \n";
-		++i;
-	}
 	if (sc->enable_dirlight)
 	{
 		shader += "	result += CalcDirLight(dirLight, norm, FragPos, viewDir);\n";
@@ -997,64 +867,6 @@ string texturemesh::generate_fragshader(scene* sc)
 		"uniform vec3 viewPos;\n"
 		"uniform Material material;\n";
 
-	if (sc->plights.size() > 0)
-	{
-		shader += "struct PointLight {\n"
-			"	vec3 position;\n"
-			"	vec3 color;\n"
-			"\n"
-			"	float constant;\n"
-			"	float linear;\n"
-			"	float quadratic;\n"
-			"\n"
-			"	vec3 ambient;\n"
-			"	vec3 diffuse;\n"
-			"	vec3 specular;\n"
-			"};\n"
-			"uniform samplerCube pldepthMap;\n"
-
-			"uniform PointLight pointLights[" + to_string(sc->plights.size()) + "];\n"
-			"uniform float far_plane;\n"
-
-			"float PointLightShadowCalculation(PointLight light, vec3 fragPos, vec3 lightDir, vec3 normal)\n"
-			"{\n"
-			"	vec3 fragToLight = fragPos - light.position;\n"
-			"	float closestDepth = texture(pldepthMap, fragToLight).r;\n"
-			"	closestDepth *= far_plane;\n"
-			"	float currentDepth = length(fragToLight);\n"
-			"	float bias = max(0.1 * (1.0 - dot(normal, lightDir)), 0.005); \n"
-			"	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;\n"
-			"	return shadow;\n"
-			"}\n"
-
-			"vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)\n"
-			"{\n"
-			"	// ambient\n"
-			"	vec3 ambient = light.ambient * light.color;\n"
-			"	vec3 color = texture(material.diffuse, TexCoords).rgb; \n"
-
-			"	// diffuse \n"
-			"	vec3 lightDir = normalize(light.position - fragPos);\n"
-			"	float diff = max(dot(normal, lightDir), 0.0);\n"
-			"	vec3 diffuse = light.diffuse * diff * light.color;\n"
-
-			"	// specular\n"
-			"	vec3 reflectDir = reflect(-lightDir, normal);\n"
-			"	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);\n"
-			"	vec3 specular = light.specular * spec * light.color;\n"
-
-			"	// attenuation\n"
-			"	float distance = length(light.position - fragPos);\n"
-			"	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));\n"
-
-			"	ambient *= attenuation;\n"
-			"	diffuse *= attenuation;\n"
-			"	specular *= attenuation;\n"
-			"	float shadow = PointLightShadowCalculation(light, fragPos, lightDir, normal); \n"
-			"	vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));\n"
-			"	return lighting * color;\n"
-			"}\n";
-	}
 	if (sc->enable_dirlight)
 	{
 		shader += "struct DirLight {\n"
@@ -1108,12 +920,6 @@ string texturemesh::generate_fragshader(scene* sc)
 		"	vec3 viewDir = normalize(viewPos - FragPos);\n"
 		"	vec3 result = vec3(0, 0, 0);\n";
 
-	int i = 0;
-	for each (pointlight l	in sc->plights)
-	{
-		shader += "	result += CalcPointLight(pointLights[" + to_string(i) + "], norm, FragPos, viewDir); \n";
-		++i;
-	}
 	if (sc->enable_dirlight)
 	{
 		shader += "	result += CalcDirLight(dirLight, norm, FragPos, viewDir);\n";
@@ -1392,64 +1198,6 @@ string diffusetexturemesh::generate_fragshader(scene* sc)
 		"uniform vec3 viewPos;\n"
 		"uniform Material material;\n";
 			
-
-	if (sc->plights.size() > 0)
-	{
-		shader += "struct PointLight {\n"
-			"	vec3 position;\n"
-			"	vec3 color;\n"
-			"\n"
-			"	float constant;\n"
-			"	float linear;\n"
-			"	float quadratic;\n"
-			"\n"
-			"	vec3 ambient;\n"
-			"	vec3 diffuse;\n"
-			"	vec3 specular;\n"
-			"};\n"
-
-			"uniform PointLight pointLights[" + to_string(sc->plights.size()) + "];\n"
-			"uniform float far_plane;\n"
-			"uniform samplerCube pldepthMap;\n"
-
-			"float PointLightShadowCalculation(PointLight light, vec3 fragPos, vec3 lightDir, vec3 normal)\n"
-			"{\n"
-			"	vec3 fragToLight = fragPos - light.position;\n"
-			"	float closestDepth = texture(pldepthMap, fragToLight).r;\n"
-			"	closestDepth *= far_plane;\n"
-			"	float currentDepth = length(fragToLight);\n"
-			"	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005); \n"
-			"	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;\n"
-			"	return shadow;\n"
-			"}\n"
-
-			"vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)\n"
-			"{\n"
-			"	// ambient\n"
-			"	vec3 ambient = light.ambient * texture(material.diffuse, TexCoords).rgb;\n"
-
-			"	// diffuse \n"
-			"	vec3 lightDir = normalize(light.position - fragPos);\n"
-			"	float diff = max(dot(normal, lightDir), 0.0);\n"
-			"	vec3 diffuse = light.diffuse * diff * texture(material.diffuse, TexCoords).rgb;\n"
-
-			"	// specular\n"
-			"	vec3 halfwayDir = normalize(lightDir + viewDir);\n"
-			"	float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);\n"
-			"	vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb;\n"
-
-			"	// attenuation\n"
-			"	float distance = length(light.position - fragPos);\n"
-			"	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));\n"
-
-			"	ambient *= attenuation;\n"
-			"	diffuse *= attenuation;\n"
-			"	specular *= attenuation;\n"
-			"	float shadow = PointLightShadowCalculation(light, fragPos, lightDir, normal); \n"
-			"	vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));\n"
-			"	return lighting;\n"
-			"}\n";
-	}
 	if (sc->enable_dirlight)
 	{
 		shader += "struct DirLight {\n"
@@ -1503,12 +1251,6 @@ string diffusetexturemesh::generate_fragshader(scene* sc)
 		"		vec3 viewDir = normalize(viewPos - FragPos);\n"
 		"		vec3 result = vec3(0, 0, 0);\n";
 
-	int i = 0;
-	for each (pointlight l	in sc->plights)
-	{
-		shader += "	result += CalcPointLight(pointLights[" + to_string(i) + "], norm, FragPos, viewDir); \n";
-		++i;
-	}
 	if (sc->enable_dirlight)
 	{
 		shader += "	result += CalcDirLight(dirLight, norm, FragPos, viewDir);\n";

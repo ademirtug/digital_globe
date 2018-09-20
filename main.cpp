@@ -1,5 +1,8 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "camera.h"
+#include "Windows.h"
+//#include <WinSock2.h>
+
 
 using namespace std;
 extern engine eng;
@@ -19,17 +22,14 @@ public:
 		radii.z = _z;
 		float num_lat = 9 * 3;
 		float num_long = 18 * 3;
-
-
 	}
 
 	spheroid(glm::vec3 xyz) : spheroid(xyz.x, xyz.y, xyz.z)
 	{
 	}
 
-	vector<glm::vec3> generate_vertices()
+	void generate()
 	{
-
 		pointcloud pc;
 		float r = 6371000.0f;
 		float a = 6356752.3f;
@@ -43,33 +43,191 @@ public:
 };
 
 
+
+string TileXYToQuadKey(int tileX, int tileY, int levelOfDetail)
+{
+	string quadkey;
+	for (int i = levelOfDetail; i > 0; i--)
+	{
+		char digit = '0';
+		int mask = 1 << (i - 1);
+		if ((tileX & mask) != 0)
+		{
+			digit++;
+		}
+		if ((tileY & mask) != 0)
+		{
+			digit++;
+			digit++;
+		}
+		quadkey.push_back(digit);
+	}
+	return quadkey;
+}
+vector<int> QuadKeyToTileXY(string quadKey)
+{
+	int tileX = 0;
+	int tileY = 0;
+	int levelOfDetail = quadKey.size();
+
+
+	for (int i = levelOfDetail; i > 0; i--)
+	{
+		int mask = 1 << (i - 1);
+		switch (quadKey[levelOfDetail - i])
+		{
+		case '0':
+			break;
+
+		case '1':
+			tileX |= mask;
+			break;
+
+		case '2':
+			tileY |= mask;
+			break;
+
+		case '3':
+			tileX |= mask;
+			tileY |= mask;
+			break;
+
+		default:
+			break;
+			
+		}
+	}
+	
+	return { tileX, tileY, levelOfDetail };
+}
+
+
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
 {
 	return glm::cross(pt2 - pt1, pt3 - pt1);
 }
 
 
-//float N(float phi, float a, float b)
-//{
-//	return (a*a) / sqrt((a*a)*cos(phi)*cos(phi) + (b*b)*sin(phi)*sin(phi));
-//}
+vector<unsigned char> getpngdata()
+{
+	vector<unsigned char> data;
+	unsigned long w, h;
+	unsigned char* rawdata;
+	size_t size = 0;
+
+
+
+
+
+	string website_HTML;
+	locale local;
+	void get_Website(string url);
+	char buffer[10000];
+	int i = 0;
+	WSADATA wsaData;
+	SOCKET Socket;
+	SOCKADDR_IN SockAddr;
+	int lineCount = 0;
+	int rowCount = 0;
+	struct hostent *host;
+	string get_http;
+	string url = "www.google.com";
+
+	get_http = "GET / HTTP/1.1\r\nHost: " + url + "\r\nConnection: close\r\n\r\n";
+
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+		cout << "WSAStartup failed.\n";
+		system("pause");
+		//return 1;
+	}
+
+	Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	host = gethostbyname(url.c_str());
+
+	SockAddr.sin_port = htons(80);
+	SockAddr.sin_family = AF_INET;
+	SockAddr.sin_addr.s_addr = *((unsigned long*)host->h_addr);
+
+	if (connect(Socket, (SOCKADDR*)(&SockAddr), sizeof(SockAddr)) != 0) {
+		cout << "Could not connect";
+		system("pause");
+		//return 1;
+	}
+	send(Socket, get_http.c_str(), strlen(get_http.c_str()), 0);
+
+	int nDataLength;
+	while ((nDataLength = recv(Socket, buffer, 10000, 0)) > 0) {
+		int i = 0;
+		while (buffer[i] >= 32 || buffer[i] == '\n' || buffer[i] == '\r') {
+
+			website_HTML += buffer[i];
+			i += 1;
+		}
+	}
+
+	closesocket(Socket);
+	WSACleanup();
+
+
+
+
+
+
+
+
+
+	decodePNG(data, w, h, rawdata, size, false);
+
+	return data;
+}
+
 
 
 float N(float phi, float a, float b)
 {
 	double e2 = 1 - ((b*b) / (a*a));
-
 	return a / sqrt(1 - e2 * sin(phi)*sin(phi));
 }
 
-void calc()
+
+void ecef2lla(double x, double y, double z) {
+
+	double f = 0.0034;
+	double b = 6356752.3f;
+	double a = 6378137.0f;
+	double e2 = sqrt((a*a - b*b) / b*b);
+	double lla[] = { 0, 0, 0 };
+	double lat, lon, height, N, theta, p;
+
+
+	p = sqrt(x*x + y*y);
+
+	theta = atan((z * a) / (p * b));
+
+	lon = atan(y / x);
+
+	lat = atan(((z + e2*e2 * b * pow(sin(theta), 3)) / ((p - pow(e2, 2) * a * pow(cos(theta), 3)))));
+	N = a / (sqrt(1 - (pow(e2, 2) * pow(sin(lat), 2))));
+
+	double m = (p / cos(lat));
+	height = m - N;
+
+
+	lon = lon * 180 / glm::pi<double>();
+	lat = lat * 180 / glm::pi<double>();
+	lla[0] = lat;
+	lla[1] = lon;
+	lla[2] = height;
+
+}
+
+void lla2ecef()
 {
 	double b = 6356752.3f;
 	double a = 6378137.0f;
 	double num_lat = 180;
 	double num_long = 360;
 	double e2 = 1 - ((b*b) / (a*a));
-
 	double lat = ((glm::pi<double>() / num_lat) * 50);
 	double lon = ((2 * glm::pi<double>() / num_long) * 50);
 
@@ -79,25 +237,27 @@ void calc()
 
 	double z = ((b*b) / (a*a)) * N(lat, a, b) * sin(lat);
 
+	ecef2lla(x, y, z);
 }
 
 int main()
 {
+
+	//getpngdata();
+
+
 	qball_camera *cam = new qball_camera();
 
 	eng.cam = cam;
 	eng.init(1024, 768);
 	eng.maxfps = 25;
-	//eng.sc->enable_dirlight = false;
-	//cam->cdist = 7000000;
 
-	//spheroid earth;
 
 	float r = 6371000.0f; 
 	float b = 6356752.3f;
 	float a = 6378137.0f;
-	float num_lat = 18;
-	float num_long = 36;
+	float num_lat = 180;
+	float num_long = 360;
 	float e2 = 1 - ((b*b) / (a*a));
 
 	glm::vec3** globe = new glm::vec3*[num_lat + 1];
@@ -110,10 +270,6 @@ int main()
 
 	pointcloud pc;
 
-
-
-	calc();
-
 	for (size_t i = 0; i < num_lat + 1; i++)
 	{
 		float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
@@ -123,9 +279,7 @@ int main()
 			float lon = ((2 * glm::pi<float>() / num_long)*j);
 
 			float x = N(lat, a, b) * cos(lat) * cos(lon);
-
 			float y = N(lat, a, b) * cos(lat) * sin(lon);
-
 			float z = (1 - e2) * N(lat, a, b) * sin(lat);
 
 			glm::vec3 pt = { x, y, z };
