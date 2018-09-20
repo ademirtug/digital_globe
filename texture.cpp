@@ -13,6 +13,19 @@ texture::texture(const std::string& filename)
 }
 void texture::load(const std::string& filename)
 {
+}
+
+bmp::bmp()
+{
+	vboid_texture = 0;
+}
+bmp::bmp(const std::string& filename)
+{
+	vboid_texture = 0;
+	load(filename);
+}
+void bmp::load(const std::string& filename)
+{
 	unsigned int w, h, datastart, imgsize;
 	char* data;
 	char* hdr = new char[54 + 1];
@@ -61,6 +74,45 @@ void texture::load(const std::string& filename)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 }
 
+
+
+
+png::png()
+{
+	vboid_texture = 0;
+}
+png::png(const std::string& filename)
+{
+	vboid_texture = 0;
+	load(filename);
+}
+void png::load(const std::string& filename)
+{
+	unsigned int w, h, datastart, imgsize;
+	char* data;
+
+	data = new char[imgsize];
+
+
+
+
+
+	glGenTextures(1, &vboid_texture);
+	glBindTexture(GL_TEXTURE_2D, vboid_texture);
+
+	//ekran kartına yükleyelim.
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	//yükleme tamam ram üzerindekini silelim.
+	delete[] data;
+
+	//trilinear filtreleme standart komut grubu
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+}
 
 
 //shadowmap

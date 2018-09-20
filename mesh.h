@@ -14,6 +14,7 @@ void arr2ind(float* data, int size, vector<glm::vec3>& vertices, vector<int>& in
 template<typename Out> void split(const std::string &s, char delim, Out result);
 std::vector<std::string> split(const std::string &s, char delim);
 
+int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32);
 
 class imesh
 {

@@ -1,5 +1,1 @@
-﻿  main.cpp
-c:\users\akn\documents\github\3d_engine\main.cpp(36): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(38): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
-  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
-  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)
+﻿
