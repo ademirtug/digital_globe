@@ -56,4 +56,4 @@ public:
 	void operator=(glm::mat4 v);
 };
 
-#endif //__SHADER_H__
+#endif //__ISHADER_H__

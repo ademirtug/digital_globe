@@ -1,4 +1,4 @@
-﻿﻿#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "camera.h"
 #include "Windows.h"
 //#include <WinSock2.h>
@@ -243,7 +243,7 @@ void lla2ecef()
 int main()
 {
 
-	getpngdata();
+	//getpngdata();
 
 
 	qball_camera *cam = new qball_camera();

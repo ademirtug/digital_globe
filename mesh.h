@@ -163,4 +163,5 @@ public:
 void obj2mesh(std::string filename, imesh* m);
 
 
-#endif 
+
+#endif//__MESH_H__
