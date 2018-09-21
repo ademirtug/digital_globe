@@ -1,1 +1,17 @@
-﻿
+﻿  main.cpp
+c:\program files (x86)\windows kits\10\include\10.0.15063.0\shared\minwindef.h(130): warning C4005: 'APIENTRY': macro redefinition
+  c:\users\akn\documents\github\3d_engine\glfw\glfw3.h(98): note: see previous definition of 'APIENTRY'
+c:\users\akn\documents\github\3d_engine\main.cpp(20): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(22): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(39): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(41): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(189): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(234): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(236): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(238): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(263): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(265): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(179): warning C4700: uninitialized local variable 'rawdata' used
+  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
+  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)

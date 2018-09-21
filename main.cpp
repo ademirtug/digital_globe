@@ -243,7 +243,7 @@ void lla2ecef()
 int main()
 {
 
-	//getpngdata();
+	getpngdata();
 
 
 	qball_camera *cam = new qball_camera();
