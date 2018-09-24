@@ -38,5 +38,6 @@
 #include "engine.h"
 
 #pragma comment(lib,"ws2_32.lib")
+#pragma comment(lib,"winhttp.lib")
 
 // TODO: reference additional headers your program requires here
