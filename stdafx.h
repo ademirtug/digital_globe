@@ -36,6 +36,8 @@
 #include "light.h"
 #include "scene.h"
 #include "engine.h"
+#include "bingmapquery.h"
+#include "http_client.h"
 
 #pragma comment(lib,"ws2_32.lib")
 #pragma comment(lib,"winhttp.lib")

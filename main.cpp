@@ -157,7 +157,6 @@ void ecef2lla(double x, double y, double z) {
 	lla[0] = lat;
 	lla[1] = lon;
 	lla[2] = height;
-
 }
 
 void lla2ecef()
@@ -171,9 +170,7 @@ void lla2ecef()
 	double lon = ((2 * glm::pi<double>() / num_long) * 50);
 
 	double x = N(lat, a, b) * cos(lat) * cos(lon);
-
 	double y = N(lat, a, b) * cos(lat) * sin(lon);
-
 	double z = ((b*b) / (a*a)) * N(lat, a, b) * sin(lat);
 
 	ecef2lla(x, y, z);
@@ -181,16 +178,13 @@ void lla2ecef()
 
 int main()
 {
-
 	getpngdata();
-
 
 	qball_camera *cam = new qball_camera();
 
 	eng.cam = cam;
 	eng.init(1024, 768);
 	eng.maxfps = 25;
-
 
 	float r = 6371000.0f; 
 	float b = 6356752.3f;
@@ -212,7 +206,6 @@ int main()
 	for (size_t i = 0; i < num_lat + 1; i++)
 	{
 		float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
-
 		for (size_t j = 0; j<num_long + 1; j++)
 		{
 			float lon = ((2 * glm::pi<float>() / num_long)*j);

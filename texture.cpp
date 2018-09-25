@@ -48,7 +48,7 @@ void bmp::load(const std::string& filename)
 	h = *((int*)&hdr[0x16]);
 
 	//sanity check devam
-	imgsize = imgsize == 0 ? w* h * 3 : imgsize;
+	imgsize = imgsize == 0 ? w * h * 3 : imgsize;
 	datastart = datastart == 0 ? 54 : datastart;
 
 	data = new char[imgsize];

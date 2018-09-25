@@ -141,9 +141,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="bingmapquery.h" />
     <ClInclude Include="buffers.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="engine.h" />
+    <ClInclude Include="http_client.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="scene.h" />
@@ -153,6 +155,7 @@
     <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bingmapquery.cpp" />
     <ClCompile Include="buffers.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="engine.cpp" />
