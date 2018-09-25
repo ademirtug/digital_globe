@@ -1,14 +1,4 @@
-﻿  stdafx.cpp
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\shared\minwindef.h(130): warning C4005: 'APIENTRY': macro redefinition
-  c:\users\akn\documents\github\3d_engine\glfw\glfw3.h(98): note: see previous definition of 'APIENTRY'
-  texture.cpp
-c:\users\akn\documents\github\3d_engine\texture.cpp(91): warning C4101: 'datastart': unreferenced local variable
-  shader.cpp
-  scene.cpp
-c:\users\akn\documents\github\3d_engine\scene.cpp(42): warning C4244: 'argument': conversion from 'float' to 'GLsizei', possible loss of data
-  picopng.cpp
-  mesh.cpp
-  main.cpp
+﻿  main.cpp
 c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(49): warning C4005: 'BOOLAPI': macro redefinition
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(59): note: see previous definition of 'BOOLAPI'
 c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(82): warning C4005: 'SECURITY_FLAG_IGNORE_CERT_DATE_INVALID': macro redefinition
@@ -38,22 +28,6 @@ c:\users\akn\documents\github\3d_engine\main.cpp(173): warning C4244: 'argument'
 c:\users\akn\documents\github\3d_engine\main.cpp(174): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\main.cpp(196): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
 c:\users\akn\documents\github\3d_engine\main.cpp(198): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
-  light.cpp
-  engine.cpp
-  camera.cpp
-c:\users\akn\documents\github\3d_engine\camera.cpp(55): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(56): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(57): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(58): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(85): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\akn\documents\github\3d_engine\camera.cpp(93): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(102): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(130): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(131): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(155): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-  buffers.cpp
   bingmapquery.cpp
+c:\users\akn\documents\github\3d_engine\bingmapquery.cpp(22): error C2110: '+': cannot add two pointers
   Generating Code...
-c:\users\akn\documents\github\3d_engine\texture.cpp(94): warning C4700: uninitialized local variable 'imgsize' used
-c:\users\akn\documents\github\3d_engine\texture.cpp(104): warning C4700: uninitialized local variable 'h' used
-c:\users\akn\documents\github\3d_engine\texture.cpp(104): warning C4700: uninitialized local variable 'w' used
