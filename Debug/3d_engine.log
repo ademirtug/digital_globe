@@ -1,33 +1,15 @@
 ﻿  main.cpp
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(49): warning C4005: 'BOOLAPI': macro redefinition
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(59): note: see previous definition of 'BOOLAPI'
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(82): warning C4005: 'SECURITY_FLAG_IGNORE_CERT_DATE_INVALID': macro redefinition
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(1317): note: see previous definition of 'SECURITY_FLAG_IGNORE_CERT_DATE_INVALID'
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(83): warning C4005: 'SECURITY_FLAG_IGNORE_CERT_CN_INVALID': macro redefinition
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(1316): note: see previous definition of 'SECURITY_FLAG_IGNORE_CERT_CN_INVALID'
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(114): error C2371: 'HTTP_VERSION_INFO': redefinition; different basic types
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(485): note: see declaration of 'HTTP_VERSION_INFO'
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(114): error C2371: 'LPHTTP_VERSION_INFO': redefinition; different basic types
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(485): note: see declaration of 'LPHTTP_VERSION_INFO'
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(121): error C2371: 'INTERNET_SCHEME': redefinition; different basic types
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(304): note: see declaration of 'INTERNET_SCHEME'
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(121): error C2371: 'LPINTERNET_SCHEME': redefinition; different basic types
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(304): note: see declaration of 'LPINTERNET_SCHEME'
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(166): error C2371: 'URL_COMPONENTS': redefinition; different basic types
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(578): note: see declaration of 'URL_COMPONENTS'
-c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\winhttp.h(166): error C2371: 'LPURL_COMPONENTS': redefinition; different basic types
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\um\wininet.h(579): note: see declaration of 'LPURL_COMPONENTS'
+c:\users\akn\documents\github\3d_engine\main.cpp(19): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\main.cpp(20): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\main.cpp(21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(22): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(39): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(41): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(128): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(172): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(173): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(174): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(196): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(198): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
-  bingmapquery.cpp
-c:\users\akn\documents\github\3d_engine\bingmapquery.cpp(22): error C2110: '+': cannot add two pointers
-  Generating Code...
+c:\users\akn\documents\github\3d_engine\main.cpp(156): warning C4101: 'rawdata': unreferenced local variable
+c:\users\akn\documents\github\3d_engine\main.cpp(155): warning C4101: 'h': unreferenced local variable
+c:\users\akn\documents\github\3d_engine\main.cpp(155): warning C4101: 'w': unreferenced local variable
+c:\users\akn\documents\github\3d_engine\main.cpp(169): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(213): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(214): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(215): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(237): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(239): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
+  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)

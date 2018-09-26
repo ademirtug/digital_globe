@@ -1,14 +1,7 @@
 #ifndef __HTTP_CLIENT__
 #define __HTTP_CLIENT__
 
-#include <string>
-#include <sstream>
-#include <iomanip>
-#include <iostream>
-#include <windows.h>
 #include <WinInet.h>
-#include <vector>
-
 
 class http_client
 {
