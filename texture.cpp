@@ -15,6 +15,10 @@ void texture::load(const std::string& filename)
 {
 }
 
+void texture::unload()
+{
+}
+
 bmp::bmp()
 {
 	vboid_texture = 0;
@@ -56,16 +60,21 @@ void bmp::load(const std::string& filename)
 
 	f.close();
 
+	load(data, w, h);
 
+	//yükleme tamam ram üzerindekini silelim.
+	delete[] data;
+
+}
+
+void bmp::load(char* data, int w, int h)
+{
 	glGenTextures(1, &vboid_texture);
 	glBindTexture(GL_TEXTURE_2D, vboid_texture);
 
 	//ekran kartına yükleyelim.
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	//yükleme tamam ram üzerindekini silelim.
-	delete[] data;
 
 	//trilinear filtreleme standart komut grubu
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -74,6 +83,10 @@ void bmp::load(const std::string& filename)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 }
 
+void bmp::unload()
+{
+	glDeleteTextures(1, &vboid_texture);
+}
 
 
 
@@ -89,13 +102,7 @@ png::png(const std::string& filename)
 void png::load(const std::string& filename)
 {
 	unsigned int w, h, datastart, imgsize;
-	char* data;
-
-	data = new char[imgsize];
-
-
-
-
+	char* data = new char[imgsize];
 
 	glGenTextures(1, &vboid_texture);
 	glBindTexture(GL_TEXTURE_2D, vboid_texture);

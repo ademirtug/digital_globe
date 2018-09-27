@@ -8,6 +8,7 @@ public:
 	texture();
 	texture(const std::string& filename);
 	virtual void load(const std::string& filename);
+	virtual void unload();
 
 	GLuint vboid_texture;
 };
@@ -19,6 +20,8 @@ public:
 	bmp();
 	bmp(const std::string& filename);
 	virtual void load(const std::string& filename);
+	virtual void load(char* data, int w, int h);
+	virtual void unload();
 };
 
 class png : public texture
