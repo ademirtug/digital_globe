@@ -4,19 +4,19 @@ c:\users\akn\documents\github\3d_engine\main.cpp(75): warning C4244: 'initializi
 c:\users\akn\documents\github\3d_engine\main.cpp(76): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\main.cpp(84): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\main.cpp(87): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(101): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(106): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(107): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(139): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(140): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(220): warning C4101: 'rawdata': unreferenced local variable
-c:\users\akn\documents\github\3d_engine\main.cpp(219): warning C4101: 'h': unreferenced local variable
-c:\users\akn\documents\github\3d_engine\main.cpp(219): warning C4101: 'w': unreferenced local variable
-c:\users\akn\documents\github\3d_engine\main.cpp(233): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(277): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(278): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(279): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(302): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(304): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(102): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(108): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(109): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(130): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(131): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(212): warning C4101: 'rawdata': unreferenced local variable
+c:\users\akn\documents\github\3d_engine\main.cpp(211): warning C4101: 'h': unreferenced local variable
+c:\users\akn\documents\github\3d_engine\main.cpp(211): warning C4101: 'w': unreferenced local variable
+c:\users\akn\documents\github\3d_engine\main.cpp(225): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(269): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(270): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(271): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(294): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(296): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)

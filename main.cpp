@@ -76,8 +76,7 @@ float merc_lat(double y) {
 	float ts = exp(-y / b);
 	float phi = glm::pi<float>() / 2 - 2 * atan(ts);
 	float dphi = 1.0;
-
-
+	
 	int i;
 	for (i = 0; fabs(dphi) > 0.000000001 && i < 15; i++) {
 		float con = ecc * sin(phi);
@@ -95,32 +94,22 @@ public:
 	bmp data;
 
 	vector<glm::vec3> vertices;
+
 	void generate_vertices()
 	{
 		int level = quadkey.size();
 		int size = pow(2, level);
 		vector<int> xy = QuadKeyToTileXY(quadkey);
-		int x = xy[0];
-		int y = xy[1];
+		int tilex = xy[0];
+		int tiley = xy[1];
+		float c = 2 * glm::pi<float>() * 6378137.0f;
 
-		float lon = (360 / size) * x;
-		float nextlon = (360 / size) * (x + 1);
-		float lat = 0 ;
+		float lon = (360 / size) * tilex;
+		float nextlon = (360 / size) * (tilex + 1);
 
-
-
-
-
-
-
-
-
-
-
-
-
-		float nextlat = 0;
-
+		float lat = merc_lat(tiley * (c / size));
+		//float lat = merc_lat(19000);
+		float nextlat = merc_lat((tiley + 1) * (c / size));
 	}
 };
 
@@ -143,6 +132,7 @@ public:
 		{
 			tile t;
 			t.quadkey = to_string(i);
+			t.generate_vertices();
 			tiles[t.quadkey] = t;
 
 			//for (size_t x = 0; x < 4; x++)
