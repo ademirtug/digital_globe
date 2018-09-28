@@ -107,6 +107,12 @@ public:
 		float lon = (360 / size) * tilex;
 		float nextlon = (360 / size) * (tilex + 1);
 
+		float phi = 5;
+		float yyy = log(tan(phi) + 1/cos(phi) * glm::pi<float>()/180);
+
+
+
+
 		float lat = merc_lat(tiley * (c / size));
 		//float lat = merc_lat(19000);
 		float nextlat = merc_lat((tiley + 1) * (c / size));
