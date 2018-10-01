@@ -63,27 +63,25 @@ vector<int> QuadKeyToTileXY(string quadKey)
 }
 
 
-//double merc_lat(double y) {
-//
-//	return rad_deg(phi);
-//}
 
-float merc_lat(double y) {
+double merc_lat(double y) {
+	double ts = exp(-y / 6378137.0f);
+	double phi = glm::pi<double>()/2 - 2 * atan(ts);
 	float b = 6356752.3f;
 	float a = 6378137.0f;
-	float ecc = sqrt(1.0 - ((b / a) * (b / a)));
-	float halfecc = ecc * 0.5;
-	float ts = exp(-y / b);
-	float phi = glm::pi<float>() / 2 - 2 * atan(ts);
-	float dphi = 1.0;
-	
+	float e2 = 1 - ((b*b) / (a*a));
+	float e = sqrt(e2);
+
+
+	double dphi = 1.0;
+
 	int i;
 	for (i = 0; fabs(dphi) > 0.000000001 && i < 15; i++) {
-		float con = ecc * sin(phi);
-		dphi = glm::pi<float>() / 2 - 2 * atan(ts * pow((1.0 - con) / (1.0 + con), halfecc)) - phi;
+		double con = e * sin(phi);
+		dphi = glm::pi<double>() / 2 - 2 * atan(ts * pow((1.0 - con) / (1.0 + con), e/2)) - phi;
 		phi += dphi;
 	}
-	return phi * glm::pi<float>() / 180.0;
+	return phi;
 }
 
 
@@ -97,25 +95,30 @@ public:
 
 	void generate_vertices()
 	{
+		float r = 6371000.0f;
+		float b = 6356752.3f;
+		float a = 6378137.0f;
+
+		float e2 = 1 - ((b*b) / (a*a));
+		float e = sqrt(e2);
+
 		int level = quadkey.size();
 		int size = pow(2, level);
 		vector<int> xy = QuadKeyToTileXY(quadkey);
 		int tilex = xy[0];
 		int tiley = xy[1];
-		float c = 2 * glm::pi<float>() * 6378137.0f;
+		float circumference = 2 * glm::pi<float>() * 6378137.0f;
+
 
 		float lon = (360 / size) * tilex;
 		float nextlon = (360 / size) * (tilex + 1);
 
-		float phi = 5;
-		float yyy = log(tan(phi) + 1/cos(phi) * glm::pi<float>()/180);
+		
+		float lat = merc_lat(190000) * glm::pi<float>() / 180;
+		float phi = 85 * glm::pi<float>() / 180;
 
+		float y = b * log(tan(glm::pi<float>()/4 + ( phi ) / 2)* pow((((1-e * sin(phi)) / (1 + e * sin(phi)))), e/2));
 
-
-
-		float lat = merc_lat(tiley * (c / size));
-		//float lat = merc_lat(19000);
-		float nextlat = merc_lat((tiley + 1) * (c / size));
 	}
 };
 
@@ -195,19 +198,10 @@ public:
 	}
 };
 
-
-
-
-
-
-
-
-
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
 {
 	return glm::cross(pt2 - pt1, pt3 - pt1);
 }
-
 
 vector<unsigned char> getpngdata()
 {
@@ -221,14 +215,11 @@ vector<unsigned char> getpngdata()
 	return data;
 }
 
-
-
 float N(float phi, float a, float b)
 {
 	double e2 = 1 - ((b*b) / (a*a));
 	return a / sqrt(1 - e2 * sin(phi)*sin(phi));
 }
-
 
 void ecef2lla(double x, double y, double z) {
 
@@ -294,6 +285,7 @@ int main()
 	float num_lat = 180;
 	float num_long = 360;
 	float e2 = 1 - ((b*b) / (a*a));
+	float e = sqrt(e2);
 
 	glm::vec3** globe = new glm::vec3*[num_lat + 1];
 	for (int i = 0; i < num_lat + 1; ++i)
