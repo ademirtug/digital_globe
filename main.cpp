@@ -63,26 +63,33 @@ vector<int> QuadKeyToTileXY(string quadKey)
 }
 
 
-
-double merc_lat(double y) {
-	double ts = exp(-y / 6378137.0f);
-	double phi = glm::pi<double>()/2 - 2 * atan(ts);
-	float b = 6356752.3f;
+float ytolat(float y)
+{
+	
+	//lat = min(89.5, Math.Max(lat, -89.5));
 	float a = 6378137.0f;
-	float e2 = 1 - ((b*b) / (a*a));
+	float b = 6356752.3f;
+	
+
+	float e2 = 1 - ((b/a) * (b/a));
 	float e = sqrt(e2);
 
+	float ts = exp(-y / a);
+	float phi = (glm::pi<float>() /2) - 2 * atan(ts);
+	float dphi = 1.0;
+	int i = 0;
 
-	double dphi = 1.0;
 
-	int i;
-	for (i = 0; fabs(dphi) > 0.000000001 && i < 15; i++) {
-		double con = e * sin(phi);
-		dphi = glm::pi<double>() / 2 - 2 * atan(ts * pow((1.0 - con) / (1.0 + con), e/2)) - phi;
+	while ((abs(dphi) > 0.000000001) && (i < 15))
+	{
+		float con = e * sin(phi);
+		dphi = glm::pi<float>()/2 - 2 * atan(ts * powf((1.0 - con) / (1.0 + con), e/2)) - phi;
 		phi += dphi;
+		i++;
 	}
-	return phi;
+	return (phi * 180.0 / glm::pi<float>());
 }
+
 
 
 class tile
@@ -114,7 +121,7 @@ public:
 		float nextlon = (360 / size) * (tilex + 1);
 
 		
-		float lat = merc_lat(190000) * glm::pi<float>() / 180;
+		float lat = ytolat( ((circumference/(size*2)) * 1 ));
 		float phi = 85 * glm::pi<float>() / 180;
 
 		float y = b * log(tan(glm::pi<float>()/4 + ( phi ) / 2)* pow((((1-e * sin(phi)) / (1 + e * sin(phi)))), e/2));
