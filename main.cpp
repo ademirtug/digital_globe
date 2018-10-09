@@ -6,6 +6,7 @@
 using namespace std;
 extern engine eng;
 
+
 string TileXYToQuadKey(int tileX, int tileY, int levelOfDetail)
 {
 	string quadkey;
@@ -62,10 +63,8 @@ vector<int> QuadKeyToTileXY(string quadKey)
 	return { tileX, tileY, levelOfDetail };
 }
 
-
 float ytolat(float y)
 {
-	
 	//lat = min(89.5, Math.Max(lat, -89.5));
 	float a = 6378137.0f;
 	float b = 6356752.3f;
@@ -79,7 +78,6 @@ float ytolat(float y)
 	float dphi = 1.0;
 	int i = 0;
 
-
 	while ((abs(dphi) > 0.000000001) && (i < 15))
 	{
 		float con = e * sin(phi);
@@ -91,43 +89,118 @@ float ytolat(float y)
 }
 
 
+//public class Quadtile {
+//	Quadtile[] children = new Quadtile[4];
+//	Image      cachedImage;
+//
+//	public Quadtile getChild(char c)
+//	{
+//		Quadtile nextChild = children[(c - 'A')];
+//		return nextChild;
+//	}
+//
+//	public Quadtile getTile(String address)
+//	{
+//		if (address.length() == 0)
+//			return this;
+//
+//		Quadtile nextChild = getChild(address.charAt(0));
+//		if (nextChild == null)
+//			return null;
+//
+//		return nextChild.getTile(address.substring(1));
+//	}
+//
+//	public void invalidate(String address)
+//	{
+//		this.cachedImage = null;
+//
+//		Quadtile nextChild = getChild(address.charAt(0));
+//		if (nextChild == null)
+//			return;
+//
+//		return nextChild.invalidate(address.substring(1));
+//	}
+//}
 
-class tile
+class quadtile : public enable_shared_from_this<quadtile>
 {
+	shared_ptr<quadtile>* children;
+	shared_ptr<bmp> image;
 public:
-	string quadkey;
-	bmp data;
+	quadtile() {};
 
-	vector<glm::vec3> vertices;
-
-	void generate_vertices()
+	shared_ptr<quadtile> getchild(char c)
 	{
-		float r = 6371000.0f;
-		float b = 6356752.3f;
-		float a = 6378137.0f;
+		if( children )
+			return children[c - 65];
+		return nullptr;
+	}
+	shared_ptr<quadtile> gettile(string tile)
+	{
+		if (tile.size() == 0)
+		{
+			return shared_from_this();
+		}
 
-		float e2 = 1 - ((b*b) / (a*a));
-		float e = sqrt(e2);
+		shared_ptr<quadtile> child = getchild(tile.at(0));
+		if (child == nullptr)
+			return nullptr;
 
-		int level = quadkey.size();
-		int size = pow(2, level);
-		vector<int> xy = QuadKeyToTileXY(quadkey);
-		int tilex = xy[0];
-		int tiley = xy[1];
-		float circumference = 2 * glm::pi<float>() * 6378137.0f;
+		return child->gettile(tile.substr(1));
+	}
+	void invalidate(string tile)
+	{
+		shared_ptr<quadtile> child = getchild(tile.at(0));
+		if (child == nullptr)
+			return;
 
-
-		float lon = (360 / size) * tilex;
-		float nextlon = (360 / size) * (tilex + 1);
-
-		
-		float lat = ytolat( ((circumference/(size*2)) * 1 ));
-		float phi = 85 * glm::pi<float>() / 180;
-
-		float y = b * log(tan(glm::pi<float>()/4 + ( phi ) / 2)* pow((((1-e * sin(phi)) / (1 + e * sin(phi)))), e/2));
-
+		return child->invalidate(tile.substr(1));
 	}
 };
+
+
+//class tile
+//{
+//public:
+//	string quadkey;
+//	bmp data;
+//
+//	vector<glm::vec3> vertices;
+//
+//	tile() {};
+//	tile(string _quadkey) 
+//	{
+//		quadkey = _quadkey;
+//		generate_vertices();
+//	}
+//
+//	void generate_vertices()
+//	{
+//		float r = 6371000.0f;
+//		float b = 6356752.3f;
+//		float a = 6378137.0f;
+//
+//		float e2 = 1 - ((b*b) / (a*a));
+//		float e = sqrt(e2);
+//
+//		int level = quadkey.size();
+//		int size = pow(2, level);
+//		//vector<int> xy = QuadKeyToTileXY(quadkey);
+//		//int tilex = xy[0];
+//		//int tiley = xy[1];
+//		//float circumference = 2 * glm::pi<float>() * 6378137.0f;
+//
+//		//float lon = (360 / size) * tilex;
+//		
+//		//float nextlon = (360 / size) * (tilex + 1);
+//		//
+//		//float lat = ytolat( ((circumference/(size*2)) * 1 ));
+//		//float phi = 85 * glm::pi<float>() / 180;
+//
+//		//float y = b * log(tan(glm::pi<float>()/4 + ( phi ) / 2)* pow((((1-e * sin(phi)) / (1 + e * sin(phi)))), e/2));
+//	}
+//};
 
 
 class spheroid
@@ -137,7 +210,7 @@ public:
 	int NUMLONG = 360;
 
 	int a, b;
-	std::map<std::string, tile> tiles;
+	//std::map<std::string, quadtile*> tiles;
 
 	spheroid(double _a, double _b)
 	{
@@ -146,17 +219,12 @@ public:
 		
 		for (size_t i = 0; i < 4; i++)
 		{
-			tile t;
-			t.quadkey = to_string(i);
-			t.generate_vertices();
-			tiles[t.quadkey] = t;
-
-			//for (size_t x = 0; x < 4; x++)
-			//{
-			//	tile tx;
-			//	tx.quadkey = to_string(i) + to_string(x);
-			//	tiles[tx.quadkey] = tx;
-			//}
+			for (size_t x = 0; x < 4; x++)
+			{
+				char ci = i + 65;
+				char cx = x + 65;
+				//tile(to_string( ci ) + to_string( cx ));
+			}
 		}
 
 		//for (size_t i = 0; i < num_lat + 1; i++)
