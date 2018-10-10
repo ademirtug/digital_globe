@@ -34,11 +34,11 @@ public:
 		result.append(vb.begin(), vb.end());
 		return result;
 	}
-	std::vector<char> get_binary_page(std::string url)
+	std::vector<unsigned char> get_binary_page(std::string url)
 	{
 		char buffer[4096];
 		memset(buffer, 0, 4096);
-		std::vector<char> vb;
+		std::vector<unsigned char> vb;
 
 		hInternet = InternetOpen(TEXT("3d_engine"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 		if (hInternet != NULL)
