@@ -86,9 +86,6 @@
     <ClCompile Include="texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="picopng.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="bingmapquery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

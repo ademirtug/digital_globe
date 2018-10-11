@@ -31,20 +31,19 @@ bmp::bmp(const std::string& filename)
 void bmp::load(const std::string& filename)
 {
 	unsigned int w, h, datastart, imgsize;
-	char* data;
-	char* hdr = new char[54 + 1];
+	unsigned char* data;
+	unsigned char* hdr = new unsigned char[54 + 1];
 
 	fstream f;
 	f.open(filename, std::fstream::in | std::fstream::binary);
 	if (!f.is_open())
 		return;
 
-	f.read(hdr, 54);
+	f.read((char*)hdr, 54);
 
 	//sanity check yapalım
 	if (hdr[0] != 'B' || hdr[1] != 'M')
 		return;
-
 
 	datastart = *((int*)&hdr[0x0A]);
 	imgsize = *((int*)&hdr[0x22]);
@@ -55,8 +54,8 @@ void bmp::load(const std::string& filename)
 	imgsize = imgsize == 0 ? w * h * 3 : imgsize;
 	datastart = datastart == 0 ? 54 : datastart;
 
-	data = new char[imgsize];
-	f.read(data, imgsize);
+	data = new unsigned char[imgsize];
+	f.read((char*)data, imgsize);
 
 	f.close();
 
@@ -67,7 +66,7 @@ void bmp::load(const std::string& filename)
 
 }
 
-void bmp::load(char* data, int w, int h)
+void bmp::load(unsigned char* data, int w, int h)
 {
 	glGenTextures(1, &vboid_texture);
 	glBindTexture(GL_TEXTURE_2D, vboid_texture);

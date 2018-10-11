@@ -8,7 +8,7 @@ class bingmapquery
 public:
 	bingmapquery();
 	~bingmapquery();
-	std::vector<char> getmap(float slat, float wlong, float nlat, float elong, int width, int height);
+	std::vector<unsigned char> getmap(float slat, float wlong, float nlat, float elong, int width, int height);
 };
 
 

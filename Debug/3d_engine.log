@@ -1,18 +1,31 @@
 ﻿  main.cpp
-c:\users\akn\documents\github\3d_engine\main.cpp(84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(88): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(121): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(202): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(276): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(277): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(340): warning C4101: 'rawdata': unreferenced local variable
-c:\users\akn\documents\github\3d_engine\main.cpp(339): warning C4101: 'h': unreferenced local variable
-c:\users\akn\documents\github\3d_engine\main.cpp(339): warning C4101: 'w': unreferenced local variable
-c:\users\akn\documents\github\3d_engine\main.cpp(349): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(392): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(393): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(394): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(418): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(420): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(36): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(40): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(596): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(641): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(642): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(643): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(678): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(756): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(786): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(789): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(790): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(791): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(797): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(799): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(800): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(801): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(807): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(809): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(810): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(811): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(816): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(818): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(819): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(820): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(917): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(918): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(928): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(628): warning C4172: returning address of local variable or temporary: lla
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)

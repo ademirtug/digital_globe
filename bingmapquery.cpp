@@ -14,7 +14,7 @@ bingmapquery::~bingmapquery()
 
 
 
-std::vector<char> bingmapquery::getmap(float slat, float wlong, float nlat, float elong, int width, int height)
+std::vector<unsigned char> bingmapquery::getmap(float slat, float wlong, float nlat, float elong, int width, int height)
 {
 	//bunun ötesi mercator da yok
 	slat = slat > 85.05112878 ? 85.05112878 : slat;

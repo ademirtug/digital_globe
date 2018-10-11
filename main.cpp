@@ -1,67 +1,19 @@
 ﻿#include "stdafx.h"
 #include "camera.h"
 #include <set>
+#include <windows.h>
+#include <algorithm>
 
+using std::min;
+using std::max;
+#include <gdiplus.h>
+#include <stdio.h>
+
+using namespace Gdiplus;
 
 using namespace std;
 extern engine eng;
 
-
-string TileXYToQuadKey(int tileX, int tileY, int levelOfDetail)
-{
-	string quadkey;
-	for (int i = levelOfDetail; i > 0; i--)
-	{
-		char digit = '0';
-		int mask = 1 << (i - 1);
-		if ((tileX & mask) != 0)
-		{
-			digit++;
-		}
-		if ((tileY & mask) != 0)
-		{
-			digit++;
-			digit++;
-		}
-		quadkey.push_back(digit);
-	}
-	return quadkey;
-}
-vector<int> QuadKeyToTileXY(string quadKey)
-{
-	int tileX = 0;
-	int tileY = 0;
-	int levelOfDetail = quadKey.size();
-
-
-	for (int i = levelOfDetail; i > 0; i--)
-	{
-		int mask = 1 << (i - 1);
-		switch (quadKey[levelOfDetail - i])
-		{
-		case '0':
-			break;
-
-		case '1':
-			tileX |= mask;
-			break;
-
-		case '2':
-			tileY |= mask;
-			break;
-
-		case '3':
-			tileX |= mask;
-			tileY |= mask;
-			break;
-
-		default:
-			break;
-		}
-	}
-
-	return { tileX, tileY, levelOfDetail };
-}
 
 float ytolat(float y)
 {
@@ -600,6 +552,102 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
 }
 
 
+
+int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+{
+	UINT  num = 0;
+	UINT  size = 0;
+
+	ImageCodecInfo* pImageCodecInfo = NULL;
+
+	GetImageEncodersSize(&num, &size);
+	if (size == 0)
+		return -1;  // Failure
+
+	pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+	if (pImageCodecInfo == NULL)
+		return -1;  // Failure
+
+	GetImageEncoders(num, size, pImageCodecInfo);
+
+	for (UINT j = 0; j < num; ++j)
+	{
+		if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+		{
+			*pClsid = pImageCodecInfo[j].Clsid;
+			free(pImageCodecInfo);
+			return j;  // Success
+		}
+	}
+
+	free(pImageCodecInfo);
+	return -1;  // Failure
+}
+
+
+glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
+{
+	return glm::cross(pt2 - pt1, pt3 - pt1);
+}
+
+float N(float phi, float a, float b)
+{
+	double e2 = 1 - ((b*b) / (a*a));
+	return a / sqrt(1 - e2 * sin(phi)*sin(phi));
+}
+
+double* ecef2lla(double x, double y, double z) {
+
+	double f = 0.0034;
+	double b = 6356752.3f;
+	double a = 6378137.0f;
+	double e2 = sqrt((a*a - b*b) / b*b);
+	double lla[] = { 0, 0, 0 };
+	double lat, lon, height, N, theta, p;
+
+
+	p = sqrt(x*x + y*y);
+
+	theta = atan((z * a) / (p * b));
+
+	lon = atan(y / x);
+
+	lat = atan(((z + e2*e2 * b * pow(sin(theta), 3)) / ((p - pow(e2, 2) * a * pow(cos(theta), 3)))));
+	N = a / (sqrt(1 - (pow(e2, 2) * pow(sin(lat), 2))));
+
+	double m = (p / cos(lat));
+	height = m - N;
+
+
+	lon = lon * 180 / glm::pi<double>();
+	lat = lat * 180 / glm::pi<double>();
+	lla[0] = lat;
+	lla[1] = lon;
+	lla[2] = height;
+
+	return lla;
+}
+
+void lla2ecef()
+{
+	double b = 6356752.3f;
+	double a = 6378137.0f;
+	double num_lat = 180;
+	double num_long = 360;
+	double e2 = 1 - ((b*b) / (a*a));
+	double lat = ((glm::pi<double>() / num_lat) * 50);
+	double lon = ((2 * glm::pi<double>() / num_long) * 50);
+
+	double x = N(lat, a, b) * cos(lat) * cos(lon);
+	double y = N(lat, a, b) * cos(lat) * sin(lon);
+	double z = ((b*b) / (a*a)) * N(lat, a, b) * sin(lat);
+
+
+
+	//ecef2lla(x, y, z);
+}
+
+
 class quadtile
 {
 public:
@@ -623,14 +671,11 @@ public:
 	{
 		if( _quadkey.size() > 0 )
 			quadkey = _quadkey;
-		
-
 
 		children = new quadtile[4];
 		for (size_t i = 0; i < 4; i++)
 		{
 			char subkey = 65 + i;
-			
 			children[i].quadkey = quadkey + subkey;
 		}
 	}
@@ -671,7 +716,6 @@ public:
 		if (quadkey.size() == 0)
 			return;
 
-
 		double circumference = 2 * glm::pi<double>() * 6378137.0f;
 		double mapsize = pow(2, quadkey.size() == 0 ? 1 : quadkey.size()) * 256;
 
@@ -679,7 +723,6 @@ public:
 		double x2 = mapsize;
 		double y1 = 0;
 		double y2 = mapsize;
-
 
 		//2 üzeri seviye kadar en boy parça
 		for (size_t i = 0; i < quadkey.size(); i++)
@@ -691,8 +734,8 @@ public:
 			}
 			else if (quadkey[i] == 'B')
 			{
-				y2 = y2 / 2;
 				x1 = x2 / 2;
+				y2 = y2 / 2;
 			}
 			else if (quadkey[i] == 'C')
 			{
@@ -712,21 +755,142 @@ public:
 		double lon = abs(fmod((360.0 / mapsize * centerx), 180.0f));
 		double lat = ytolat(circumference / mapsize * centery);
 
+
+		float r = 6371000.0f;
+		float b = 6356752.3f;
+		float a = 6378137.0f;
+		float num_lat = 180;
+		float num_long = 360;
+		float e2 = 1 - ((b*b) / (a*a));
+		float e = sqrt(e2);
+
+
+
+		//plate oluştur
+		double xsep = (x2 - x1) / 4;
+		double ysep = (y2 - y1) / 4;
+		
+		vector<glm::vec3> vertices;
+		vector<glm::vec3> normals;
+
+		for (size_t x = 0; x < 4; x++)
+		{
+			for (size_t i = 0; i < 4; i++)
+			{
+				double mercx1 = x1 + i * xsep;
+				double mercy1 = (mapsize/2)- (y1 + x * ysep);
+				double mercx2 = x1 + (i + 1) * xsep;
+				double mercy2 = y1 + (x + 1) * ysep;
+
+				//2d to lat long
+				double lat1 = ytolat(circumference / mapsize * mercy1);
+				double lon1 = abs(fmod((360.0 / mapsize * mercx1), 180.0f));
+				double ecefx, ecefy, ecefz;
+				ecefx = N(lat, a, b) * cos(lat1) * cos(lon1);
+				ecefy = N(lat, a, b) * cos(lat1) * sin(lon1);
+				ecefz = (1 - e2) * N(lat1, a, b) * sin(lat1);
+
+				glm::vec3 topleft = { ecefx, ecefy, ecefz };
+
+
+
+				double lat2 = ytolat(circumference / mapsize * mercy1);
+				double lon2 = abs(fmod((360.0 / mapsize * mercx2), 180.0f));
+				ecefx = N(lat, a, b) * cos(lat2) * cos(lon2);
+				ecefy = N(lat, a, b) * cos(lat2) * sin(lon2);
+				ecefz = (1 - e2) * N(lat2, a, b) * sin(lat2);
+
+				glm::vec3 topright = { ecefx, ecefy, ecefz };
+
+
+
+				double lat3 = ytolat(circumference / mapsize * mercy2);
+				double lon3 = abs(fmod((360.0 / mapsize * mercx1), 180.0f));
+				ecefx = N(lat, a, b) * cos(lat3) * cos(lon3);
+				ecefy = N(lat, a, b) * cos(lat3) * sin(lon3);
+				ecefz = (1 - e2) * N(lat3, a, b) * sin(lat3);
+
+				glm::vec3 bottomleft = { ecefx, ecefy, ecefz };
+
+
+				double lat4 = ytolat(circumference / mapsize * mercy2);
+				double lon4 = abs(fmod((360.0 / mapsize * mercx1), 180.0f));
+				ecefx = N(lat, a, b) * cos(lat4) * cos(lon4);
+				ecefy = N(lat, a, b) * cos(lat4) * sin(lon4);
+				ecefz = (1 - e2) * N(lat4, a, b) * sin(lat4);
+
+				glm::vec3 bottomright = { ecefx, ecefy, ecefz };
+				
+
+				vertices.push_back(topleft);
+				vertices.push_back(bottomleft);
+				vertices.push_back(topright);
+
+				normals.push_back(calc_normal(topleft, bottomleft, topright));
+				normals.push_back(calc_normal(bottomleft, topright, topleft));
+				normals.push_back(calc_normal(topright, topleft, bottomleft));
+
+				vertices.push_back(bottomleft);
+				vertices.push_back(bottomright);
+				vertices.push_back(topright);
+
+				normals.push_back(calc_normal(bottomleft, bottomright, topright));
+				normals.push_back(calc_normal(bottomright, topright, bottomleft));
+				normals.push_back(calc_normal(topright, bottomleft, bottomright));
+
+
+			}
+		}
+
 		//haritaları yükle
-		string req = "https://www.mapquestapi.com/staticmap/v5/map?key=kAGxoy8TfqxNPPXu1Va54jWMoYMkRCbG&center=" +
+		string req = "https://www.mapquestapi.com/staticmap/v5/map?key=kAGxoy8TfqxNPPXu1Va54jWMoYMkRCbG&format=png&center=" +
 			to_string(lat) + "," + to_string(lon) +
 			"&size=256,256&zoom=" + to_string(quadkey.size());
 			
 		http_client hc;
 		vector<unsigned char> png = hc.get_binary_page(req);
 
-		vector<unsigned char> bmpdata;
-		unsigned long width = 0;
-		unsigned long height = 0;
+		GdiplusStartupInput gdiplusStartupInput;
+		ULONG_PTR gdiplusToken;
+		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-		int res = decodePNG(bmpdata, width, height, png.data(), false);
+		CLSID   encoderClsid;
+		Status  stat;
+		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, png.size());
+		
+		PVOID pMem = GlobalLock(hMem); // get the actual pointer for the HGLOBAL
+		RtlMoveMemory(pMem, &png[0], png.size());
+		IStream *pStream = 0;
+		HRESULT hr = CreateStreamOnHGlobal(hMem, TRUE, &pStream);
+
+		Image* img = new Gdiplus::Image(pStream);
+
+		GetEncoderClsid(L"image/bmp", &encoderClsid);
+		stat = img->Save(L"C:\\data\\example.bmp", &encoderClsid, NULL);
+
+		delete img;
+		GdiplusShutdown(gdiplusToken);
+		image.reset(new bmp("C:\\data\\example.bmp"));
 
 
+		
+		colormesh* cm = new colormesh(vertices, normals);
+		cm->position = { 0.0, 0.0, 0.0 };
+		eng.sc->meshes.push_back(cm);
+
+		//vector<unsigned char> bmpdata;
+		//unsigned long width = 256;
+		//unsigned long height = 256;
+		//unsigned char* buff = new unsigned char[png.size()+1];
+		//
+		//memset(buff, 0, png.size() + 1);
+		//for (int i = 0; i < png.size(); i++) {
+		//	buff[i] = png[i];
+		//}
+		//int res = decodePNG(bmpdata, width, height, &png[0], png.size(), false);
+		//image.reset(new bmp);
+		//image->load(bmpdata.data(), width, height);
+		//delete[] buff;
 		//std::ofstream output_file("c:\\data\\example.png", ios::out | ios::binary);
 		//std::ostream_iterator<char> output_iterator(output_file);
 		//std::copy(png.begin(), png.end(), output_iterator);
@@ -736,47 +900,7 @@ public:
 };
 
 
-//class tile
-//{
-//public:
-//	string quadkey;
-//	bmp data;
-//
-//	vector<glm::vec3> vertices;
-//
-//	tile() {};
-//	tile(string _quadkey) 
-//	{
-//		quadkey = _quadkey;
-//		generate_vertices();
-//	}
-//
-//	void generate_vertices()
-//	{
-//		float r = 6371000.0f;
-//		float b = 6356752.3f;
-//		float a = 6378137.0f;
-//
-//		float e2 = 1 - ((b*b) / (a*a));
-//		float e = sqrt(e2);
-//
-//		int level = quadkey.size();
-//		int size = pow(2, level);
-//		//vector<int> xy = QuadKeyToTileXY(quadkey);
-//		//int tilex = xy[0];
-//		//int tiley = xy[1];
-//		//float circumference = 2 * glm::pi<float>() * 6378137.0f;
-//
-//		//float lon = (360 / size) * tilex;
-//		
-//		//float nextlon = (360 / size) * (tilex + 1);
-//		//
-//		//float lat = ytolat( ((circumference/(size*2)) * 1 ));
-//		//float phi = 85 * glm::pi<float>() / 180;
-//
-//		//float y = b * log(tan(glm::pi<float>()/4 + ( phi ) / 2)* pow((((1-e * sin(phi)) / (1 + e * sin(phi)))), e/2));
-//	}
-//};
+
 
 
 class spheroid
@@ -796,48 +920,15 @@ public:
 		for (size_t i = 0; i < 4; i++)
 		{
 			tiles.children[i].init();
-			tiles.children[i].getmap();
+			//tiles.children[i].getmap();
 		}
 
+		double circumference = 2 * glm::pi<double>() * 6378137.0f;
+		double mapsize = 1024;
+		double lat = ytolat(circumference / mapsize * 512);
 
-		//for (size_t i = 0; i < num_lat + 1; i++)
-		//{
-		//	float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
-		//	for (size_t j = 0; j<num_long + 1; j++)
-		//	{
-		//		float lon = ((2 * glm::pi<float>() / num_long)*j);
-		//		float x = N(lat, a, b) * cos(lat) * cos(lon);
-		//		float y = N(lat, a, b) * cos(lat) * sin(lon);
-		//		float z = (1 - e2) * N(lat, a, b) * sin(lat);
-		//		glm::vec3 pt = { x, y, z };
-		//		globe[i][j] = pt;
-		//		pc.addpoint(pt);
-		//	}
-		//}
-		//for (size_t i = 0; i < num_lat; i++)
-		//{
-		//	for (size_t j = 0; j< num_long; j++)
-		//	{
-		//		glm::vec3 pt1 = globe[i][j];
-		//		glm::vec3 pt2 = globe[i + 1][j];
-		//		glm::vec3 pt3 = globe[i][j + 1];
-		//		vertices.push_back(pt1);
-		//		vertices.push_back(pt2);
-		//		vertices.push_back(pt3);
-		//		normals.push_back(calc_normal(pt1, pt2, pt3));
-		//		normals.push_back(calc_normal(pt2, pt3, pt1));
-		//		normals.push_back(calc_normal(pt3, pt1, pt2));
-		//		glm::vec3 pt4 = globe[i + 1][j];
-		//		glm::vec3 pt5 = globe[i + 1][j + 1];
-		//		glm::vec3 pt6 = globe[i][j + 1];
-		//		vertices.push_back(pt4);
-		//		vertices.push_back(pt5);
-		//		vertices.push_back(pt6);
-		//		normals.push_back(calc_normal(pt4, pt5, pt6));
-		//		normals.push_back(calc_normal(pt5, pt6, pt4));
-		//		normals.push_back(calc_normal(pt6, pt4, pt5));
-		//	}
-		//}
+
+		tiles.children[0].getmap();
 	}
 
 	void generate()
@@ -845,78 +936,13 @@ public:
 	}
 };
 
-glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
-{
-	return glm::cross(pt2 - pt1, pt3 - pt1);
-}
-
-vector<unsigned char> getpngdata()
-{
-	vector<unsigned char> data;
-	unsigned long w, h;
-	unsigned char* rawdata;
-	size_t size = 0;
-
-	return data;
-}
-
-float N(float phi, float a, float b)
-{
-	double e2 = 1 - ((b*b) / (a*a));
-	return a / sqrt(1 - e2 * sin(phi)*sin(phi));
-}
-
-void ecef2lla(double x, double y, double z) {
-
-	double f = 0.0034;
-	double b = 6356752.3f;
-	double a = 6378137.0f;
-	double e2 = sqrt((a*a - b*b) / b*b);
-	double lla[] = { 0, 0, 0 };
-	double lat, lon, height, N, theta, p;
 
 
-	p = sqrt(x*x + y*y);
 
-	theta = atan((z * a) / (p * b));
-
-	lon = atan(y / x);
-
-	lat = atan(((z + e2*e2 * b * pow(sin(theta), 3)) / ((p - pow(e2, 2) * a * pow(cos(theta), 3)))));
-	N = a / (sqrt(1 - (pow(e2, 2) * pow(sin(lat), 2))));
-
-	double m = (p / cos(lat));
-	height = m - N;
-
-
-	lon = lon * 180 / glm::pi<double>();
-	lat = lat * 180 / glm::pi<double>();
-	lla[0] = lat;
-	lla[1] = lon;
-	lla[2] = height;
-}
-
-void lla2ecef()
-{
-	double b = 6356752.3f;
-	double a = 6378137.0f;
-	double num_lat = 180;
-	double num_long = 360;
-	double e2 = 1 - ((b*b) / (a*a));
-	double lat = ((glm::pi<double>() / num_lat) * 50);
-	double lon = ((2 * glm::pi<double>() / num_long) * 50);
-
-	double x = N(lat, a, b) * cos(lat) * cos(lon);
-	double y = N(lat, a, b) * cos(lat) * sin(lon);
-	double z = ((b*b) / (a*a)) * N(lat, a, b) * sin(lat);
-
-	ecef2lla(x, y, z);
-}
 
 int main()
 {
-	spheroid earth(6378137.0f, 6356752.3f);
-	getpngdata();
+
 
 	qball_camera *cam = new qball_camera();
 
@@ -924,75 +950,80 @@ int main()
 	eng.init(1024, 768);
 	eng.maxfps = 25;
 
-	float r = 6371000.0f; 
-	float b = 6356752.3f;
-	float a = 6378137.0f;
-	float num_lat = 180;
-	float num_long = 360;
-	float e2 = 1 - ((b*b) / (a*a));
-	float e = sqrt(e2);
-
-	glm::vec3** globe = new glm::vec3*[num_lat + 1];
-	for (int i = 0; i < num_lat + 1; ++i)
-		globe[i] = new glm::vec3[num_long + 1];
 
 
-	vector<glm::vec3> vertices;
-	vector<glm::vec3> normals;
-
-	pointcloud pc;
-
-	for (size_t i = 0; i < num_lat + 1; i++)
-	{
-		float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
-		for (size_t j = 0; j<num_long + 1; j++)
-		{
-			float lon = ((2 * glm::pi<float>() / num_long)*j);
-
-			float x = N(lat, a, b) * cos(lat) * cos(lon);
-			float y = N(lat, a, b) * cos(lat) * sin(lon);
-			float z = (1 - e2) * N(lat, a, b) * sin(lat);
-
-			glm::vec3 pt = { x, y, z };
-			globe[i][j] = pt;
-			pc.addpoint(pt);
-		}
-	}
+	spheroid earth(6378137.0f, 6356752.3f);
 
 
-	for (size_t i = 0; i < num_lat; i++)
-	{
-		for (size_t j = 0; j< num_long; j++)
-		{
-			glm::vec3 pt1 = globe[i][j];
-			glm::vec3 pt2 = globe[i + 1][j];
-			glm::vec3 pt3 = globe[i][j + 1];
 
-			vertices.push_back(pt1);
-			vertices.push_back(pt2);
-			vertices.push_back(pt3);
+	//////float r = 6371000.0f; 
+	//////float b = 6356752.3f;
+	//////float a = 6378137.0f;
+	//////float num_lat = 180;
+	//////float num_long = 360;
+	//////float e2 = 1 - ((b*b) / (a*a));
+	//////float e = sqrt(e2);
 
-			normals.push_back(calc_normal(pt1, pt2, pt3));
-			normals.push_back(calc_normal(pt2, pt3, pt1));
-			normals.push_back(calc_normal(pt3, pt1, pt2));
+	//////glm::vec3** globe = new glm::vec3*[num_lat + 1];
+	//////for (int i = 0; i < num_lat + 1; ++i)
+	//////	globe[i] = new glm::vec3[num_long + 1];
 
-			glm::vec3 pt4 = globe[i + 1][j];
-			glm::vec3 pt5 = globe[i + 1][j + 1];
-			glm::vec3 pt6 = globe[i][j + 1];
+	//////vector<glm::vec3> vertices;
+	//////vector<glm::vec3> normals;
 
-			vertices.push_back(pt4);
-			vertices.push_back(pt5);
-			vertices.push_back(pt6);
+	//////pointcloud pc;
 
-			normals.push_back(calc_normal(pt4, pt5, pt6));
-			normals.push_back(calc_normal(pt5, pt6, pt4));
-			normals.push_back(calc_normal(pt6, pt4, pt5));
-		}
-	}
+	//////for (size_t i = 0; i < num_lat + 1; i++)
+	//////{
+	//////	float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
+	//////	for (size_t j = 0; j<num_long + 1; j++)
+	//////	{
+	//////		float lon = ((2 * glm::pi<float>() / num_long)*j);
 
-	colormesh cm(vertices, normals);
-	cm.position = { 0.0, 0.0, 0.0 };
-	eng.sc->meshes.push_back(&cm);
+	//////		float x = N(lat, a, b) * cos(lat) * cos(lon);
+	//////		float y = N(lat, a, b) * cos(lat) * sin(lon);
+	//////		float z = (1 - e2) * N(lat, a, b) * sin(lat);
+
+	//////		glm::vec3 pt = { x, y, z };
+	//////		globe[i][j] = pt;
+	//////		pc.addpoint(pt);
+	//////	}
+	//////}
+
+
+	//////for (size_t i = 0; i < num_lat; i++)
+	//////{
+	//////	for (size_t j = 0; j< num_long; j++)
+	//////	{
+	//////		glm::vec3 pt1 = globe[i][j];
+	//////		glm::vec3 pt2 = globe[i + 1][j];
+	//////		glm::vec3 pt3 = globe[i][j + 1];
+
+	//////		vertices.push_back(pt1);
+	//////		vertices.push_back(pt2);
+	//////		vertices.push_back(pt3);
+
+	//////		normals.push_back(calc_normal(pt1, pt2, pt3));
+	//////		normals.push_back(calc_normal(pt2, pt3, pt1));
+	//////		normals.push_back(calc_normal(pt3, pt1, pt2));
+
+	//////		glm::vec3 pt4 = globe[i + 1][j];
+	//////		glm::vec3 pt5 = globe[i + 1][j + 1];
+	//////		glm::vec3 pt6 = globe[i][j + 1];
+
+	//////		vertices.push_back(pt4);
+	//////		vertices.push_back(pt5);
+	//////		vertices.push_back(pt6);
+
+	//////		normals.push_back(calc_normal(pt4, pt5, pt6));
+	//////		normals.push_back(calc_normal(pt5, pt6, pt4));
+	//////		normals.push_back(calc_normal(pt6, pt4, pt5));
+	//////	}
+	//////}
+
+	//////colormesh cm(vertices, normals);
+	//////cm.position = { 0.0, 0.0, 0.0 };
+	//////eng.sc->meshes.push_back(&cm);
 
 	//pc.init();
 	//pc.position = { 0.0, 0.0, 0.0 };

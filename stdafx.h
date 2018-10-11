@@ -47,4 +47,5 @@
 #pragma comment(lib,"ws2_32.lib")
 #pragma comment(lib,"winhttp.lib")
 #pragma comment(lib,"wininet.lib")
+#pragma comment (lib, "gdiplus.lib")
 // TODO: reference additional headers your program requires here
