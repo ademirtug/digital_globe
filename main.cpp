@@ -3,7 +3,7 @@
 #include <set>
 #include <windows.h>
 #include <algorithm>
-
+#include <math.h>
 using std::min;
 using std::max;
 #include <gdiplus.h>
@@ -592,7 +592,7 @@ glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
 
 float N(float phi, float a, float b)
 {
-	double e2 = 1 - ((b*b) / (a*a));
+	double e2 = 0.00669437999;
 	return a / sqrt(1 - e2 * sin(phi)*sin(phi));
 }
 
@@ -601,48 +601,50 @@ double* ecef2lla(double x, double y, double z) {
 	double f = 0.0034;
 	double b = 6356752.3f;
 	double a = 6378137.0f;
-	double e2 = sqrt((a*a - b*b) / b*b);
+	double e2 = 0.00669437999;
 	double lla[] = { 0, 0, 0 };
 	double lat, lon, height, N, theta, p;
 
-
-	p = sqrt(x*x + y*y);
-
-	theta = atan((z * a) / (p * b));
-
-	lon = atan(y / x);
-
-	lat = atan(((z + e2*e2 * b * pow(sin(theta), 3)) / ((p - pow(e2, 2) * a * pow(cos(theta), 3)))));
-	N = a / (sqrt(1 - (pow(e2, 2) * pow(sin(lat), 2))));
-
-	double m = (p / cos(lat));
-	height = m - N;
+	lon = 2 * atan((sqrt(x*x + y*y) - x) / y);
 
 
-	lon = lon * 180 / glm::pi<double>();
-	lat = lat * 180 / glm::pi<double>();
-	lla[0] = lat;
-	lla[1] = lon;
-	lla[2] = height;
+	//p = sqrt(x*x + y*y);
+
+	//theta = atan((z * a) / (p * b));
+
+	//lon = atan(y / x);
+
+	//lat = atan(((z + e2*e2 * b * pow(sin(theta), 3)) / ((p - pow(e2, 2) * a * pow(cos(theta), 3)))));
+	//N = a / (sqrt(1 - (pow(e2, 2) * pow(sin(lat), 2))));
+
+	//double m = (p / cos(lat));
+	//height = m - N;
+
+
+	//lon = lon * 180 / glm::pi<double>();
+	//lat = lat * 180 / glm::pi<double>();
+	//lla[0] = lat;
+	//lla[1] = lon;
+	//lla[2] = height;
 
 	return lla;
 }
 
 void lla2ecef()
 {
-	double b = 6356752.3f;
 	double a = 6378137.0f;
-	double num_lat = 180;
-	double num_long = 360;
+	double b = 6356752.3f;
+	
 	double e2 = 1 - ((b*b) / (a*a));
-	double lat = ((glm::pi<double>() / num_lat) * 50);
-	double lon = ((2 * glm::pi<double>() / num_long) * 50);
+	//double e2 = 0.00669437999;
+	double lat = 48.8562;
+	double lon = 0.0000000;
 
 	double x = N(lat, a, b) * cos(lat) * cos(lon);
 	double y = N(lat, a, b) * cos(lat) * sin(lon);
-	double z = ((b*b) / (a*a)) * N(lat, a, b) * sin(lat);
+	double z = ( ((b*b) / (a*a))* N(lat, a, b)) * sin(lat);
 
-
+	int stop = 5;
 
 	//ecef2lla(x, y, z);
 }
@@ -765,7 +767,6 @@ public:
 		float e = sqrt(e2);
 
 
-
 		//plate oluştur
 		double xsep = (x2 - x1) / 4;
 		double ysep = (y2 - y1) / 4;
@@ -778,21 +779,23 @@ public:
 			for (size_t i = 0; i < 4; i++)
 			{
 				double mercx1 = x1 + i * xsep;
-				double mercy1 = (mapsize/2)- (y1 + x * ysep);
+				double mercy1 = (mapsize / 2) - fmod((y1 + x * ysep), (mapsize/2));
 				double mercx2 = x1 + (i + 1) * xsep;
-				double mercy2 = y1 + (x + 1) * ysep;
+				double mercy2 = (mapsize / 2) - fmod(y1 + (x + 1) * ysep, (mapsize / 2));
 
 				//2d to lat long
 				double lat1 = ytolat(circumference / mapsize * mercy1);
 				double lon1 = abs(fmod((360.0 / mapsize * mercx1), 180.0f));
 				double ecefx, ecefy, ecefz;
-				ecefx = N(lat, a, b) * cos(lat1) * cos(lon1);
-				ecefy = N(lat, a, b) * cos(lat1) * sin(lon1);
-				ecefz = (1 - e2) * N(lat1, a, b) * sin(lat1);
+				ecefx = N(lon1, a, b) * cos(lon1) * cos(lat1);
+				ecefy = N(lon1, a, b) * cos(lon1) * sin(lat1);
+				ecefz = (1 - e2) * N(lon1, a, b) * sin(lon1);
 
 				glm::vec3 topleft = { ecefx, ecefy, ecefz };
 
-
+				//////		float x = N(lat, a, b) * cos(lat) * cos(lon);
+				//////		float y = N(lat, a, b) * cos(lat) * sin(lon);
+				//////		float z = (1 - e2) * N(lat, a, b) * sin(lat);
 
 				double lat2 = ytolat(circumference / mapsize * mercy1);
 				double lon2 = abs(fmod((360.0 / mapsize * mercx2), 180.0f));
@@ -801,7 +804,6 @@ public:
 				ecefz = (1 - e2) * N(lat2, a, b) * sin(lat2);
 
 				glm::vec3 topright = { ecefx, ecefy, ecefz };
-
 
 
 				double lat3 = ytolat(circumference / mapsize * mercy2);
@@ -837,8 +839,6 @@ public:
 				normals.push_back(calc_normal(bottomleft, bottomright, topright));
 				normals.push_back(calc_normal(bottomright, topright, bottomleft));
 				normals.push_back(calc_normal(topright, bottomleft, bottomright));
-
-
 			}
 		}
 
@@ -899,10 +899,6 @@ public:
 	}
 };
 
-
-
-
-
 class spheroid
 {
 public:
@@ -952,78 +948,79 @@ int main()
 
 
 
-	spheroid earth(6378137.0f, 6356752.3f);
+	//spheroid earth(6378137.0f, 6356752.3f);
+
+	lla2ecef();
+	//ecef2lla(548845.68, 0, 6333173.37);
+
+	//float r = 6371000.0f; 
+	//float b = 6356752.3f;
+	//float a = 6378137.0f;
+	//float num_lat = 180;
+	//float num_long = 360;
+	//float e2 = 1 - ((b*b) / (a*a));
+	//float e = sqrt(e2);
+
+	//glm::vec3** globe = new glm::vec3*[num_lat + 1];
+	//for (int i = 0; i < num_lat + 1; ++i)
+	//	globe[i] = new glm::vec3[num_long + 1];
+
+	//vector<glm::vec3> vertices;
+	//vector<glm::vec3> normals;
+
+	//pointcloud pc;
+
+	//for (size_t i = 0; i < num_lat + 1; i++)
+	//{
+	//	float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
+	//	for (size_t j = 0; j<num_long + 1; j++)
+	//	{
+	//		float lon = ((2 * glm::pi<float>() / num_long)*j);
+
+	//		float x = N(lat, a, b) * cos(lat) * cos(lon);
+	//		float y = N(lat, a, b) * cos(lat) * sin(lon);
+	//		float z = (1 - e2) * N(lat, a, b) * sin(lat);
+
+	//		glm::vec3 pt = { x, y, z };
+	//		globe[i][j] = pt;
+	//		pc.addpoint(pt);
+	//	}
+	//}
 
 
+	//for (size_t i = 0; i < num_lat; i++)
+	//{
+	//	for (size_t j = 0; j< num_long; j++)
+	//	{
+	//		glm::vec3 pt1 = globe[i][j];
+	//		glm::vec3 pt2 = globe[i + 1][j];
+	//		glm::vec3 pt3 = globe[i][j + 1];
 
-	//////float r = 6371000.0f; 
-	//////float b = 6356752.3f;
-	//////float a = 6378137.0f;
-	//////float num_lat = 180;
-	//////float num_long = 360;
-	//////float e2 = 1 - ((b*b) / (a*a));
-	//////float e = sqrt(e2);
+	//		vertices.push_back(pt1);
+	//		vertices.push_back(pt2);
+	//		vertices.push_back(pt3);
 
-	//////glm::vec3** globe = new glm::vec3*[num_lat + 1];
-	//////for (int i = 0; i < num_lat + 1; ++i)
-	//////	globe[i] = new glm::vec3[num_long + 1];
+	//		normals.push_back(calc_normal(pt1, pt2, pt3));
+	//		normals.push_back(calc_normal(pt2, pt3, pt1));
+	//		normals.push_back(calc_normal(pt3, pt1, pt2));
 
-	//////vector<glm::vec3> vertices;
-	//////vector<glm::vec3> normals;
+	//		glm::vec3 pt4 = globe[i + 1][j];
+	//		glm::vec3 pt5 = globe[i + 1][j + 1];
+	//		glm::vec3 pt6 = globe[i][j + 1];
 
-	//////pointcloud pc;
+	//		vertices.push_back(pt4);
+	//		vertices.push_back(pt5);
+	//		vertices.push_back(pt6);
 
-	//////for (size_t i = 0; i < num_lat + 1; i++)
-	//////{
-	//////	float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
-	//////	for (size_t j = 0; j<num_long + 1; j++)
-	//////	{
-	//////		float lon = ((2 * glm::pi<float>() / num_long)*j);
+	//		normals.push_back(calc_normal(pt4, pt5, pt6));
+	//		normals.push_back(calc_normal(pt5, pt6, pt4));
+	//		normals.push_back(calc_normal(pt6, pt4, pt5));
+	//	}
+	//}
 
-	//////		float x = N(lat, a, b) * cos(lat) * cos(lon);
-	//////		float y = N(lat, a, b) * cos(lat) * sin(lon);
-	//////		float z = (1 - e2) * N(lat, a, b) * sin(lat);
-
-	//////		glm::vec3 pt = { x, y, z };
-	//////		globe[i][j] = pt;
-	//////		pc.addpoint(pt);
-	//////	}
-	//////}
-
-
-	//////for (size_t i = 0; i < num_lat; i++)
-	//////{
-	//////	for (size_t j = 0; j< num_long; j++)
-	//////	{
-	//////		glm::vec3 pt1 = globe[i][j];
-	//////		glm::vec3 pt2 = globe[i + 1][j];
-	//////		glm::vec3 pt3 = globe[i][j + 1];
-
-	//////		vertices.push_back(pt1);
-	//////		vertices.push_back(pt2);
-	//////		vertices.push_back(pt3);
-
-	//////		normals.push_back(calc_normal(pt1, pt2, pt3));
-	//////		normals.push_back(calc_normal(pt2, pt3, pt1));
-	//////		normals.push_back(calc_normal(pt3, pt1, pt2));
-
-	//////		glm::vec3 pt4 = globe[i + 1][j];
-	//////		glm::vec3 pt5 = globe[i + 1][j + 1];
-	//////		glm::vec3 pt6 = globe[i][j + 1];
-
-	//////		vertices.push_back(pt4);
-	//////		vertices.push_back(pt5);
-	//////		vertices.push_back(pt6);
-
-	//////		normals.push_back(calc_normal(pt4, pt5, pt6));
-	//////		normals.push_back(calc_normal(pt5, pt6, pt4));
-	//////		normals.push_back(calc_normal(pt6, pt4, pt5));
-	//////	}
-	//////}
-
-	//////colormesh cm(vertices, normals);
-	//////cm.position = { 0.0, 0.0, 0.0 };
-	//////eng.sc->meshes.push_back(&cm);
+	//colormesh cm(vertices, normals);
+	//cm.position = { 0.0, 0.0, 0.0 };
+	//eng.sc->meshes.push_back(&cm);
 
 	//pc.init();
 	//pc.position = { 0.0, 0.0, 0.0 };
