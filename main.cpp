@@ -590,10 +590,17 @@ glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
 	return glm::cross(pt2 - pt1, pt3 - pt1);
 }
 
-float N(float phi, float a, float b)
+double N(double phi, double a, double b)
 {
-	double e2 = 0.00669437999;
+	double e2 = 1 - ((b*b) / (a*a));
 	return a / sqrt(1 - e2 * sin(phi)*sin(phi));
+}
+
+double N(double phi)
+{
+	double a = 6378137.0f;
+	double b = 6356752.3f;
+	return a*a / sqrt( a*a * cos(phi)*cos(phi) + b*b*sin(phi)* sin(phi));
 }
 
 double* ecef2lla(double x, double y, double z) {
@@ -608,45 +615,78 @@ double* ecef2lla(double x, double y, double z) {
 	lon = 2 * atan((sqrt(x*x + y*y) - x) / y);
 
 
-	//p = sqrt(x*x + y*y);
+	p = sqrt(x*x + y*y);
 
-	//theta = atan((z * a) / (p * b));
+	theta = atan((z * a) / (p * b));
 
-	//lon = atan(y / x);
+	lon = atan(y / x);
 
-	//lat = atan(((z + e2*e2 * b * pow(sin(theta), 3)) / ((p - pow(e2, 2) * a * pow(cos(theta), 3)))));
-	//N = a / (sqrt(1 - (pow(e2, 2) * pow(sin(lat), 2))));
+	lat = atan(((z + e2*e2 * b * pow(sin(theta), 3)) / ((p - pow(e2, 2) * a * pow(cos(theta), 3)))));
+	N = a / (sqrt(1 - (pow(e2, 2) * pow(sin(lat), 2))));
 
-	//double m = (p / cos(lat));
-	//height = m - N;
+	double m = (p / cos(lat));
+	height = m - N;
 
 
-	//lon = lon * 180 / glm::pi<double>();
-	//lat = lat * 180 / glm::pi<double>();
-	//lla[0] = lat;
-	//lla[1] = lon;
-	//lla[2] = height;
+	lon = lon * 180 / glm::pi<double>();
+	lat = lat * 180 / glm::pi<double>();
+	lla[0] = lat;
+	lla[1] = lon;
+	lla[2] = height;
 
 	return lla;
 }
 
-void lla2ecef()
+
+//private final double a = 6378137; // radius
+//private final double e = 8.1819190842622e-2;  // eccentricity
+//
+//private final double asq = Math.pow(a, 2);
+//private final double esq = Math.pow(e, 2);
+
+double* ecef2lla2(double x, double y, double z) {
+	double a = 6378137; // radius
+	double e = 8.1819190842622e-2;  // eccentricity
+	
+	double asq = pow(a, 2);
+	double esq = pow(e, 2);
+
+
+	double b = sqrt(asq * (1 - esq));
+	double bsq = pow(b, 2);
+	double ep = sqrt((asq - bsq) / bsq);
+	double p = sqrt(pow(x, 2) + pow(y, 2));
+	double th = atan2(a*z, b*p);
+
+	double lon = atan2(y, x);
+	double lat = atan2((z + pow(ep, 2)*b*pow(sin(th), 3)), (p - esq*a*pow(cos(th), 3)));
+	double N = a / (sqrt(1 - esq*pow(sin(lat), 2)));
+	double alt = p / cos(lat) - N;
+
+	// mod lat to 0-2pi
+	lon = fmod(lon, (2 * glm::pi<double>()));
+
+	// correction for altitude near poles left out.
+
+	double ret[] = { 0, 0, 0 };
+
+	return ret;
+}
+
+
+glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 {
 	double a = 6378137.0f;
 	double b = 6356752.3f;
 	
-	double e2 = 1 - ((b*b) / (a*a));
-	//double e2 = 0.00669437999;
-	double lat = 48.8562;
-	double lon = 0.0000000;
+	double lat = lat_indegrees * glm::pi<double>() / 180;
+	double lon = lon_indegrees * glm::pi<double>() / 180;
 
-	double x = N(lat, a, b) * cos(lat) * cos(lon);
-	double y = N(lat, a, b) * cos(lat) * sin(lon);
-	double z = ( ((b*b) / (a*a))* N(lat, a, b)) * sin(lat);
-
-	int stop = 5;
-
-	//ecef2lla(x, y, z);
+	double x = N(lat) * cos(lat) * cos(lon);
+	double y = N(lat) * cos(lat) * sin(lon);
+	double z = (((b*b) / (a*a)) * N(lat)) * sin(lat);
+	
+	return { x, y, z };
 }
 
 
@@ -715,9 +755,10 @@ public:
 
 	void getmap()
 	{
-		if (quadkey.size() == 0)
+		if (quadkey.size() == 0 || quadkey.size() == 1)
 			return;
 
+		
 		double circumference = 2 * glm::pi<double>() * 6378137.0f;
 		double mapsize = pow(2, quadkey.size() == 0 ? 1 : quadkey.size()) * 256;
 
@@ -774,9 +815,9 @@ public:
 		vector<glm::vec3> vertices;
 		vector<glm::vec3> normals;
 
-		for (size_t x = 0; x < 4; x++)
+		for (size_t x = 0; x < 1; x++)
 		{
-			for (size_t i = 0; i < 4; i++)
+			for (size_t i = 0; i < 1; i++)
 			{
 				double mercx1 = x1 + i * xsep;
 				double mercy1 = (mapsize / 2) - fmod((y1 + x * ysep), (mapsize/2));
@@ -787,41 +828,30 @@ public:
 				double lat1 = ytolat(circumference / mapsize * mercy1);
 				double lon1 = abs(fmod((360.0 / mapsize * mercx1), 180.0f));
 				double ecefx, ecefy, ecefz;
-				ecefx = N(lon1, a, b) * cos(lon1) * cos(lat1);
-				ecefy = N(lon1, a, b) * cos(lon1) * sin(lat1);
-				ecefz = (1 - e2) * N(lon1, a, b) * sin(lon1);
 
-				glm::vec3 topleft = { ecefx, ecefy, ecefz };
+				glm::vec3 ecef = lla2ecef(lat1, lon1);
+				glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
 
-				//////		float x = N(lat, a, b) * cos(lat) * cos(lon);
-				//////		float y = N(lat, a, b) * cos(lat) * sin(lon);
-				//////		float z = (1 - e2) * N(lat, a, b) * sin(lat);
 
 				double lat2 = ytolat(circumference / mapsize * mercy1);
 				double lon2 = abs(fmod((360.0 / mapsize * mercx2), 180.0f));
-				ecefx = N(lat, a, b) * cos(lat2) * cos(lon2);
-				ecefy = N(lat, a, b) * cos(lat2) * sin(lon2);
-				ecefz = (1 - e2) * N(lat2, a, b) * sin(lat2);
 
-				glm::vec3 topright = { ecefx, ecefy, ecefz };
+				ecef = lla2ecef(lat2, lon2);
+				glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
 
 
 				double lat3 = ytolat(circumference / mapsize * mercy2);
 				double lon3 = abs(fmod((360.0 / mapsize * mercx1), 180.0f));
-				ecefx = N(lat, a, b) * cos(lat3) * cos(lon3);
-				ecefy = N(lat, a, b) * cos(lat3) * sin(lon3);
-				ecefz = (1 - e2) * N(lat3, a, b) * sin(lat3);
 
-				glm::vec3 bottomleft = { ecefx, ecefy, ecefz };
+				ecef = lla2ecef(lat3, lon3);
+				glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
 
 
 				double lat4 = ytolat(circumference / mapsize * mercy2);
-				double lon4 = abs(fmod((360.0 / mapsize * mercx1), 180.0f));
-				ecefx = N(lat, a, b) * cos(lat4) * cos(lon4);
-				ecefy = N(lat, a, b) * cos(lat4) * sin(lon4);
-				ecefz = (1 - e2) * N(lat4, a, b) * sin(lat4);
+				double lon4 = abs(fmod((360.0 / mapsize * mercx2), 180.0f));
 
-				glm::vec3 bottomright = { ecefx, ecefy, ecefz };
+				ecef = lla2ecef(lat4, lon4);
+				glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
 				
 
 				vertices.push_back(topleft);
@@ -916,15 +946,8 @@ public:
 		for (size_t i = 0; i < 4; i++)
 		{
 			tiles.children[i].init();
-			//tiles.children[i].getmap();
+			tiles.children[0].children[i].getmap();
 		}
-
-		double circumference = 2 * glm::pi<double>() * 6378137.0f;
-		double mapsize = 1024;
-		double lat = ytolat(circumference / mapsize * 512);
-
-
-		tiles.children[0].getmap();
 	}
 
 	void generate()
@@ -948,9 +971,9 @@ int main()
 
 
 
-	//spheroid earth(6378137.0f, 6356752.3f);
+	spheroid earth(6378137.0f, 6356752.3f);
 
-	lla2ecef();
+	lla2ecef(85,15);
 	//ecef2lla(548845.68, 0, 6333173.37);
 
 	//float r = 6371000.0f; 

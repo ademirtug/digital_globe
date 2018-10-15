@@ -246,7 +246,6 @@ string colormesh::generate_geoshader(scene* sc)
 		//"in vec3 gsFragPos;\n"
 		//"in vec3 gsNormal;\n"
 		//"in vec2 gsTexCoords;\n"
-
 		//"out vec3 FragPos;\n"
 		//"out vec3 Normal;\n"
 		//"out vec2 TexCoords;\n"
