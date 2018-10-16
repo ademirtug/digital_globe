@@ -551,8 +551,6 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
 	return decoder.error;
 }
 
-
-
 int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 {
 	UINT  num = 0;
@@ -583,7 +581,6 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 	free(pImageCodecInfo);
 	return -1;  // Failure
 }
-
 
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
 {
@@ -637,7 +634,6 @@ double* ecef2lla(double x, double y, double z) {
 	return lla;
 }
 
-
 //private final double a = 6378137; // radius
 //private final double e = 8.1819190842622e-2;  // eccentricity
 //
@@ -688,7 +684,6 @@ glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 	
 	return { x, y, z };
 }
-
 
 class quadtile
 {
@@ -809,8 +804,8 @@ public:
 
 
 		//plate oluştur
-		double xsep = (x2 - x1) / 4;
-		double ysep = (y2 - y1) / 4;
+		double xstep = (x2 - x1) / 4;
+		double ystep = (y2 - y1) / 4;
 		
 		vector<glm::vec3> vertices;
 		vector<glm::vec3> normals;
@@ -819,41 +814,48 @@ public:
 		{
 			for (size_t i = 0; i < 1; i++)
 			{
-				double mercx1 = x1 + i * xsep;
-				double mercy1 = (mapsize / 2) - fmod((y1 + x * ysep), (mapsize/2));
-				double mercx2 = x1 + (i + 1) * xsep;
-				double mercy2 = (mapsize / 2) - fmod(y1 + (x + 1) * ysep, (mapsize / 2));
+				if (quadkey == "AB" && i == 3)
+				{
+					int x = 5;
+				}
+
+				double mercx1 = x1 + i * xstep;
+				double mercx2 = x1 + (i + 1) * xstep;
+
+				double mercy1 = y1 + i * ystep;
+				double mercy2 = y1 + (i+1) * ystep;
+
 
 				//2d to lat long
 				double lat1 = ytolat(circumference / mapsize * mercy1);
-				double lon1 = abs(fmod((360.0 / mapsize * mercx1), 180.0f));
-				double ecefx, ecefy, ecefz;
+				double lon1 = (360.0 / mapsize * mercx1) - 180;
 
 				glm::vec3 ecef = lla2ecef(lat1, lon1);
 				glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
 
 
-				double lat2 = ytolat(circumference / mapsize * mercy1);
-				double lon2 = abs(fmod((360.0 / mapsize * mercx2), 180.0f));
+				double lat2 = ytolat(circumference / mapsize * mercy1); 
+				double lon2 = (360.0 / mapsize * mercx2) - 180;
 
 				ecef = lla2ecef(lat2, lon2);
 				glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
 
 
 				double lat3 = ytolat(circumference / mapsize * mercy2);
-				double lon3 = abs(fmod((360.0 / mapsize * mercx1), 180.0f));
+				double lon3 = (360.0 / mapsize * mercx1) - 180;
+				 
 
 				ecef = lla2ecef(lat3, lon3);
 				glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
 
-
 				double lat4 = ytolat(circumference / mapsize * mercy2);
-				double lon4 = abs(fmod((360.0 / mapsize * mercx2), 180.0f));
+				double lon4 = (360.0 / mapsize * mercx2) - 180;
 
+				
 				ecef = lla2ecef(lat4, lon4);
 				glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
-				
 
+				
 				vertices.push_back(topleft);
 				vertices.push_back(bottomleft);
 				vertices.push_back(topright);
@@ -877,32 +879,25 @@ public:
 			to_string(lat) + "," + to_string(lon) +
 			"&size=256,256&zoom=" + to_string(quadkey.size());
 			
-		http_client hc;
-		vector<unsigned char> png = hc.get_binary_page(req);
-
-		GdiplusStartupInput gdiplusStartupInput;
-		ULONG_PTR gdiplusToken;
-		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-
-		CLSID   encoderClsid;
-		Status  stat;
-		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, png.size());
-		
-		PVOID pMem = GlobalLock(hMem); // get the actual pointer for the HGLOBAL
-		RtlMoveMemory(pMem, &png[0], png.size());
-		IStream *pStream = 0;
-		HRESULT hr = CreateStreamOnHGlobal(hMem, TRUE, &pStream);
-
-		Image* img = new Gdiplus::Image(pStream);
-
-		GetEncoderClsid(L"image/bmp", &encoderClsid);
-		stat = img->Save(L"C:\\data\\example.bmp", &encoderClsid, NULL);
-
-		delete img;
-		GdiplusShutdown(gdiplusToken);
-		image.reset(new bmp("C:\\data\\example.bmp"));
-
-
+		//http_client hc;
+		//vector<unsigned char> png = hc.get_binary_page(req);
+		//GdiplusStartupInput gdiplusStartupInput;
+		//ULONG_PTR gdiplusToken;
+		//GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+		//CLSID   encoderClsid;
+		//Status  stat;
+		//HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, png.size());
+		//
+		//PVOID pMem = GlobalLock(hMem); // get the actual pointer for the HGLOBAL
+		//RtlMoveMemory(pMem, &png[0], png.size());
+		//IStream *pStream = 0;
+		//HRESULT hr = CreateStreamOnHGlobal(hMem, TRUE, &pStream);
+		//Image* img = new Gdiplus::Image(pStream);
+		//GetEncoderClsid(L"image/bmp", &encoderClsid);
+		//stat = img->Save(L"C:\\data\\example.bmp", &encoderClsid, NULL);
+		//delete img;
+		//GdiplusShutdown(gdiplusToken);
+		//image.reset(new bmp("C:\\data\\example.bmp"));
 		
 		colormesh* cm = new colormesh(vertices, normals);
 		cm->position = { 0.0, 0.0, 0.0 };
@@ -943,10 +938,13 @@ public:
 		a = _a;
 		b = _b;
 		tiles.init("");
-		for (size_t i = 0; i < 4; i++)
+		for (size_t i = 0; i < 1; i++)
 		{
 			tiles.children[i].init();
-			tiles.children[0].children[i].getmap();
+			for (size_t x = 0; x < 2; x++)
+			{
+				tiles.children[i].children[x].getmap();
+			}
 		}
 	}
 
@@ -955,27 +953,21 @@ public:
 	}
 };
 
-
-
-
-
 int main()
 {
-
-
 	qball_camera *cam = new qball_camera();
 
 	eng.cam = cam;
 	eng.init(1024, 768);
 	eng.maxfps = 25;
 
-
-
 	spheroid earth(6378137.0f, 6356752.3f);
 
-	lla2ecef(85,15);
+	//lla2ecef(85,15);
+	//lla2ecef(-85, 15);
+	//lla2ecef(85, -15);
+	//lla2ecef(-85, -15);
 	//ecef2lla(548845.68, 0, 6333173.37);
-
 	//float r = 6371000.0f; 
 	//float b = 6356752.3f;
 	//float a = 6378137.0f;
@@ -983,34 +975,26 @@ int main()
 	//float num_long = 360;
 	//float e2 = 1 - ((b*b) / (a*a));
 	//float e = sqrt(e2);
-
 	//glm::vec3** globe = new glm::vec3*[num_lat + 1];
 	//for (int i = 0; i < num_lat + 1; ++i)
 	//	globe[i] = new glm::vec3[num_long + 1];
-
 	//vector<glm::vec3> vertices;
 	//vector<glm::vec3> normals;
-
 	//pointcloud pc;
-
 	//for (size_t i = 0; i < num_lat + 1; i++)
 	//{
 	//	float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
 	//	for (size_t j = 0; j<num_long + 1; j++)
 	//	{
 	//		float lon = ((2 * glm::pi<float>() / num_long)*j);
-
 	//		float x = N(lat, a, b) * cos(lat) * cos(lon);
 	//		float y = N(lat, a, b) * cos(lat) * sin(lon);
 	//		float z = (1 - e2) * N(lat, a, b) * sin(lat);
-
 	//		glm::vec3 pt = { x, y, z };
 	//		globe[i][j] = pt;
 	//		pc.addpoint(pt);
 	//	}
 	//}
-
-
 	//for (size_t i = 0; i < num_lat; i++)
 	//{
 	//	for (size_t j = 0; j< num_long; j++)
@@ -1018,23 +1002,18 @@ int main()
 	//		glm::vec3 pt1 = globe[i][j];
 	//		glm::vec3 pt2 = globe[i + 1][j];
 	//		glm::vec3 pt3 = globe[i][j + 1];
-
 	//		vertices.push_back(pt1);
 	//		vertices.push_back(pt2);
 	//		vertices.push_back(pt3);
-
 	//		normals.push_back(calc_normal(pt1, pt2, pt3));
 	//		normals.push_back(calc_normal(pt2, pt3, pt1));
 	//		normals.push_back(calc_normal(pt3, pt1, pt2));
-
 	//		glm::vec3 pt4 = globe[i + 1][j];
 	//		glm::vec3 pt5 = globe[i + 1][j + 1];
 	//		glm::vec3 pt6 = globe[i][j + 1];
-
 	//		vertices.push_back(pt4);
 	//		vertices.push_back(pt5);
 	//		vertices.push_back(pt6);
-
 	//		normals.push_back(calc_normal(pt4, pt5, pt6));
 	//		normals.push_back(calc_normal(pt5, pt6, pt4));
 	//		normals.push_back(calc_normal(pt6, pt4, pt5));

@@ -1,18 +1,15 @@
 ﻿  main.cpp
 c:\users\akn\documents\github\3d_engine\main.cpp(36): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\main.cpp(40): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(720): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(799): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(828): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(836): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(843): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(850): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(830): warning C4101: 'ecefz': unreferenced local variable
-c:\users\akn\documents\github\3d_engine\main.cpp(830): warning C4101: 'ecefy': unreferenced local variable
-c:\users\akn\documents\github\3d_engine\main.cpp(830): warning C4101: 'ecefx': unreferenced local variable
-c:\users\akn\documents\github\3d_engine\main.cpp(943): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(944): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(673): warning C4172: returning address of local variable or temporary: ret
-c:\users\akn\documents\github\3d_engine\main.cpp(637): warning C4172: returning address of local variable or temporary: lla
+c:\users\akn\documents\github\3d_engine\main.cpp(715): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(794): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(832): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(840): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(847): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(854): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(941): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(942): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\main.cpp(634): warning C4172: returning address of local variable or temporary: lla
+c:\users\akn\documents\github\3d_engine\main.cpp(669): warning C4172: returning address of local variable or temporary: ret
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)

@@ -7,10 +7,10 @@ extern engine eng;
 pointlight::pointlight()
 {
 	vboid_vertices = 0;
-	position = { 2.0f, 2.0f, 2.0f };
+	position = { -2.0f, -2.0f, -2.0f };
 	color = { 1.0f, 1.0f, 1.0f };
 
-	ambient = { 0.1f, 0.1f, 0.1f };
+	ambient = { 0.5f, 0.5f, 0.5f };
 	diffuse = { 1.0f, 1.0f, 1.0f };
 	specular = { 1.0f, 1.0f, 1.0f };
 
@@ -172,8 +172,8 @@ string pointlight::generate_vertshader(scene* sc)
 
 directionallight::directionallight()
 {
-	direction = { -2.0f, 5.0f, -1.0f };
-	ambient = { 0.3f, 0.3f, 0.3f };
+	direction = { 2.0f, -5.0f, 1.0f };
+	ambient = { 0.4f, 0.4f, 0.4f };
 	diffuse = { 0.7f, 0.7f, 0.7f };
 	specular = { 0.7f, 0.7f, 0.7f };
 

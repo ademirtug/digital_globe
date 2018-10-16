@@ -42,7 +42,7 @@ void scene::draw()
 	glViewport(0, 0, width, height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 projection = glm::perspective(45.0f, width/height, 100.0f, 16000000.0f);
+	glm::mat4 projection = glm::perspective(45.0f, width/height, 100.0f, 50000000.0f);
 	glm::mat4 view = eng.cam->getview();
 	glm::vec3 cameraPos = eng.cam->getpos();
 	
