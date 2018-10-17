@@ -762,28 +762,33 @@ public:
 		double y1 = 0;
 		double y2 = mapsize;
 
+		if (quadkey == "CA")
+		{
+			int x = 5;
+
+		}
 		//2 üzeri seviye kadar en boy parça
 		for (size_t i = 0; i < quadkey.size(); i++)
 		{
 			if (quadkey[i] == 'A')
 			{
-				x2 = x2 / 2;
-				y2 = y2 / 2;
+				y2 = (y2 + y1) / 2;
+				x2 = (x2 + x1) / 2;
 			}
 			else if (quadkey[i] == 'B')
 			{
-				x1 = x2 / 2;
-				y2 = y2 / 2;
+				x1 = (x2 + x1) / 2;
+				y2 = (y2 + y1) / 2;
 			}
 			else if (quadkey[i] == 'C')
 			{
-				x2 = x2 / 2;
-				y1 = y2 / 2;
+				x2 = (x2 + x1) / 2;
+				y1 = (y2 + y1) / 2;
 			}
 			else if (quadkey[i] == 'D')
 			{
-				x1 = x2 / 2;
-				y1 = y2 / 2;
+				x1 = (x2 + x1) / 2;
+				y1 = (y2 + y1) / 2;
 			}
 		}
 
@@ -794,7 +799,6 @@ public:
 		double lat = ytolat(circumference / mapsize * centery);
 
 
-		float r = 6371000.0f;
 		float b = 6356752.3f;
 		float a = 6378137.0f;
 		float num_lat = 180;
@@ -803,52 +807,55 @@ public:
 		float e = sqrt(e2);
 
 
+		int platenum = 16;
 		//plate oluştur
-		double xstep = (x2 - x1) / 4;
-		double ystep = (y2 - y1) / 4;
+		double xstep = (x2 - x1) / platenum;
+		double ystep = (y2 - y1) / platenum;
 		
+
+		if (y2<y1 || x1 > x2 || xstep == 0 || ystep == 0)
+		{
+			int somethingwrong = 0;
+		}
+
+
 		vector<glm::vec3> vertices;
 		vector<glm::vec3> normals;
 
-		for (size_t x = 0; x < 1; x++)
+		for (size_t x = 0; x < platenum; x++)
 		{
-			for (size_t i = 0; i < 1; i++)
+			for (size_t i = 0; i < platenum; i++)
 			{
-				if (quadkey == "AB" && i == 3)
-				{
-					int x = 5;
-				}
-
 				double mercx1 = x1 + i * xstep;
 				double mercx2 = x1 + (i + 1) * xstep;
 
-				double mercy1 = y1 + i * ystep;
-				double mercy2 = y1 + (i+1) * ystep;
+				double mercy1 = y1 + x * ystep;
+				double mercy2 = y1 + (x+1) * ystep;
 
 
 				//2d to lat long
-				double lat1 = ytolat(circumference / mapsize * mercy1);
+				double lat1 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
 				double lon1 = (360.0 / mapsize * mercx1) - 180;
 
 				glm::vec3 ecef = lla2ecef(lat1, lon1);
 				glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
 
 
-				double lat2 = ytolat(circumference / mapsize * mercy1); 
+				double lat2 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
 				double lon2 = (360.0 / mapsize * mercx2) - 180;
 
 				ecef = lla2ecef(lat2, lon2);
 				glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
 
 
-				double lat3 = ytolat(circumference / mapsize * mercy2);
+				double lat3 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
 				double lon3 = (360.0 / mapsize * mercx1) - 180;
 				 
 
 				ecef = lla2ecef(lat3, lon3);
 				glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
 
-				double lat4 = ytolat(circumference / mapsize * mercy2);
+				double lat4 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
 				double lon4 = (360.0 / mapsize * mercx2) - 180;
 
 				
@@ -938,10 +945,10 @@ public:
 		a = _a;
 		b = _b;
 		tiles.init("");
-		for (size_t i = 0; i < 1; i++)
+		for (size_t i = 0; i < 4; i++)
 		{
 			tiles.children[i].init();
-			for (size_t x = 0; x < 2; x++)
+			for (size_t x = 0; x < 4; x++)
 			{
 				tiles.children[i].children[x].getmap();
 			}
