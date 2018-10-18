@@ -689,8 +689,8 @@ class quadtile
 {
 public:
 	quadtile* children;
-	shared_ptr<bmp> image;
 	string quadkey;
+	//shared_ptr<texturemesh> tm;
 
 	quadtile() 
 	{
@@ -699,7 +699,6 @@ public:
 
 	~quadtile()
 	{
-		image.reset();
 		if (children != nullptr)
 			delete[] children;
 	}
@@ -739,13 +738,19 @@ public:
 	}
 	void invalidate(string tile)
 	{
-		image.reset();
-
 		quadtile* child = getchild(tile.at(0));
 		if (child == nullptr)
 			return;
 
 		return child->invalidate(tile.substr(1));
+	}
+
+	BOOL FileExists(LPCTSTR szPath)
+	{
+		DWORD dwAttrib = GetFileAttributes(szPath);
+
+		return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+			!(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 	}
 
 	void getmap()
@@ -762,11 +767,7 @@ public:
 		double y1 = 0;
 		double y2 = mapsize;
 
-		if (quadkey == "CA")
-		{
-			int x = 5;
 
-		}
 		//2 üzeri seviye kadar en boy parça
 		for (size_t i = 0; i < quadkey.size(); i++)
 		{
@@ -795,14 +796,13 @@ public:
 		double centerx = (x2 + x1) / 2;
 		double centery = (y2 + y1) / 2;
 
-		double lon = abs(fmod((360.0 / mapsize * centerx), 180.0f));
-		double lat = ytolat(circumference / mapsize * centery);
+		double lat = ytolat(circumference / mapsize * (mapsize / 2 - centery)); // ytolat(circumference / mapsize * centery);
+		double lon = (360.0 / mapsize * centerx) - 180;//abs(fmod((360.0 / mapsize * centerx), 180.0f));
+		
 
 
 		float b = 6356752.3f;
 		float a = 6378137.0f;
-		float num_lat = 180;
-		float num_long = 360;
 		float e2 = 1 - ((b*b) / (a*a));
 		float e = sqrt(e2);
 
@@ -813,14 +813,9 @@ public:
 		double ystep = (y2 - y1) / platenum;
 		
 
-		if (y2<y1 || x1 > x2 || xstep == 0 || ystep == 0)
-		{
-			int somethingwrong = 0;
-		}
-
-
 		vector<glm::vec3> vertices;
 		vector<glm::vec3> normals;
+		vector<glm::vec2> uvs;
 
 		for (size_t x = 0; x < platenum; x++)
 		{
@@ -831,6 +826,11 @@ public:
 
 				double mercy1 = y1 + x * ystep;
 				double mercy2 = y1 + (x+1) * ystep;
+
+				double u = 0;
+				double u1 = 0;
+				double v = 0;
+				double v1 = 0;
 
 
 				//2d to lat long
@@ -862,10 +862,19 @@ public:
 				ecef = lla2ecef(lat4, lon4);
 				glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
 
-				
+
 				vertices.push_back(topleft);
 				vertices.push_back(bottomleft);
 				vertices.push_back(topright);
+
+				glm::vec2 uvtopleft = {(i * xstep) / 256,  -(x * ystep) / 256 };
+				glm::vec2 uvbottomleft = { (i * xstep) / 256,  -((x + 1) * ystep) / 256 };
+				glm::vec2 uvtopright = { ((i+1) * xstep) / 256,  -(x * ystep) / 256 };
+
+				uvs.push_back(uvtopleft);
+				uvs.push_back(uvbottomleft);
+				uvs.push_back(uvtopright);
+
 
 				normals.push_back(calc_normal(topleft, bottomleft, topright));
 				normals.push_back(calc_normal(bottomleft, topright, topleft));
@@ -874,6 +883,12 @@ public:
 				vertices.push_back(bottomleft);
 				vertices.push_back(bottomright);
 				vertices.push_back(topright);
+
+				glm::vec2 uvbottomright = { ((i + 1) * xstep) / 256, - ((x + 1) * ystep) / 256 };
+
+				uvs.push_back(uvbottomleft);
+				uvs.push_back(uvbottomright);
+				uvs.push_back(uvtopright);
 
 				normals.push_back(calc_normal(bottomleft, bottomright, topright));
 				normals.push_back(calc_normal(bottomright, topright, bottomleft));
@@ -885,49 +900,37 @@ public:
 		string req = "https://www.mapquestapi.com/staticmap/v5/map?key=kAGxoy8TfqxNPPXu1Va54jWMoYMkRCbG&format=png&center=" +
 			to_string(lat) + "," + to_string(lon) +
 			"&size=256,256&zoom=" + to_string(quadkey.size());
-			
-		//http_client hc;
-		//vector<unsigned char> png = hc.get_binary_page(req);
-		//GdiplusStartupInput gdiplusStartupInput;
-		//ULONG_PTR gdiplusToken;
-		//GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-		//CLSID   encoderClsid;
-		//Status  stat;
-		//HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, png.size());
-		//
-		//PVOID pMem = GlobalLock(hMem); // get the actual pointer for the HGLOBAL
-		//RtlMoveMemory(pMem, &png[0], png.size());
-		//IStream *pStream = 0;
-		//HRESULT hr = CreateStreamOnHGlobal(hMem, TRUE, &pStream);
-		//Image* img = new Gdiplus::Image(pStream);
-		//GetEncoderClsid(L"image/bmp", &encoderClsid);
-		//stat = img->Save(L"C:\\data\\example.bmp", &encoderClsid, NULL);
-		//delete img;
-		//GdiplusShutdown(gdiplusToken);
-		//image.reset(new bmp("C:\\data\\example.bmp"));
 		
-		colormesh* cm = new colormesh(vertices, normals);
-		cm->position = { 0.0, 0.0, 0.0 };
-		eng.sc->meshes.push_back(cm);
+		wstring fname = L"C:\\data\\" + wstring(quadkey.begin(), quadkey.end()) + L".bmp";
 
-		//vector<unsigned char> bmpdata;
-		//unsigned long width = 256;
-		//unsigned long height = 256;
-		//unsigned char* buff = new unsigned char[png.size()+1];
-		//
-		//memset(buff, 0, png.size() + 1);
-		//for (int i = 0; i < png.size(); i++) {
-		//	buff[i] = png[i];
-		//}
-		//int res = decodePNG(bmpdata, width, height, &png[0], png.size(), false);
-		//image.reset(new bmp);
-		//image->load(bmpdata.data(), width, height);
-		//delete[] buff;
-		//std::ofstream output_file("c:\\data\\example.png", ios::out | ios::binary);
-		//std::ostream_iterator<char> output_iterator(output_file);
-		//std::copy(png.begin(), png.end(), output_iterator);
-		//output_file.flush();
-		//output_file.close();
+		if (!FileExists(fname.c_str()))
+		{
+			http_client hc;
+			vector<unsigned char> png = hc.get_binary_page(req);
+			GdiplusStartupInput gdiplusStartupInput;
+			ULONG_PTR gdiplusToken;
+			GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+			CLSID   encoderClsid;
+			Status  stat;
+			HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, png.size());
+
+			PVOID pMem = GlobalLock(hMem); // get the actual pointer for the HGLOBAL
+			RtlMoveMemory(pMem, &png[0], png.size());
+			IStream *pStream = 0;
+			HRESULT hr = CreateStreamOnHGlobal(hMem, TRUE, &pStream);
+			
+
+			Image* img = new Gdiplus::Image(pStream);
+			GetEncoderClsid(L"image/bmp", &encoderClsid);
+
+			stat = img->Save(fname.c_str(), &encoderClsid, NULL);
+			delete img;
+			GdiplusShutdown(gdiplusToken);
+		}
+
+		texturemesh* tm = new texturemesh(vertices, normals, uvs, string(fname.begin(), fname.end()));
+		tm->position = { 0.0, 0.0, 0.0 };
+		eng.sc->meshes.push_back(tm);
 	}
 };
 
@@ -969,71 +972,6 @@ int main()
 	eng.maxfps = 25;
 
 	spheroid earth(6378137.0f, 6356752.3f);
-
-	//lla2ecef(85,15);
-	//lla2ecef(-85, 15);
-	//lla2ecef(85, -15);
-	//lla2ecef(-85, -15);
-	//ecef2lla(548845.68, 0, 6333173.37);
-	//float r = 6371000.0f; 
-	//float b = 6356752.3f;
-	//float a = 6378137.0f;
-	//float num_lat = 180;
-	//float num_long = 360;
-	//float e2 = 1 - ((b*b) / (a*a));
-	//float e = sqrt(e2);
-	//glm::vec3** globe = new glm::vec3*[num_lat + 1];
-	//for (int i = 0; i < num_lat + 1; ++i)
-	//	globe[i] = new glm::vec3[num_long + 1];
-	//vector<glm::vec3> vertices;
-	//vector<glm::vec3> normals;
-	//pointcloud pc;
-	//for (size_t i = 0; i < num_lat + 1; i++)
-	//{
-	//	float lat = ((glm::pi<float>() / num_lat)*i) + glm::pi<float>() / 2;
-	//	for (size_t j = 0; j<num_long + 1; j++)
-	//	{
-	//		float lon = ((2 * glm::pi<float>() / num_long)*j);
-	//		float x = N(lat, a, b) * cos(lat) * cos(lon);
-	//		float y = N(lat, a, b) * cos(lat) * sin(lon);
-	//		float z = (1 - e2) * N(lat, a, b) * sin(lat);
-	//		glm::vec3 pt = { x, y, z };
-	//		globe[i][j] = pt;
-	//		pc.addpoint(pt);
-	//	}
-	//}
-	//for (size_t i = 0; i < num_lat; i++)
-	//{
-	//	for (size_t j = 0; j< num_long; j++)
-	//	{
-	//		glm::vec3 pt1 = globe[i][j];
-	//		glm::vec3 pt2 = globe[i + 1][j];
-	//		glm::vec3 pt3 = globe[i][j + 1];
-	//		vertices.push_back(pt1);
-	//		vertices.push_back(pt2);
-	//		vertices.push_back(pt3);
-	//		normals.push_back(calc_normal(pt1, pt2, pt3));
-	//		normals.push_back(calc_normal(pt2, pt3, pt1));
-	//		normals.push_back(calc_normal(pt3, pt1, pt2));
-	//		glm::vec3 pt4 = globe[i + 1][j];
-	//		glm::vec3 pt5 = globe[i + 1][j + 1];
-	//		glm::vec3 pt6 = globe[i][j + 1];
-	//		vertices.push_back(pt4);
-	//		vertices.push_back(pt5);
-	//		vertices.push_back(pt6);
-	//		normals.push_back(calc_normal(pt4, pt5, pt6));
-	//		normals.push_back(calc_normal(pt5, pt6, pt4));
-	//		normals.push_back(calc_normal(pt6, pt4, pt5));
-	//	}
-	//}
-
-	//colormesh cm(vertices, normals);
-	//cm.position = { 0.0, 0.0, 0.0 };
-	//eng.sc->meshes.push_back(&cm);
-
-	//pc.init();
-	//pc.position = { 0.0, 0.0, 0.0 };
-	//eng.sc->meshes.push_back(&pc);
 
 	eng.sc->generate_shaders();
 	eng.run();

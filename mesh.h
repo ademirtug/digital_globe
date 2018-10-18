@@ -103,6 +103,7 @@ public:
 	texturemesh();
 	texturemesh(const std::string& objfile, const std::string& texfile = "");
 	texturemesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals = {}, vector<glm::vec2> _uv = {});
+	texturemesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::vec2> _uv, const std::string& texfile);
 	virtual ~texturemesh();
 
 	void draw(glm::mat4 view, glm::mat4 projection);

@@ -1,17 +1,14 @@
-﻿  main.cpp
-c:\users\akn\documents\github\3d_engine\main.cpp(36): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(40): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(715): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(799): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(825): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\main.cpp(827): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\main.cpp(837): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(844): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(851): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(858): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(945): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(946): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(669): warning C4172: returning address of local variable or temporary: ret
-c:\users\akn\documents\github\3d_engine\main.cpp(634): warning C4172: returning address of local variable or temporary: lla
+﻿  camera.cpp
+c:\users\akn\documents\github\3d_engine\camera.cpp(55): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(56): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(57): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(58): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(85): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\akn\documents\github\3d_engine\camera.cpp(93): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(102): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(130): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(131): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(146): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(155): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)

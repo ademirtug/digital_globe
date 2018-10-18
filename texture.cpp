@@ -1,6 +1,6 @@
 ﻿ #include "stdafx.h"
 #include "texture.h"
-
+#include <wingdi.h>
 
 texture::texture()
 {
@@ -30,49 +30,51 @@ bmp::bmp(const std::string& filename)
 }
 void bmp::load(const std::string& filename)
 {
-	unsigned int w, h, datastart, imgsize;
+	BITMAPFILEHEADER* hdr;
+	BITMAPINFOHEADER* info;
+
 	unsigned char* data;
-	unsigned char* hdr = new unsigned char[54 + 1];
+	unsigned char* uchdr = new unsigned char[54 + 1];
+
 
 	fstream f;
 	f.open(filename, std::fstream::in | std::fstream::binary);
 	if (!f.is_open())
 		return;
 
-	f.read((char*)hdr, 54);
+
+	f.read((char*)uchdr, 54);
+	hdr = (BITMAPFILEHEADER*)uchdr;
+	info = (BITMAPINFOHEADER*)(uchdr + sizeof(BITMAPFILEHEADER));
+
 
 	//sanity check yapalım
-	if (hdr[0] != 'B' || hdr[1] != 'M')
+	if (uchdr[0] != 'B' || uchdr[1] != 'M')
 		return;
 
-	datastart = *((int*)&hdr[0x0A]);
-	imgsize = *((int*)&hdr[0x22]);
-	w = *((int*)&hdr[0x12]);
-	h = *((int*)&hdr[0x16]);
+	data = new unsigned char[hdr->bfSize-54];
 
-	//sanity check devam
-	imgsize = imgsize == 0 ? w * h * 3 : imgsize;
-	datastart = datastart == 0 ? 54 : datastart;
-
-	data = new unsigned char[imgsize];
-	f.read((char*)data, imgsize);
+	f.read((char*)data, hdr->bfSize - 54);
 
 	f.close();
 
-	load(data, w, h);
+	load(data, info->biWidth, info->biHeight, info->biBitCount);
 
 	//yükleme tamam ram üzerindekini silelim.
+	delete[] uchdr;
 	delete[] data;
 
 }
 
-void bmp::load(unsigned char* data, int w, int h)
+void bmp::load(unsigned char* data, int w, int h, int bitcount)
 {
 	glGenTextures(1, &vboid_texture);
 	glBindTexture(GL_TEXTURE_2D, vboid_texture);
 
+	unsigned int type = bitcount == 32 ? GL_BGRA : GL_BGR;
+
 	//ekran kartına yükleyelim.
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, type, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	//trilinear filtreleme standart komut grubu

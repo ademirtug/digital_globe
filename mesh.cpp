@@ -665,7 +665,7 @@ texturemesh::texturemesh(const std::string& objfile, const std::string& texfile)
 	loadobj(objfile);
 
 	if (texfile != "")
-		tex = new texture(texfile);
+		tex = new bmp(texfile);
 
 	init();
 
@@ -675,6 +675,17 @@ texturemesh::texturemesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals
 	vertices = _vertices;
 	normals = _normals;
 	uv = _uv;
+
+	init();
+}
+texturemesh::texturemesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals, vector<glm::vec2> _uv, const std::string& texfile) : texturemesh()
+{
+	vertices = _vertices;
+	normals = _normals;
+	uv = _uv;
+
+	if (texfile != "")
+		tex = new bmp(texfile);
 
 	init();
 }

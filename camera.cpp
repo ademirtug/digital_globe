@@ -143,7 +143,7 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 		glm::vec3 rightaxis = glm::normalize(glm::cross(mouseaxis, up));
 		glm::vec3 rotaxis = glm::normalize(glm::cross(mouseaxis, rightaxis));
 
-		glm::quat newrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(dx, dy, 0))/5), rotaxis);
+		glm::quat newrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(dx, dy, 0))/((10*log2f(zoomlevel)))), rotaxis);
 		currot = newrot * currot;
 
 		lastx = xpos;
@@ -165,23 +165,18 @@ eu_orbit_camera::eu_orbit_camera()
 {
 	cdist = 15;
 }
-
 eu_orbit_camera::~eu_orbit_camera()
 {}
-
-
 glm::mat4 eu_orbit_camera::getview()
 {
 	cdist += mydiff / 5;
 	mydiff = 0;
 	return glm::translate(glm::mat4(), glm::vec3(0, 0, -cdist)) * glm::eulerAngleXY(-(float)ry / 100, (float)rx / 100);
 }
-
 glm::vec3 eu_orbit_camera::getpos()
 {
 	return inverse(getview())[3];
 }
-
 void eu_orbit_camera::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)

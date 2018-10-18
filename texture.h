@@ -20,7 +20,7 @@ public:
 	bmp();
 	bmp(const std::string& filename);
 	virtual void load(const std::string& filename);
-	virtual void load(unsigned char* data, int w, int h);
+	virtual void load(unsigned char* data, int w, int h, int bitcount=32);
 	virtual void unload();
 };
 
