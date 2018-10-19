@@ -20,7 +20,12 @@
 #include <sstream>
 #include <iomanip>
 #include <windows.h>
-
+#include <set>
+#include <windows.h>
+#include <algorithm>
+#include <math.h>
+#include <gdiplus.h>
+#include <stdio.h>
 
 
 #include "glm/glm.hpp"

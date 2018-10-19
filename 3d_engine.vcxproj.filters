@@ -54,6 +54,9 @@
     <ClInclude Include="bingmapquery.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="bingmapquery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
