@@ -32,7 +32,7 @@ bool engine::init(int width, int height)
 {
 	if (!glfwInit())
 		return false;
-
+	
 	window = glfwCreateWindow(width, height, "3d_engine", NULL, NULL);
 	if (window == NULL) 
 		return false;

@@ -357,14 +357,14 @@ void quadtile::getmap()
 		GdiplusShutdown(gdiplusToken);
 	}
 
-	////lock
-	//eng.sc->mxmeshes.lock();
+	//lock
+	eng.sc->mxmeshes.lock();
 
-	//texturemesh* tm = new texturemesh(vertices, normals, uvs, string(fname.begin(), fname.end()));
-	//tm->position = { 0.0, 0.0, 0.0 };
-	//eng.sc->meshes.push_back(tm);
+	texturemesh* tm = new texturemesh(vertices, normals, uvs, string(fname.begin(), fname.end()));
+	tm->position = { 0.0, 0.0, 0.0 };
+	eng.sc->meshes.push_back(tm);
 
-	////unlock
-	//eng.sc->mxmeshes.unlock();
+	//unlock
+	eng.sc->mxmeshes.unlock();
 
 }
