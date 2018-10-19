@@ -77,12 +77,14 @@ void scene::draw()
 	}
 
 	glBindVertexArray(0);
-	mxmeshes.unlock();
+
 
 	glfwSwapBuffers(eng.window);
 	glfwPollEvents();
 	if (err != GL_NO_ERROR)
 		cout << gluErrorString(err);
+
+	mxmeshes.unlock();
 }
 void scene::generate_shaders()
 {
