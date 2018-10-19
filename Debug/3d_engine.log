@@ -1,21 +1,3 @@
-﻿  work.cpp
-  sphere.cpp
-c:\users\akn\documents\github\3d_engine\sphere.cpp(26): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.cpp(30): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.cpp(146): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.cpp(231): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.cpp(250): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\sphere.cpp(252): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\sphere.cpp(267): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.cpp(274): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.cpp(281): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.cpp(288): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.cpp(376): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.cpp(377): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-  Generating Code...
-c:\users\akn\documents\github\3d_engine\sphere.cpp(105): warning C4172: returning address of local variable or temporary: lla
-  Skipping... (no relevant changes detected)
-  pool.cpp
-  main.cpp
+﻿  pool.cpp
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)

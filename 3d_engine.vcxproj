@@ -150,7 +150,7 @@
     <ClInclude Include="idlethread.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="mesh.h" />
-    <ClInclude Include="pool.h" />
+    <ClInclude Include="threadpool.h" />
     <ClInclude Include="quadtile.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
@@ -168,7 +168,7 @@
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mesh.cpp" />
-    <ClCompile Include="pool.cpp" />
+    <ClCompile Include="threadpool.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="sphere.cpp" />

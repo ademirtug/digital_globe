@@ -1,5 +1,5 @@
-#ifndef __POOL_H__
-#define __POOL_H__
+#ifndef __THREADPOOL_H__
+#define __THREADPOOL_H__
 
 #include "work.h"
 #include "idlethread.h"

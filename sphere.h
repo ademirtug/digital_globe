@@ -2,7 +2,7 @@
 #define __SPHERE_H__
 
 #include "quadtile.h"
-#include "pool.h"
+#include "threadpool.h"
 
 class spheroid
 {

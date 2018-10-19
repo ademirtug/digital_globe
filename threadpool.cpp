@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "work.h"
 #include "idlethread.h"
-#include "pool.h"
+#include "threadpool.h"
 #include "sphere.h"
 
 #include "stdafx.h"
