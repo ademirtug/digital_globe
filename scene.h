@@ -10,6 +10,8 @@ public:
 	scene();
 	void generate_shaders();
 	void draw();
+	
+	std::mutex mxmeshes;
 
 	GLuint vao_mesh_id, vao_lights_id;
 	std::vector<imesh*> meshes;

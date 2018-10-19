@@ -1,6 +1,91 @@
-﻿  main.cpp
-c:\users\akn\documents\github\3d_engine\sphere.h(40): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\sphere.h(41): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\akn\documents\github\3d_engine\main.cpp(44): warning C4018: '<': signed/unsigned mismatch
-  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
-  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.pdb (Partial PDB)
+﻿  pool.cpp
+c:\users\akn\documents\github\3d_engine\idlethread.h(14): error C3646: 'work_arrived': unknown override specifier
+c:\users\akn\documents\github\3d_engine\idlethread.h(14): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+c:\users\akn\documents\github\3d_engine\idlethread.h(28): error C2039: 'scoped_lock': is not a member of 'std::mutex'
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.10.25017\include\mutex(79): note: see declaration of 'std::mutex'
+c:\users\akn\documents\github\3d_engine\idlethread.h(28): error C2065: 'scoped_lock': undeclared identifier
+c:\users\akn\documents\github\3d_engine\idlethread.h(28): error C2146: syntax error: missing ';' before identifier 'lk'
+c:\users\akn\documents\github\3d_engine\idlethread.h(28): error C3861: 'lk': identifier not found
+c:\users\akn\documents\github\3d_engine\idlethread.h(30): error C2653: 'boost': is not a class or namespace name
+c:\users\akn\documents\github\3d_engine\idlethread.h(31): error C2653: 'boost': is not a class or namespace name
+c:\users\akn\documents\github\3d_engine\idlethread.h(31): error C2589: 'constant': illegal token on right side of '::'
+c:\users\akn\documents\github\3d_engine\idlethread.h(31): error C2062: type 'unknown-type' unexpected
+c:\users\akn\documents\github\3d_engine\idlethread.h(34): error C2065: 'work_arrived': undeclared identifier
+c:\users\akn\documents\github\3d_engine\idlethread.h(34): error C2228: left of '.timed_wait' must have class/struct/union
+  c:\users\akn\documents\github\3d_engine\idlethread.h(34): note: type is 'unknown-type'
+c:\users\akn\documents\github\3d_engine\idlethread.h(34): error C2065: 'lk': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(20): error C2039: 'scoped_lock': is not a member of 'std::mutex'
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.10.25017\include\mutex(79): note: see declaration of 'std::mutex'
+c:\users\akn\documents\github\3d_engine\pool.cpp(20): error C2065: 'scoped_lock': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(20): error C2146: syntax error: missing ';' before identifier 'lk_idle_threads'
+c:\users\akn\documents\github\3d_engine\pool.cpp(20): error C3861: 'lk_idle_threads': identifier not found
+c:\users\akn\documents\github\3d_engine\pool.cpp(30): error C2065: 'lk_idle_threads': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(30): error C2228: left of '.unlock' must have class/struct/union
+  c:\users\akn\documents\github\3d_engine\pool.cpp(30): note: type is 'unknown-type'
+c:\users\akn\documents\github\3d_engine\pool.cpp(32): error C2039: 'scoped_lock': is not a member of 'std::mutex'
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.10.25017\include\mutex(79): note: see declaration of 'std::mutex'
+c:\users\akn\documents\github\3d_engine\pool.cpp(32): error C2065: 'scoped_lock': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(32): error C2146: syntax error: missing ';' before identifier 'lk_works'
+c:\users\akn\documents\github\3d_engine\pool.cpp(32): error C3861: 'lk_works': identifier not found
+c:\users\akn\documents\github\3d_engine\pool.cpp(34): error C2065: 'lk_works': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(34): error C2228: left of '.unlock' must have class/struct/union
+  c:\users\akn\documents\github\3d_engine\pool.cpp(34): note: type is 'unknown-type'
+c:\users\akn\documents\github\3d_engine\pool.cpp(37): error C2039: 'scoped_lock': is not a member of 'std::mutex'
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.10.25017\include\mutex(79): note: see declaration of 'std::mutex'
+c:\users\akn\documents\github\3d_engine\pool.cpp(37): error C2065: 'scoped_lock': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(37): error C2146: syntax error: missing ';' before identifier 'lk_working_threads'
+c:\users\akn\documents\github\3d_engine\pool.cpp(37): error C3861: 'lk_working_threads': identifier not found
+c:\users\akn\documents\github\3d_engine\pool.cpp(40): error C2653: 'boost': is not a class or namespace name
+c:\users\akn\documents\github\3d_engine\pool.cpp(42): error C2653: 'boost': is not a class or namespace name
+c:\users\akn\documents\github\3d_engine\pool.cpp(56): error C2039: 'scoped_lock': is not a member of 'std::mutex'
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.10.25017\include\mutex(79): note: see declaration of 'std::mutex'
+c:\users\akn\documents\github\3d_engine\pool.cpp(56): error C2065: 'scoped_lock': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(56): error C2146: syntax error: missing ';' before identifier 'lk_works'
+c:\users\akn\documents\github\3d_engine\pool.cpp(56): error C3861: 'lk_works': identifier not found
+c:\users\akn\documents\github\3d_engine\pool.cpp(62): error C2065: 'lk_works': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(62): error C2228: left of '.unlock' must have class/struct/union
+  c:\users\akn\documents\github\3d_engine\pool.cpp(62): note: type is 'unknown-type'
+c:\users\akn\documents\github\3d_engine\pool.cpp(68): error C2039: 'scoped_lock': is not a member of 'std::mutex'
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.10.25017\include\mutex(79): note: see declaration of 'std::mutex'
+c:\users\akn\documents\github\3d_engine\pool.cpp(68): error C2065: 'scoped_lock': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(68): error C2146: syntax error: missing ';' before identifier 'lk_idle_threads'
+c:\users\akn\documents\github\3d_engine\pool.cpp(68): error C3861: 'lk_idle_threads': identifier not found
+c:\users\akn\documents\github\3d_engine\pool.cpp(70): error C2065: 'lk_idle_threads': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.cpp(70): error C2228: left of '.unlock' must have class/struct/union
+  c:\users\akn\documents\github\3d_engine\pool.cpp(70): note: type is 'unknown-type'
+c:\users\akn\documents\github\3d_engine\pool.cpp(94): error C2059: syntax error: '}'
+c:\users\akn\documents\github\3d_engine\pool.cpp(94): error C2143: syntax error: missing ';' before '}'
+  Generating Code...
+  Compiling...
+  main.cpp
+c:\users\akn\documents\github\3d_engine\pool.h(17): error C2065: 'idlethread': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.h(17): error C2923: 'std::shared_ptr': 'idlethread' is not a valid template type argument for parameter '_Ty'
+c:\users\akn\documents\github\3d_engine\pool.h(17): error C3203: 'shared_ptr': unspecialized class template can't be used as a template argument for template parameter '_Ty', expected a real type
+  Generating Code...
+  Compiling...
+  sphere.cpp
+c:\users\akn\documents\github\3d_engine\pool.h(17): error C2065: 'idlethread': undeclared identifier
+c:\users\akn\documents\github\3d_engine\pool.h(17): error C2923: 'std::shared_ptr': 'idlethread' is not a valid template type argument for parameter '_Ty'
+c:\users\akn\documents\github\3d_engine\pool.h(17): error C3203: 'shared_ptr': unspecialized class template can't be used as a template argument for template parameter '_Ty', expected a real type
+c:\users\akn\documents\github\3d_engine\sphere.cpp(26): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(30): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(146): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(231): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(250): warning C4018: '<': signed/unsigned mismatch
+c:\users\akn\documents\github\3d_engine\sphere.cpp(252): warning C4018: '<': signed/unsigned mismatch
+c:\users\akn\documents\github\3d_engine\sphere.cpp(267): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(274): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(281): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(288): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(376): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(377): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(387): error C2259: 'tilerequest': cannot instantiate abstract class
+  c:\users\akn\documents\github\3d_engine\sphere.cpp(387): note: due to following members:
+  c:\users\akn\documents\github\3d_engine\sphere.cpp(387): note: 'void iwork::perform(void)': is abstract
+  c:\users\akn\documents\github\3d_engine\work.h(9): note: see declaration of 'iwork::perform'
+c:\users\akn\documents\github\3d_engine\sphere.cpp(388): error C2039: 'enqueue': is not a member of 'threadpool'
+  c:\users\akn\documents\github\3d_engine\pool.h(7): note: see declaration of 'threadpool'
+  Generating Code...
+  Compiling...
+  work.cpp
+  Generating Code...

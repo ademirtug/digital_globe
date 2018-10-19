@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "sphere.h"
 
+
 extern engine eng;
 using namespace Gdiplus;
 using std::min;
@@ -64,8 +65,6 @@ glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3)
 {
 	return glm::cross(pt2 - pt1, pt3 - pt1);
 }
-
-
 
 double N(double phi)
 {
@@ -359,7 +358,37 @@ void quadtile::getmap()
 		GdiplusShutdown(gdiplusToken);
 	}
 
+	//lock
+	eng.sc->mxmeshes.lock();
+
 	texturemesh* tm = new texturemesh(vertices, normals, uvs, string(fname.begin(), fname.end()));
 	tm->position = { 0.0, 0.0, 0.0 };
 	eng.sc->meshes.push_back(tm);
+
+	//unlock
+	eng.sc->mxmeshes.unlock();
+
+}
+
+
+spheroid::spheroid(double _a, double _b)
+{
+	a = _a;
+	b = _b;
+	tiles.init("");
+	for (size_t i = 0; i < 4; i++)
+	{
+		tiles.children[i].init();
+		for (size_t x = 0; x < 4; x++)
+		{
+			tiles.children[i].children[x].init();
+			for (size_t y = 0; y < 4; y++)
+			{
+				shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i].children[x].children[y]));
+				pool.enqueue(tr);
+
+				//tiles.children[i].children[x].children[y].getmap();
+			}
+		}
+	}
 }

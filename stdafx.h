@@ -8,7 +8,6 @@
 #include "targetver.h"
 
 
-#include <stdio.h>
 #include <tchar.h>
 #include <iostream>
 #include <string>
@@ -26,6 +25,9 @@
 #include <math.h>
 #include <gdiplus.h>
 #include <stdio.h>
+#include <thread>
+#include <mutex>
+#include <queue>
 
 
 #include "glm/glm.hpp"

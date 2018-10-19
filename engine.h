@@ -15,6 +15,7 @@ public:
 	virtual ~engine();
 
 	bool init(int width, int height);
+ 
 
 	camera* cam;
 	scene* sc;

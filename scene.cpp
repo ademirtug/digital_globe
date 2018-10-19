@@ -14,6 +14,8 @@ scene::scene()
 
 void scene::draw()
 {
+	mxmeshes.lock();
+
 	GLenum err = 0;
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -46,7 +48,9 @@ void scene::draw()
 	glm::mat4 view = eng.cam->getview();
 	glm::vec3 cameraPos = eng.cam->getpos();
 	
+
 	glBindVertexArray(vao_mesh_id);
+
 	for (auto m : meshes)
 	{
 		glUseProgram(programs[m->spname()]->get_id());
@@ -73,7 +77,7 @@ void scene::draw()
 	}
 
 	glBindVertexArray(0);
-
+	mxmeshes.unlock();
 
 	glfwSwapBuffers(eng.window);
 	glfwPollEvents();
