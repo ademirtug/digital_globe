@@ -17,5 +17,6 @@ class tilerequest : public iwork
 public:
 	tilerequest();
 	tilerequest(quadtile* tile);
-	virtual void dojob();
+	~tilerequest();
+	virtual void perform();
 };

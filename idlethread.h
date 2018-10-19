@@ -1,6 +1,8 @@
 #ifndef __IDLETHREAD_H__
 #define __IDLETHREAD_H__
 
+#include <mutex>
+
 class idlethread
 {
 private:
@@ -11,7 +13,7 @@ protected:
 	mutex monitor;
 
 
-	condition work_arrived;
+	condition_variable work_arrived;
 public:
 
 	void attach(shared_ptr<iwork> work)
@@ -25,13 +27,11 @@ public:
 		if (attached_work.get() != NULL)
 			return attached_work;
 
-		mutex::scoped_lock lk(monitor);
+		unique_lock<std::mutex> lk(monitor);
 
-		boost::xtime timeout;
-		boost::xtime_get(&timeout, boost::TIME_UTC);
-		timeout.nsec += nsecTimeout;
+		work_arrived.wait_for(lk, std::chrono::milliseconds(nsecTimeout));
 
-		work_arrived.timed_wait(lk, timeout);
+
 
 		return attached_work;
 	}
@@ -40,7 +40,7 @@ public:
 	{
 
 	}
-	virtual ~idlethread();
+	virtual ~idlethread() {};
 };
 
 

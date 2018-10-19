@@ -2,6 +2,7 @@
 #define __POOL_H__
 
 #include "work.h"
+#include "idlethread.h"
 
 class threadpool
 {
@@ -10,11 +11,11 @@ protected:
 	size_t maxallowed;
 
 
-	vector< shared_ptr<iwork> > works;//queue
-	vector< shared_ptr<thread> > working_threads;
+	vector<shared_ptr<iwork> > works;//queue
+	vector<shared_ptr<thread> > working_threads;
 
 
-	vector< shared_ptr<idlethread>> idle_threads;
+	vector<shared_ptr<idlethread>> idle_threads;
 
 	mutex mtx_working_threads;
 	mutex mtx_idle_threads;

@@ -385,7 +385,7 @@ spheroid::spheroid(double _a, double _b)
 			for (size_t y = 0; y < 4; y++)
 			{
 				shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i].children[x].children[y]));
-				pool.enqueue(tr);
+				pool.queue(tr);
 
 				//tiles.children[i].children[x].children[y].getmap();
 			}

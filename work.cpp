@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "work.h"
 
+
+
+iwork::~iwork() {}
+
 tilerequest::tilerequest()
 {
 }
@@ -8,7 +12,10 @@ tilerequest::tilerequest(quadtile* tile)
 {
 	__tile = tile;
 }
-void tilerequest::dojob()
+tilerequest::~tilerequest()
+{
+}
+void tilerequest::perform()
 {
 	__tile->getmap();
 }
