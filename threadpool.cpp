@@ -8,7 +8,7 @@
 
 
 
-threadpool::threadpool() : maxallowed(0), running(1)
+threadpool::threadpool() : maxallowed(5), running(1)
 {
 }
 threadpool::~threadpool()
