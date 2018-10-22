@@ -2,7 +2,7 @@
 #define __SPHERE_H__
 
 #include "quadtile.h"
-#include "threadpool.h"
+
 
 class spheroid
 {
@@ -10,7 +10,7 @@ class spheroid
 public:
 	int a, b;
 	quadtile tiles;
-	threadpool pool;
+	vector<shared_ptr<thread>> threads;
 
 	spheroid(double _a, double _b);
 };

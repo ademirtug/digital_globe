@@ -2,7 +2,7 @@
 #define __SCENE_H__
 
 #include "stdafx.h"
-
+#include "quadtile.h"
 
 class scene
 {
@@ -11,10 +11,11 @@ public:
 	void generate_shaders();
 	void draw();
 	
-	std::mutex mxmeshes;
+	std::mutex mxqueuedmeshes;
 
 	GLuint vao_mesh_id, vao_lights_id;
-	std::vector<imesh*> meshes;
+	std::vector<shared_ptr<imesh>> meshes;
+	std::vector<quadtile*> queuedmeshes;
 
 	directionallight dirlight;
 	std::vector<pointlight> plights;

@@ -63,12 +63,6 @@
     <ClInclude Include="quadtile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="idlethread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="threadpool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -107,13 +101,10 @@
     <ClCompile Include="sphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="work.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="threadpool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="quadtile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="work.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

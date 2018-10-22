@@ -132,6 +132,8 @@ quadtile::~quadtile()
 {
 	if (children != nullptr)
 		delete[] children;
+	if (tm != nullptr)
+		tm.reset();
 }
 
 void quadtile::init(string _quadkey)
@@ -242,10 +244,6 @@ void quadtile::getmap()
 	double ystep = (y2 - y1) / platenum;
 
 
-	vector<glm::vec3> vertices;
-	vector<glm::vec3> normals;
-	vector<glm::vec2> uvs;
-
 	for (size_t x = 0; x < platenum; x++)
 	{
 		for (size_t i = 0; i < platenum; i++)
@@ -330,7 +328,7 @@ void quadtile::getmap()
 		to_string(lat) + "," + to_string(lon) +
 		"&size=256,256&zoom=" + to_string(quadkey.size());
 
-	wstring fname = L"C:\\data\\" + wstring(quadkey.begin(), quadkey.end()) + L".bmp";
+	fname = L"C:\\data\\" + wstring(quadkey.begin(), quadkey.end()) + L".bmp";
 
 	if (!FileExists(fname.c_str()))
 	{
@@ -356,15 +354,4 @@ void quadtile::getmap()
 		delete img;
 		GdiplusShutdown(gdiplusToken);
 	}
-
-	//lock
-	eng.sc->mxmeshes.lock();
-
-	texturemesh* tm = new texturemesh(vertices, normals, uvs, string(fname.begin(), fname.end()));
-	tm->position = { 0.0, 0.0, 0.0 };
-	eng.sc->meshes.push_back(tm);
-
-	//unlock
-	eng.sc->mxmeshes.unlock();
-
 }

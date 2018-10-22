@@ -14,12 +14,28 @@ scene::scene()
 
 void scene::draw()
 {
-	mxmeshes.lock();
-
 	GLenum err = 0;
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+	//lock
+	eng.sc->mxqueuedmeshes.lock();
+	if (queuedmeshes.size() > 0)
+	{
+		for (auto tile : queuedmeshes)
+		{
+			tile->tm.reset(new texturemesh(tile->vertices, tile->normals, tile->uvs, string(tile->fname.begin(), tile->fname.end())));
+			tile->tm->position = { 0.0, 0.0, 0.0 };
+			eng.sc->meshes.push_back(tile->tm);
+		}
+		queuedmeshes.clear();
+	}
+	//unlock
+	eng.sc->mxqueuedmeshes.unlock();
+
+
 
 
 	if (enable_dirlight)
@@ -83,8 +99,6 @@ void scene::draw()
 	glfwPollEvents();
 	if (err != GL_NO_ERROR)
 		cout << gluErrorString(err);
-
-	mxmeshes.unlock();
 }
 void scene::generate_shaders()
 {
@@ -209,41 +223,79 @@ void scene::generate_shaders()
 
 		programs["dirlightshadowdepth"] = sp;
 	}
-	for (auto m : meshes)
-	{
-		if (programs.find(m->spname()) == programs.end())
-		{
-			program* sp = new program();
-
-			////geo shader
-			//shader gsh(GL_GEOMETRY_SHADER);
-			//if (gsh.compile(m->generate_geoshader(this)) == GL_FALSE)
-			//	cout << "geo failed";
-
-			//if (sp->attach_shader(&gsh) != GL_NO_ERROR)
-			//	cout << "geo attach failed";
 
 
-			//frag shader
-			shader fsh(GL_FRAGMENT_SHADER);
-			if (fsh.compile(m->generate_fragshader(this)) == GL_FALSE)
-				cout << "frag failed";
+	program* sp = new program();
 
-			if (sp->attach_shader(&fsh) != GL_NO_ERROR)
-				cout << "frag attach failed";
+	////geo shader
+	//shader gsh(GL_GEOMETRY_SHADER);
+	//if (gsh.compile(m->generate_geoshader(this)) == GL_FALSE)
+	//	cout << "geo failed";
 
-			//vert shader
-			shader vsh(GL_VERTEX_SHADER);
-			if (vsh.compile(m->generate_vertshader(this)) == GL_FALSE)
-				cout << "vertex failed";
+	//if (sp->attach_shader(&gsh) != GL_NO_ERROR)
+	//	cout << "geo attach failed";
 
-			if (sp->attach_shader(&vsh) != GL_NO_ERROR)
-				cout << "vert attach failed";
+	shared_ptr<texturemesh> m;
+	m.reset(new texturemesh());
 
-			if (sp->link() != GL_NO_ERROR)
-				cout << "link failed";
+	//frag shader
+	shader fsh(GL_FRAGMENT_SHADER);
+	if (fsh.compile(m->generate_fragshader(this)) == GL_FALSE)
+		cout << "frag failed";
 
-			programs[m->spname()] = sp;
-		}
-	}
+	if (sp->attach_shader(&fsh) != GL_NO_ERROR)
+		cout << "frag attach failed";
+
+	//vert shader
+	shader vsh(GL_VERTEX_SHADER);
+	if (vsh.compile(m->generate_vertshader(this)) == GL_FALSE)
+		cout << "vertex failed";
+
+	if (sp->attach_shader(&vsh) != GL_NO_ERROR)
+		cout << "vert attach failed";
+
+	if (sp->link() != GL_NO_ERROR)
+		cout << "link failed";
+
+	programs[m->spname()] = sp;
+
+
+
+	//for (auto m : meshes)
+	//{
+	//	if (programs.find(m->spname()) == programs.end())
+	//	{
+	//		program* sp = new program();
+
+	//		////geo shader
+	//		//shader gsh(GL_GEOMETRY_SHADER);
+	//		//if (gsh.compile(m->generate_geoshader(this)) == GL_FALSE)
+	//		//	cout << "geo failed";
+
+	//		//if (sp->attach_shader(&gsh) != GL_NO_ERROR)
+	//		//	cout << "geo attach failed";
+
+
+	//		//frag shader
+	//		shader fsh(GL_FRAGMENT_SHADER);
+	//		if (fsh.compile(m->generate_fragshader(this)) == GL_FALSE)
+	//			cout << "frag failed";
+
+	//		if (sp->attach_shader(&fsh) != GL_NO_ERROR)
+	//			cout << "frag attach failed";
+
+	//		//vert shader
+	//		shader vsh(GL_VERTEX_SHADER);
+	//		if (vsh.compile(m->generate_vertshader(this)) == GL_FALSE)
+	//			cout << "vertex failed";
+
+	//		if (sp->attach_shader(&vsh) != GL_NO_ERROR)
+	//			cout << "vert attach failed";
+
+	//		if (sp->link() != GL_NO_ERROR)
+	//			cout << "link failed";
+
+	//		programs[m->spname()] = sp;
+	//	}
+	//}
 }

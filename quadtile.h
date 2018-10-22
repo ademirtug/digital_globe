@@ -13,6 +13,11 @@ class quadtile
 public:
 	quadtile* children;
 	string quadkey;
+	vector<glm::vec3> vertices;
+	vector<glm::vec3> normals;
+	vector<glm::vec2> uvs;
+	shared_ptr<texturemesh> tm;
+	wstring fname;
 
 	quadtile();
 	~quadtile();
