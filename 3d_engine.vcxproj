@@ -157,7 +157,6 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="threadpool.h" />
-    <ClInclude Include="work.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bingmapquery.cpp" />

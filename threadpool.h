@@ -8,6 +8,9 @@
 #include <mutex>
 #include <iostream>
 
+using namespace std;
+
+
 class iwork
 {
 
@@ -15,24 +18,19 @@ public:
 
 	virtual void perform()
 	{
-		std::cout << "merhaba" << endl;
 	};
 	virtual ~iwork() {};
 };
 
-
 class tilerequest : public iwork
 {
-	//quadtile* __tile;
+	quadtile* __tile;
 public:
 	tilerequest();
-	//tilerequest(quadtile* tile);
+	tilerequest(quadtile* tile);
 	~tilerequest();
 	virtual void perform();
 };
-
-
-using namespace std;
 
 class safethread
 {
@@ -50,8 +48,6 @@ public:
 			th->detach();
 		}
 	};
-
-
 };
 
 

@@ -29,3 +29,6 @@ public:
 	BOOL FileExists(LPCTSTR szPath);
 	void getmap();
 };
+
+
+

@@ -1,10 +1,8 @@
 #include "stdafx.h"
-#include "work.h"
 
+#include "threadpool.h"
 
 extern engine eng;
-
-iwork::~iwork() {}
 
 tilerequest::tilerequest()
 {

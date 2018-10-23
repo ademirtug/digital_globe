@@ -57,9 +57,6 @@
     <ClInclude Include="sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="work.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="quadtile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
