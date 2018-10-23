@@ -63,6 +63,9 @@
     <ClInclude Include="quadtile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="threadpool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -105,6 +108,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="work.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="threadpool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
