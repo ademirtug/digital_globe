@@ -16,8 +16,6 @@ void threadpool::queue(shared_ptr<iwork> work)
 	deadthreads.erase(deadthreads.begin(), deadthreads.end());
 	lk_dead.unlock();
 
-
-
 	unique_lock ul_works(mtx_works);
 	works.push_back(work);
 	ul_works.unlock();

@@ -43,9 +43,9 @@ public:
 	};
 	~safethread()
 	{
-		if (th != nullptr)
+		if (th != nullptr && th->joinable())
 		{
-			th->join();
+			th->detach();
 		}
 	};
 };

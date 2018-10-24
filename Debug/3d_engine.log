@@ -1,2 +1,8 @@
-﻿  threadpool.cpp
+﻿  main.cpp
+  sphere.cpp
+c:\users\akn\documents\github\3d_engine\sphere.cpp(7): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(8): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  threadpool.cpp
+  work.cpp
+  Generating Code...
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
