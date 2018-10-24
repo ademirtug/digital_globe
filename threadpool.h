@@ -45,7 +45,7 @@ public:
 	{
 		if (th != nullptr)
 		{
-			th->detach();
+			th->join();
 		}
 	};
 };
