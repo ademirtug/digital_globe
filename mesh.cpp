@@ -68,7 +68,6 @@ imesh::imesh()
 }
 imesh::~imesh()
 {
-	//delete yazmayı unutma
 }
 glm::mat4 imesh::model()
 {
@@ -98,6 +97,12 @@ colormesh::colormesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals) : 
 }
 colormesh::~colormesh()
 {
+	if (vboid_vertices)
+		glDeleteBuffers(1, &vboid_vertices);
+	if (vboid_normals)
+		glDeleteBuffers(1, &vboid_normals);
+	if (vboid_uv)
+		glDeleteBuffers(1, &vboid_uv);
 }
 void colormesh::init()
 {
@@ -233,7 +238,6 @@ void colormesh::shadowdraw()
 
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 }
-
 string colormesh::generate_geoshader(scene* sc)
 {
 	string shader = ""
@@ -266,7 +270,6 @@ string colormesh::generate_geoshader(scene* sc)
 
 	return shader;
 }
-
 string colormesh::generate_fragshader(scene* sc)
 {
 	string shader = "#version 330 core\n"
@@ -345,8 +348,6 @@ string colormesh::generate_fragshader(scene* sc)
 
 	return shader;
 }
-
-
 string colormesh::generate_vertshader(scene* sc)
 {
 	string shader = "#version 330 core\n"
@@ -411,6 +412,8 @@ pointcloud::pointcloud(vector<glm::vec3> _vertices) : pointcloud()
 }
 pointcloud::~pointcloud()
 {
+	if (vboid_vertices)
+		glDeleteBuffers(1, &vboid_vertices);
 }
 void pointcloud::addpoint(glm::vec3 point)
 {
@@ -665,7 +668,7 @@ texturemesh::texturemesh(const std::string& objfile, const std::string& texfile)
 	loadobj(objfile);
 
 	if (texfile != "")
-		tex = new bmp(texfile);
+		tex.reset(new bmp(texfile));
 
 	init();
 
@@ -685,12 +688,18 @@ texturemesh::texturemesh(vector<glm::vec3> _vertices, vector<glm::vec3> _normals
 	uv = _uv;
 
 	if (texfile != "")
-		tex = new bmp(texfile);
+		tex.reset(new bmp(texfile));
 
 	init();
 }
 texturemesh::~texturemesh()
 {
+	if (vboid_vertices)
+		glDeleteBuffers(1, &vboid_vertices);
+	if (vboid_normals)
+		glDeleteBuffers(1, &vboid_normals);
+	if (vboid_uv)
+		glDeleteBuffers(1, &vboid_uv);
 }
 void texturemesh::init()
 {
@@ -799,7 +808,7 @@ void texturemesh::loadobj(const std::string& filename)
 		{
 		}
 	}
-
+	f.close();
 }
 string texturemesh::spname()
 {
@@ -842,14 +851,12 @@ void texturemesh::draw(glm::mat4 view, glm::mat4 projection)
 	eng.sc->programs["texturemesh"]->setuniform("material.specular", specular);
 
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-	
 
 	if (tex != NULL && tex->vboid_texture != NULL)
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-
 }
 void texturemesh::shadowdraw()
 {
@@ -995,10 +1002,10 @@ diffusetexturemesh::diffusetexturemesh(const std::string& objfile, const std::st
 	loadobj(objfile);
 
 	if (texfile != "")
-		tex = new texture(texfile);
+		tex.reset( new texture(texfile));
 
 	if (diffusefile != "")
-		spec = new texture(diffusefile);
+		spec.reset(new texture(diffusefile));
 
 	init();
 

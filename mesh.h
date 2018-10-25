@@ -112,9 +112,6 @@ public:
 	void loadobj(const std::string& filename);
 	string generate_fragshader(scene* sc);
 	string generate_vertshader(scene* sc);
-
-	
-	
 	
 	float shininess, diffuse;
 	glm::vec3 specular;
@@ -123,7 +120,7 @@ public:
 	vector<glm::vec3> colors;
 	vector<glm::vec2> uv;
 
-	texture* tex;
+	shared_ptr<texture> tex;
 
 	GLuint vboid_normals, vboid_uv;
 };
@@ -154,8 +151,8 @@ public:
 	vector<glm::vec3> colors;
 	vector<glm::vec2> uv;
 
-	texture* tex;
-	texture* spec;
+	shared_ptr<texture> tex;
+	shared_ptr<texture> spec;
 
 	GLuint vboid_normals, vboid_uv;
 };

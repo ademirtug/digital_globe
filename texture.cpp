@@ -28,6 +28,11 @@ bmp::bmp(const std::string& filename)
 	vboid_texture = 0;
 	load(filename);
 }
+bmp::~bmp()
+{
+	unload();
+}
+
 void bmp::load(const std::string& filename)
 {
 	BITMAPFILEHEADER* hdr;

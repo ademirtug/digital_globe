@@ -68,7 +68,6 @@ void threadpool::handleworks()
 			}
 			lk_threads.unlock();
 
-
 			if (th != nullptr)
 			{
 				unique_lock<std::mutex> lk_dead(mtx_dthreads);
@@ -76,7 +75,6 @@ void threadpool::handleworks()
 				lk_dead.unlock();
 			}
 		}
-
 	}
 }
 

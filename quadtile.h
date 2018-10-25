@@ -26,7 +26,6 @@ public:
 	quadtile* getchild(char c);
 	quadtile* gettile(string tile);
 	void invalidate(string tile);
-	BOOL FileExists(LPCTSTR szPath);
 	void getmap();
 };
 

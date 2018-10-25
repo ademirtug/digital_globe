@@ -13,9 +13,7 @@ using namespace std;
 
 class iwork
 {
-
 public:
-
 	virtual void perform()
 	{
 	};

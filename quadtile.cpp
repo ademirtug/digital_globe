@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "quadtile.h"
+#include <filesystem>
+
 
 extern engine eng;
 using namespace Gdiplus;
@@ -120,9 +122,6 @@ glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 	return { x, y, z };
 }
 
-
-
-
 quadtile::quadtile()
 {
 	children = nullptr;
@@ -176,14 +175,6 @@ void quadtile::invalidate(string tile)
 		return;
 
 	return child->invalidate(tile.substr(1));
-}
-
-BOOL quadtile::FileExists(LPCTSTR szPath)
-{
-	DWORD dwAttrib = GetFileAttributes(szPath);
-
-	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
-		!(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
 void quadtile::getmap()
@@ -328,9 +319,9 @@ void quadtile::getmap()
 		to_string(lat) + "," + to_string(lon) +
 		"&size=256,256&zoom=" + to_string(quadkey.size());
 
-	fname = L"C:\\data\\" + wstring(quadkey.begin(), quadkey.end()) + L".bmp";
+	fname = L"C:\\mapdata\\" + wstring(quadkey.begin(), quadkey.end()) + L".bmp";
 
-	if (!FileExists(fname.c_str()))
+	if (!std::filesystem::exists("C:\\mapdata\\" + quadkey + ".bmp"))
 	{
 		http_client hc;
 		vector<unsigned char> png = hc.get_binary_page(req);
