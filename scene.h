@@ -3,7 +3,8 @@
 
 #include "stdafx.h"
 #include "quadtile.h"
-
+#include "camera.h"
+#include "sphere.h"
 class scene
 {
 public:
@@ -13,6 +14,9 @@ public:
 	
 	std::mutex mxqueuedmeshes;
 
+	shared_ptr<spheroid> earth;
+
+	shared_ptr<camera> cam;
 	GLuint vao_mesh_id, vao_lights_id;
 	std::vector<shared_ptr<imesh>> meshes;
 	std::vector<quadtile*> queuedmeshes;

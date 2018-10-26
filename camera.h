@@ -12,6 +12,10 @@ using namespace std;
 class camera
 {
 public:
+	double cdist;
+	int zoomlevel;
+
+	virtual int getzoomlevel() { return 2; };
 	virtual glm::mat4 getview() = 0;
 	virtual glm::vec3 getpos() = 0;
 	virtual void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) = 0;
@@ -24,7 +28,6 @@ public:
 class arcball_camera : public camera
 {
 public:
-	double cdist;
 	arcball_camera();
 	~arcball_camera();
 	
@@ -38,8 +41,7 @@ public:
 class qball_camera : public camera
 {
 public:
-	double cdist;
-	int zoomlevel;
+
 	qball_camera();
 	~qball_camera();
 
@@ -54,7 +56,6 @@ public:
 class eu_orbit_camera : public camera
 {
 public:
-	double cdist;
 	eu_orbit_camera();
 	~eu_orbit_camera();
 

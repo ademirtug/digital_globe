@@ -9,6 +9,8 @@ scene::scene()
 	enable_dirlight = true;
 	width = 1024.0f;
 	height = 768.0f;
+	cam.reset(new qball_camera());
+	earth.reset(new spheroid(6378137.0f, 6356752.3f));
 }
 
 
@@ -36,7 +38,11 @@ void scene::draw()
 	eng.sc->mxqueuedmeshes.unlock();
 
 
+	//focus bul
+	for (size_t i = 0; i < eng.sc->cam->zoomlevel; i++)
+	{
 
+	}
 
 	if (enable_dirlight)
 	{
@@ -56,13 +62,16 @@ void scene::draw()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+
+
+
 	//NORMAL ÇÝZÝM
 	glViewport(0, 0, width, height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 projection = glm::perspective(45.0f, width/height, 100.0f, 50000000.0f);
-	glm::mat4 view = eng.cam->getview();
-	glm::vec3 cameraPos = eng.cam->getpos();
+	glm::mat4 view = eng.sc->cam->getview();
+	glm::vec3 cameraPos = eng.sc->cam->getpos();
 	
 
 	glBindVertexArray(vao_mesh_id);

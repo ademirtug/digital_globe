@@ -8,15 +8,16 @@ engine eng;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	eng.cam->mouse_button_callback(window, button, action, mods);
+	
+	eng.sc->cam->mouse_button_callback(window, button, action, mods);
 }
 void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	eng.cam->cursor_pos_callback(window, xpos, ypos);
+	eng.sc->cam->cursor_pos_callback(window, xpos, ypos);
 }
 void mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	eng.cam->mouse_wheel_callback(window, xoffset, yoffset);
+	eng.sc->cam->mouse_wheel_callback(window, xoffset, yoffset);
 }
 
 engine::engine()
@@ -24,8 +25,6 @@ engine::engine()
 }
 engine::~engine()
 {
-	//programlar listesini delete yap
-	delete sc;
 }
 
 bool engine::init(int width, int height)
@@ -58,7 +57,7 @@ bool engine::init(int width, int height)
 	
 	glEnable(GL_CULL_FACE);
 	
-	sc = new scene();
+	sc.reset(new scene());
 	glGenVertexArrays(1, &sc->vao_mesh_id);
 	glGenVertexArrays(1, &sc->vao_lights_id);
 

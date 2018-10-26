@@ -17,8 +17,7 @@ public:
 	bool init(int width, int height);
  
 
-	camera* cam;
-	scene* sc;
+	shared_ptr<scene> sc;
 	GLFWwindow* window;
 	
 	int maxfps;
