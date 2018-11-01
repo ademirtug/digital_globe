@@ -8,16 +8,21 @@ engine eng;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	
-	eng.sc->cam->mouse_button_callback(window, button, action, mods);
+	if(eng.sc != nullptr)
+		if (eng.sc->cam != nullptr)
+			eng.sc->cam->mouse_button_callback(window, button, action, mods);
 }
 void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	eng.sc->cam->cursor_pos_callback(window, xpos, ypos);
+	if (eng.sc != nullptr)
+		if (eng.sc->cam != nullptr)
+			eng.sc->cam->cursor_pos_callback(window, xpos, ypos);
 }
 void mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	eng.sc->cam->mouse_wheel_callback(window, xoffset, yoffset);
+	if (eng.sc != nullptr)
+		if (eng.sc->cam != nullptr)
+			eng.sc->cam->mouse_wheel_callback(window, xoffset, yoffset);
 }
 
 engine::engine()

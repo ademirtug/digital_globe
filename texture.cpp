@@ -39,7 +39,7 @@ void bmp::load(const std::string& filename)
 	BITMAPINFOHEADER* info;
 
 	unsigned char* data;
-	unsigned char* uchdr = new unsigned char[54 + 1];
+	unsigned char* uchdr = new unsigned char[54+1];
 
 
 	fstream f;

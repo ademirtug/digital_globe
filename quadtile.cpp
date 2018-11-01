@@ -177,6 +177,15 @@ void quadtile::invalidate(string tile)
 	return child->invalidate(tile.substr(1));
 }
 
+bool checkrange(glm::vec2 uv)
+{
+	if (uv.y > 0 || uv.y < -1.0)
+	{
+		return false;
+	}
+	return true;
+}
+
 void quadtile::getmap()
 {
 	if (quadkey.size() < 2)
@@ -234,21 +243,19 @@ void quadtile::getmap()
 	double xstep = (x2 - x1) / platenum;
 	double ystep = (y2 - y1) / platenum;
 
+	int px = -1;
+	int py = -1;
 
 	for (size_t x = 0; x < platenum; x++)
 	{
 		for (size_t i = 0; i < platenum; i++)
 		{
+
 			double mercx1 = x1 + i * xstep;
 			double mercx2 = x1 + (i + 1) * xstep;
 
 			double mercy1 = y1 + x * ystep;
 			double mercy2 = y1 + (x + 1) * ystep;
-
-			double u = 0;
-			double u1 = 0;
-			double v = 0;
-			double v1 = 0;
 
 
 			//2d to lat long
@@ -287,11 +294,16 @@ void quadtile::getmap()
 
 			glm::vec2 uvtopleft = { (i * xstep) / 256,  -(x * ystep) / 256 };
 			glm::vec2 uvbottomleft = { (i * xstep) / 256,  -((x + 1) * ystep) / 256 };
-			glm::vec2 uvtopright = { ((i + 1) * xstep) / 256,  -(x * ystep) / 256 };
+			glm::vec2 uvtopright = { ((i + 1) * xstep) / 256, -(x * ystep) / 256 };
+
 
 			uvs.push_back(uvtopleft);
 			uvs.push_back(uvbottomleft);
 			uvs.push_back(uvtopright);
+
+			checkrange(uvtopleft);
+			checkrange(uvbottomleft);
+			checkrange(uvtopright);
 
 
 			normals.push_back(calc_normal(topleft, bottomleft, topright));
@@ -303,6 +315,8 @@ void quadtile::getmap()
 			vertices.push_back(topright);
 
 			glm::vec2 uvbottomright = { ((i + 1) * xstep) / 256, -((x + 1) * ystep) / 256 };
+			checkrange(uvbottomright);
+
 
 			uvs.push_back(uvbottomleft);
 			uvs.push_back(uvbottomright);
