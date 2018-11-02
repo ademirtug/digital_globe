@@ -124,7 +124,8 @@ glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 
 quadtile::quadtile()
 {
-	children = nullptr;
+	children = nullptr;	
+	platenum = 16;
 }
 
 quadtile::~quadtile()
@@ -137,6 +138,7 @@ quadtile::~quadtile()
 
 void quadtile::init(string _quadkey)
 {
+
 	if (_quadkey.size() > 0)
 		quadkey = _quadkey;
 
@@ -238,8 +240,6 @@ void quadtile::getmap()
 	float e2 = 1 - ((b*b) / (a*a));
 	float e = sqrt(e2);
 
-
-	int platenum = 16;
 	double xstep = (x2 - x1) / platenum;
 	double ystep = (y2 - y1) / platenum;
 

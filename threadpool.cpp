@@ -74,6 +74,7 @@ void threadpool::handleworks()
 				deadthreads.push_back(th);
 				lk_dead.unlock();
 			}
+			break;
 		}
 	}
 }

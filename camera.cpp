@@ -76,7 +76,6 @@ float toRadians(float degree)
 {
 	return degree * (glm::pi<float>() / 180);
 }
-
 float getAltitude(float mapzoom) {
 	//this equation is a transformation of the angular size equation solving for D. See: http://en.wikipedia.org/wiki/Forced_perspective
 	float googleearthaltitude;
@@ -156,7 +155,7 @@ void qball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, doub
 	zoomlevel = zoomlevel < 2 ? 2 : zoomlevel;
 	zoomlevel = zoomlevel > 19 ? 19 : zoomlevel;
 
-	//mydiff = -yoffset;
+	
 }
 
 

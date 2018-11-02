@@ -18,6 +18,7 @@ public:
 	vector<glm::vec2> uvs;
 	shared_ptr<texturemesh> tm;
 	wstring fname;
+	int platenum;
 
 	quadtile();
 	~quadtile();

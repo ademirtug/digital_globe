@@ -9,20 +9,23 @@ scene::scene()
 	enable_dirlight = true;
 	width = 1024.0f;
 	height = 768.0f;
-	cam.reset(new qball_camera());
-	earth.reset(new spheroid(6378137.0f, 6356752.3f));
 }
 
-
+int zl = 0;
+string currentfocus = "";   
 void scene::draw()
 {
+	if (cam == nullptr)
+	{
+		cam.reset(new qball_camera());
+		earth.reset(new spheroid(6378137.0f, 6356752.3f));
+	}
 	GLenum err = 0;
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-	//lock
 	eng.sc->mxqueuedmeshes.lock();
 	if (queuedmeshes.size() > 0)
 	{
@@ -34,15 +37,25 @@ void scene::draw()
 		}
 		queuedmeshes.clear();
 	}
-	//unlock
 	eng.sc->mxqueuedmeshes.unlock();
 
 
-	//focus bul
-	for (size_t i = 0; i < eng.sc->cam->zoomlevel; i++)
+	if (zl != eng.sc->cam->zoomlevel)
 	{
 
+
+		//focus bul
+		for (size_t i = 0; i < eng.sc->cam->zoomlevel; i++)
+		{
+
+		}
+
+
+
+
+		zl = eng.sc->cam->zoomlevel;
 	}
+
 
 	if (enable_dirlight)
 	{
@@ -61,8 +74,6 @@ void scene::draw()
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-
-
 
 
 	//NORMAL ÇÝZÝM
