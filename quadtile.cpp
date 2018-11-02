@@ -246,6 +246,9 @@ void quadtile::getmap()
 	int px = -1;
 	int py = -1;
 
+
+
+
 	for (size_t x = 0; x < platenum; x++)
 	{
 		for (size_t i = 0; i < platenum; i++)

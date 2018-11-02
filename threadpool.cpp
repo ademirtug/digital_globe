@@ -2,7 +2,7 @@
 #include "threadpool.h"
 
 
-threadpool::threadpool() : maxallowed(5), running(1)
+threadpool::threadpool() : maxallowed(5), running(true)
 {
 }
 threadpool::~threadpool()

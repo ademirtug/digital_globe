@@ -43,7 +43,7 @@ public:
 	{
 		if (th != nullptr && th->joinable())
 		{
-			th->join();
+			th->detach();
 		}
 	};
 };

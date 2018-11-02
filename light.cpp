@@ -136,6 +136,7 @@ vector<glm::mat4> pointlight::getshadowtransforms()
 	shadowTransforms.push_back(shadowProj * glm::lookAt(position, position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
 	shadowTransforms.push_back(shadowProj * glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 	shadowTransforms.push_back(shadowProj * glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+
 	return shadowTransforms;
 }
 
@@ -149,7 +150,6 @@ string pointlight::generate_fragshader(scene* sc)
 	shader += "}\n";
 
 	return shader;
-
 }
 string pointlight::generate_vertshader(scene* sc)
 {
@@ -173,7 +173,7 @@ string pointlight::generate_vertshader(scene* sc)
 directionallight::directionallight()
 {
 	direction = { 2.0f, -5.0f, 1.0f };
-	ambient = { 0.7f, 0.7f, 0.7f };
+	ambient = { 1.0f, 1.0f, 1.0f };
 	diffuse = { 0.0f, 0.0f, 0.0f };
 	specular = { 0.0f, 0.0f, 0.0f };
 

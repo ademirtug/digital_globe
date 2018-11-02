@@ -93,6 +93,7 @@ qball_camera::qball_camera()
 }
 qball_camera::~qball_camera()
 {
+
 }
 
 glm::quat currot(1, 0, 0, 0);

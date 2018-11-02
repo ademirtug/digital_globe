@@ -16,6 +16,8 @@ public:
 	vector<glm::vec3> vertices;
 	vector<glm::vec3> normals;
 	vector<glm::vec2> uvs;
+	vector<glm::vec2> borderuvs;
+
 	shared_ptr<texturemesh> tm;
 	wstring fname;
 	int platenum;
