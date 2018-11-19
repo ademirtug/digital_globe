@@ -88,7 +88,7 @@ float getAltitude(float mapzoom) {
 
 qball_camera::qball_camera()
 {
-	zoomlevel = 3;
+	zoomlevel = 2;
 	cdist = getAltitude(zoomlevel);
 }
 qball_camera::~qball_camera()

@@ -1,4 +1,5 @@
-﻿  engine.cpp
-  light.cpp
-  Generating Code...
+﻿  scene.cpp
+c:\users\akn\documents\github\3d_engine\scene.cpp(63): warning C4018: '<': signed/unsigned mismatch
+c:\users\akn\documents\github\3d_engine\scene.cpp(67): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
+c:\users\akn\documents\github\3d_engine\scene.cpp(112): warning C4244: 'argument': conversion from 'float' to 'GLsizei', possible loss of data
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe

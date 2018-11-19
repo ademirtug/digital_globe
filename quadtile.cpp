@@ -125,7 +125,7 @@ glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 quadtile::quadtile()
 {
 	children = nullptr;	
-	platenum = 16;
+	platenum = 32;
 }
 
 quadtile::~quadtile()
@@ -190,7 +190,7 @@ bool checkrange(glm::vec2 uv)
 
 void quadtile::getmap()
 {
-	if (quadkey.size() < 2)
+	if (quadkey.size() < 1)
 		return;
 
 
@@ -245,8 +245,6 @@ void quadtile::getmap()
 
 	int px = -1;
 	int py = -1;
-
-
 
 
 	for (size_t x = 0; x < platenum; x++)
@@ -308,10 +306,9 @@ void quadtile::getmap()
 			checkrange(uvbottomleft);
 			checkrange(uvtopright);
 
-
-			normals.push_back(calc_normal(topleft, bottomleft, topright));
-			normals.push_back(calc_normal(bottomleft, topright, topleft));
-			normals.push_back(calc_normal(topright, topleft, bottomleft));
+			normals.push_back(calc_normal(topleft, bottomleft, topright));//topleft
+			normals.push_back(calc_normal(bottomleft, topright, topleft));//bottomleft
+			normals.push_back(calc_normal(topright, topleft, bottomleft));//topright
 
 			vertices.push_back(bottomleft);
 			vertices.push_back(bottomright);
@@ -320,16 +317,33 @@ void quadtile::getmap()
 			glm::vec2 uvbottomright = { ((i + 1) * xstep) / 256, -((x + 1) * ystep) / 256 };
 			checkrange(uvbottomright);
 
-
 			uvs.push_back(uvbottomleft);
 			uvs.push_back(uvbottomright);
 			uvs.push_back(uvtopright);
 
-			normals.push_back(calc_normal(bottomleft, bottomright, topright));
-			normals.push_back(calc_normal(bottomright, topright, bottomleft));
-			normals.push_back(calc_normal(topright, bottomleft, bottomright));
+			normals.push_back(calc_normal(bottomleft, bottomright, topright));//bottomleft
+			normals.push_back(calc_normal(bottomright, topright, bottomleft));//bottomright
+			normals.push_back(calc_normal(topright, bottomleft, bottomright));//topright
+
+			if (x == 0 && i == 0)
+			{
+				corners.upperleft = calc_normal(topleft, bottomleft, topright);
+			}
+			if (x == 0 && i == (platenum - 1))
+			{
+				corners.bottomleft = calc_normal(bottomleft, topright, topleft);
+			}
+			if (x == (platenum - 1) && i == 0)
+			{
+				corners.upperright = calc_normal(topright, topleft, bottomleft);
+			}
+			if (x == (platenum - 1) && i == (platenum - 1))
+			{
+				corners.bottomright = calc_normal(bottomright, topright, bottomleft);
+			}
 		}
 	}
+
 
 	//haritalarý yükle
 	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=kAGxoy8TfqxNPPXu1Va54jWMoYMkRCbG&format=png&center=" +
@@ -353,7 +367,6 @@ void quadtile::getmap()
 		RtlMoveMemory(pMem, &png[0], png.size());
 		IStream *pStream = 0;
 		HRESULT hr = CreateStreamOnHGlobal(hMem, TRUE, &pStream);
-
 
 		Image* img = new Gdiplus::Image(pStream);
 		GetEncoderClsid(L"image/bmp", &encoderClsid);

@@ -11,7 +11,16 @@ scene::scene()
 	height = 768.0f;
 }
 
-int zl = 0;
+
+void search(string base, quadtile* tile)
+{
+	for (size_t i = 0; i < 4; i++)
+	{
+		string ch = base + (char)(65 + i);
+	}
+}
+
+int zl = 2;
 string currentfocus = "";   
 void scene::draw()
 {
@@ -24,7 +33,6 @@ void scene::draw()
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 	eng.sc->mxqueuedmeshes.lock();
 	if (queuedmeshes.size() > 0)
@@ -39,21 +47,46 @@ void scene::draw()
 	}
 	eng.sc->mxqueuedmeshes.unlock();
 
-
+	
+	glm::vec3 cameraPos = eng.sc->cam->getpos();
 	if (zl != eng.sc->cam->zoomlevel)
 	{
+		float min = 90;
+		vector<float> acc;
 
+		string cs = "";
+
+		quadtile* root = &earth->tiles;
+		string letter = "";
 
 		//focus bul
-		for (size_t i = 0; i < eng.sc->cam->zoomlevel; i++)
+		for (size_t i = 0; i < eng.sc->cam->zoomlevel-2; i++)
 		{
+			for (size_t x = 0; x < 4; x++)
+			{
+				char z = 65 + x;
+				string ns = cs + z;
+				quadtile *t = earth->tiles.gettile(ns);
 
+				int er = 0;
+
+				float diff = glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomleft));
+				diff += glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomright));
+				diff += glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperleft));
+				diff += glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperright));
+
+				diff /= 4;
+				
+				//we dont like negative guys
+				if (diff < min && diff > 0)
+				{
+					letter = ns;
+					min = diff;
+				}
+			}
 		}
-
-
-
-
 		zl = eng.sc->cam->zoomlevel;
+		cout << letter;
 	}
 
 
@@ -82,7 +115,7 @@ void scene::draw()
 
 	glm::mat4 projection = glm::perspective(45.0f, width/height, 100.0f, 50000000.0f);
 	glm::mat4 view = eng.sc->cam->getview();
-	glm::vec3 cameraPos = eng.sc->cam->getpos();
+	
 	
 
 	glBindVertexArray(vao_mesh_id);

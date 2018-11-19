@@ -7,6 +7,10 @@ double N(double phi);
 double* ecef2lla(double x, double y, double z);
 glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees);
 
+struct normalpack
+{
+	glm::vec3 upperleft, upperright, bottomleft, bottomright;
+};
 
 class quadtile
 {
@@ -17,6 +21,7 @@ public:
 	vector<glm::vec3> normals;
 	vector<glm::vec2> uvs;
 	vector<glm::vec2> borderuvs;
+	normalpack corners;
 
 	shared_ptr<texturemesh> tm;
 	wstring fname;
