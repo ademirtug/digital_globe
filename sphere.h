@@ -13,6 +13,7 @@ public:
 	vector<shared_ptr<thread>> threads;
 	threadpool pool;
 	spheroid(double _a, double _b);
+	
 };
 
 #endif//__SPHERE_H__

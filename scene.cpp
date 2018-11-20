@@ -1,7 +1,9 @@
 #include "stdafx.h"
 
+#include <string>
 
 extern engine eng;
+using namespace std;
 
 scene::scene()
 {
@@ -54,10 +56,10 @@ void scene::draw()
 		float min = 90;
 		vector<float> acc;
 
-		string cs = "";
-
 		quadtile* root = &earth->tiles;
 		string letter = "";
+		string mintile = "";
+		string subtile = "";
 
 		//focus bul
 		for (size_t i = 0; i < eng.sc->cam->zoomlevel-2; i++)
@@ -65,8 +67,13 @@ void scene::draw()
 			for (size_t x = 0; x < 4; x++)
 			{
 				char z = 65 + x;
-				string ns = cs + z;
-				quadtile *t = earth->tiles.gettile(ns);
+				subtile = z;
+				quadtile *t = root->gettile(subtile);
+
+				if (t == nullptr)
+				{
+					break;
+				}
 
 				int er = 0;
 
@@ -80,13 +87,45 @@ void scene::draw()
 				//we dont like negative guys
 				if (diff < min && diff > 0)
 				{
-					letter = ns;
+					mintile = z;
 					min = diff;
 				}
 			}
+			letter += mintile;
+			root = earth->tiles.gettile(letter);
 		}
 		zl = eng.sc->cam->zoomlevel;
-		cout << letter;
+		std::cout << letter;
+
+		//for (std::vector<shared_ptr<imesh>>::iterator it = eng.sc->meshes.begin(); it!= eng.sc->meshes.end(); ++it)
+		//{
+		//	if ((*it)->vboid_vertices == root->tm->vboid_vertices )
+		//	{
+		//		eng.sc->meshes.erase(it);
+		//		break;
+		//	}
+		//}
+		//root->init();
+		//for (size_t i = 0; i < 4; i++)
+		//{
+		//	shared_ptr<tilerequest> tr(new tilerequest(&(*root).children[i]));
+		//	earth->pool.queue(tr);
+
+
+		//	//tiles.children[i].init();
+		//	//for (size_t x = 0; x < 4; x++)
+		//	//{
+		//	//	tiles.children[i].children[x].init();
+		//	//	for (size_t y = 0; y < 4; y++)
+		//	//	{
+		//	//		shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i].children[x].children[y]));
+		//	//		pool.queue(tr);
+		//	//	}
+		//	//}
+		//}
+
+
+
 	}
 
 
@@ -115,8 +154,6 @@ void scene::draw()
 
 	glm::mat4 projection = glm::perspective(45.0f, width/height, 100.0f, 50000000.0f);
 	glm::mat4 view = eng.sc->cam->getview();
-	
-	
 
 	glBindVertexArray(vao_mesh_id);
 
@@ -311,44 +348,4 @@ void scene::generate_shaders()
 		cout << "link failed";
 
 	programs[m->spname()] = sp;
-
-
-
-	//for (auto m : meshes)
-	//{
-	//	if (programs.find(m->spname()) == programs.end())
-	//	{
-	//		program* sp = new program();
-
-	//		////geo shader
-	//		//shader gsh(GL_GEOMETRY_SHADER);
-	//		//if (gsh.compile(m->generate_geoshader(this)) == GL_FALSE)
-	//		//	cout << "geo failed";
-
-	//		//if (sp->attach_shader(&gsh) != GL_NO_ERROR)
-	//		//	cout << "geo attach failed";
-
-
-	//		//frag shader
-	//		shader fsh(GL_FRAGMENT_SHADER);
-	//		if (fsh.compile(m->generate_fragshader(this)) == GL_FALSE)
-	//			cout << "frag failed";
-
-	//		if (sp->attach_shader(&fsh) != GL_NO_ERROR)
-	//			cout << "frag attach failed";
-
-	//		//vert shader
-	//		shader vsh(GL_VERTEX_SHADER);
-	//		if (vsh.compile(m->generate_vertshader(this)) == GL_FALSE)
-	//			cout << "vertex failed";
-
-	//		if (sp->attach_shader(&vsh) != GL_NO_ERROR)
-	//			cout << "vert attach failed";
-
-	//		if (sp->link() != GL_NO_ERROR)
-	//			cout << "link failed";
-
-	//		programs[m->spname()] = sp;
-	//	}
-	//}
 }
