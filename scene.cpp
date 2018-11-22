@@ -66,6 +66,7 @@ void scene::draw()
 	if (zl != eng.sc->cam->zoomlevel)
 	{
 		float min = 90*4;
+		float min1 = 90 * 8;
 		vector<float> acc;
 
 		quadtile* root = &earth->tiles;
@@ -73,11 +74,11 @@ void scene::draw()
 		string mintile = "";
 		string subtile = "";
 
-		vector<double> angles;
-		vector<double> angles1;
+		
 		//focus bul
 		for (size_t i = 0; i < eng.sc->cam->zoomlevel-1; i++)
 		{
+			vector<double> angles;
 			for (size_t x = 0; x < 4; x++)
 			{
 				char z = 65 + x;
@@ -87,36 +88,14 @@ void scene::draw()
   				if (t == nullptr)
  					break;
 
-				float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomleft)));
-				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomright)));
-				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperleft)));
-				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperright)));
-
-
-				float d1 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomleft)));
-				float d2 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomright)));
-				float d3 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperleft)));
-				float d4 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperright)));
-
-
-
-
 				normalspack corners = earth->getcornernormals(subtile);
-				float diff1 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
-				diff1 += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
-				diff1 += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
-				diff1 += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
-
-
-				float d5 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
-				float d6 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
-				float d7 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
-				float d8 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
-
+				float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
+				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
+				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
+				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
 
 				angles.push_back(diff);
-				angles1.push_back(diff1);
-				//we dont like negative guys and i don't know why the heck on earth mintile has the max angle 
+
 				if (diff < min)
 				{
 					mintile = z;
@@ -129,37 +108,7 @@ void scene::draw()
 		}
 
 		zl = eng.sc->cam->zoomlevel;
-		std::cout << letter << "-";
-
-		//for (std::vector<shared_ptr<imesh>>::iterator it = eng.sc->meshes.begin(); it!= eng.sc->meshes.end(); ++it)
-		//{
-		//	if ((*it)->vboid_vertices == root->tm->vboid_vertices )
-		//	{
-		//		eng.sc->meshes.erase(it);
-		//		break;
-		//	}
-		//}
-		//root->init();
-		//for (size_t i = 0; i < 4; i++)
-		//{
-		//	shared_ptr<tilerequest> tr(new tilerequest(&(*root).children[i]));
-		//	earth->pool.queue(tr);
-
-
-		//	//tiles.children[i].init();
-		//	//for (size_t x = 0; x < 4; x++)
-		//	//{
-		//	//	tiles.children[i].children[x].init();
-		//	//	for (size_t y = 0; y < 4; y++)
-		//	//	{
-		//	//		shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i].children[x].children[y]));
-		//	//		pool.queue(tr);
-		//	//	}
-		//	//}
-		//}
-
-
-
+		std::cout << mintile << "--";
 	}
 
 

@@ -1,14 +1,5 @@
-﻿  quadtile.cpp
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(27): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(31): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(148): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(226): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(230): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(244): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(246): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(257): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(264): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(271): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(278): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(106): warning C4172: returning address of local variable or temporary: lla
+﻿  scene.cpp
+c:\users\akn\documents\github\3d_engine\scene.cpp(79): warning C4018: '<': signed/unsigned mismatch
+c:\users\akn\documents\github\3d_engine\scene.cpp(84): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
+c:\users\akn\documents\github\3d_engine\scene.cpp(135): warning C4244: 'argument': conversion from 'float' to 'GLsizei', possible loss of data
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
