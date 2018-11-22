@@ -49,6 +49,11 @@ normalspack spheroid::getcornernormals(string quadkey)
 	if (quadkey.size() < 1)
 		return corners;
 
+	if (quadkey.size() > 1)
+	{
+		int x = 5;
+	}
+
 	double platenum = 32;
 	double circumference = 2 * glm::pi<double>() * 6378137.0f;
 	double mapsize = pow(2, quadkey.size()) * 256;

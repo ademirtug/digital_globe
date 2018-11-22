@@ -76,19 +76,15 @@ void scene::draw()
 
 		
 		//focus bul
-		for (size_t i = 0; i < eng.sc->cam->zoomlevel-1; i++)
+		for (size_t i = 0; i < eng.sc->cam->zoomlevel-2; i++)
 		{
 			vector<double> angles;
 			for (size_t x = 0; x < 4; x++)
 			{
 				char z = 65 + x;
 				subtile = z;
-				quadtile *t = root->gettile(subtile);
 
-  				if (t == nullptr)
- 					break;
-
-				normalspack corners = earth->getcornernormals(subtile);
+				normalspack corners = earth->getcornernormals(letter + subtile);
 				float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
 				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
 				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
@@ -108,7 +104,7 @@ void scene::draw()
 		}
 
 		zl = eng.sc->cam->zoomlevel;
-		std::cout << mintile << "--";
+		std::cout << letter << "--";
 	}
 
 
