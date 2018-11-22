@@ -16,30 +16,8 @@ spheroid::spheroid(double _a, double _b)
 	{
 		shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i]));
 		pool.queue(tr);
-
-
-		//tiles.children[i].init();
-		//for (size_t x = 0; x < 4; x++)
-		//{
-		//	tiles.children[i].children[x].init();
-		//	for (size_t y = 0; y < 4; y++)
-		//	{
-		//		shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i].children[x].children[y]));
-		//		pool.queue(tr);
-		//	}
-		//}
 	}
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -111,76 +89,74 @@ normalspack spheroid::getcornernormals(string quadkey)
 	{
 		for (size_t i = 0; i < platenum; i++)
 		{
-			double mercx1 = x1 + i * xstep;
-			double mercx2 = x1 + (i + 1) * xstep;
-
-			double mercy1 = y1 + x * ystep;
-			double mercy2 = y1 + (x + 1) * ystep;
-
-
-			//2d to lat long
-			double lat1 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
-			double lon1 = (360.0 / mapsize * mercx1) - 180;
-
-			glm::vec3 ecef = lla2ecef(lat1, lon1);
-			glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
-
-
-			double lat2 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
-			double lon2 = (360.0 / mapsize * mercx2) - 180;
-
-			ecef = lla2ecef(lat2, lon2);
-			glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
-
-
-			double lat3 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
-			double lon3 = (360.0 / mapsize * mercx1) - 180;
-
-
-			ecef = lla2ecef(lat3, lon3);
-			glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
-
-			double lat4 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
-			double lon4 = (360.0 / mapsize * mercx2) - 180;
-
-
-			ecef = lla2ecef(lat4, lon4);
-			glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
-
-
-			glm::vec2 uvtopleft = { (i * xstep) / 256,  -(x * ystep) / 256 };
-			glm::vec2 uvbottomleft = { (i * xstep) / 256,  -((x + 1) * ystep) / 256 };
-			glm::vec2 uvtopright = { ((i + 1) * xstep) / 256, -(x * ystep) / 256 };
-
-
-			glm::vec2 uvbottomright = { ((i + 1) * xstep) / 256, -((x + 1) * ystep) / 256 };
-
-
-			if (x == 0 && i == 0)
+			if ((x == 0 && i == 0) || (x == 0 && i == (platenum - 1)) || (x == (platenum - 1) && i == 0) || (x == (platenum - 1) && i == (platenum - 1)))
 			{
-				corners.upperleft = calc_normal(topleft, bottomleft, topright);
-			}
-			if (x == 0 && i == (platenum - 1))
-			{
-				corners.bottomleft = calc_normal(bottomleft, topright, topleft);
-			}
-			if (x == (platenum - 1) && i == 0)
-			{
-				corners.upperright = calc_normal(topright, topleft, bottomleft);
-			}
-			if (x == (platenum - 1) && i == (platenum - 1))
-			{
-				corners.bottomright = calc_normal(bottomright, topright, bottomleft);
+				double mercx1 = x1 + i * xstep;
+				double mercx2 = x1 + (i + 1) * xstep;
+
+				double mercy1 = y1 + x * ystep;
+				double mercy2 = y1 + (x + 1) * ystep;
+
+
+				//2d to lat long
+				double lat1 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
+				double lon1 = (360.0 / mapsize * mercx1) - 180;
+
+				glm::vec3 ecef = lla2ecef(lat1, lon1);
+				glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
+
+
+				double lat2 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
+				double lon2 = (360.0 / mapsize * mercx2) - 180;
+
+				ecef = lla2ecef(lat2, lon2);
+				glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
+
+
+				double lat3 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
+				double lon3 = (360.0 / mapsize * mercx1) - 180;
+
+
+				ecef = lla2ecef(lat3, lon3);
+				glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
+
+				double lat4 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
+				double lon4 = (360.0 / mapsize * mercx2) - 180;
+
+
+				ecef = lla2ecef(lat4, lon4);
+				glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
+
+
+				glm::vec2 uvtopleft = { (i * xstep) / 256,  -(x * ystep) / 256 };
+				glm::vec2 uvbottomleft = { (i * xstep) / 256,  -((x + 1) * ystep) / 256 };
+				glm::vec2 uvtopright = { ((i + 1) * xstep) / 256, -(x * ystep) / 256 };
+
+
+				glm::vec2 uvbottomright = { ((i + 1) * xstep) / 256, -((x + 1) * ystep) / 256 };
+
+
+				if (x == 0 && i == 0)
+				{
+					corners.upperleft = calc_normal(topleft, bottomleft, topright);
+				}
+				if (x == 0 && i == (platenum - 1))
+				{
+					corners.bottomleft = calc_normal(bottomleft, topright, topleft);
+				}
+				if (x == (platenum - 1) && i == 0)
+				{
+					corners.upperright = calc_normal(topright, topleft, bottomleft);
+				}
+				if (x == (platenum - 1) && i == (platenum - 1))
+				{
+					corners.bottomright = calc_normal(bottomright, topright, bottomleft);
+				}
 			}
 		}
 	}
-
 	return corners;
 }
-
-
-
-
 
 
 //

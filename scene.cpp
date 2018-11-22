@@ -19,14 +19,6 @@ void search(string base, quadtile* tile)
 int zl = 2;
 string currentfocus = "";
 
-float angleBetween(glm::vec3 a, glm::vec3 b, glm::vec3 origin = {0,0,0})
-{
-	glm::vec3 da = glm::normalize(a - origin);
-	glm::vec3 db = glm::normalize(b - origin);
-	return glm::acos(glm::dot(da, db));
-}
-
-
 scene::scene()
 {
 	//bunu texture sýnýfýndan türeme shadow map yap
@@ -66,11 +58,7 @@ void scene::draw()
 	if (zl != eng.sc->cam->zoomlevel)
 	{
 		float min = 90*4;
-		float min1 = 90 * 8;
-		vector<float> acc;
-
-		quadtile* root = &earth->tiles;
-		string letter = "";
+		string tile = "";
 		string mintile = "";
 		string subtile = "";
 
@@ -78,33 +66,34 @@ void scene::draw()
 		//focus bul
 		for (size_t i = 0; i < eng.sc->cam->zoomlevel-2; i++)
 		{
-			vector<double> angles;
 			for (size_t x = 0; x < 4; x++)
 			{
-				char z = 65 + x;
-				subtile = z;
+				subtile = char(65 + x);
 
-				normalspack corners = earth->getcornernormals(letter + subtile);
+				normalspack corners = earth->getcornernormals(tile + subtile);
 				float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
 				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
 				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
 				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
 
-				angles.push_back(diff);
-
 				if (diff < min)
 				{
-					mintile = z;
+					mintile = char(65 + x);
 					min = diff;
 				}
 			}
-
-			letter += mintile;
-			root = earth->tiles.gettile(letter);
+			tile += mintile;
 		}
 
 		zl = eng.sc->cam->zoomlevel;
-		std::cout << letter << "--";
+		std::cout << tile << "--";
+
+		if (tile != currentfocus)
+		{
+
+		}
+
+		currentfocus = tile;
 	}
 
 
