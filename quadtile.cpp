@@ -179,14 +179,6 @@ void quadtile::invalidate(string tile)
 	return child->invalidate(tile.substr(1));
 }
 
-bool checkrange(glm::vec2 uv)
-{
-	if (uv.y > 0 || uv.y < -1.0)
-	{
-		return false;
-	}
-	return true;
-}
 
 void quadtile::getmap()
 {
@@ -195,7 +187,7 @@ void quadtile::getmap()
 
 
 	double circumference = 2 * glm::pi<double>() * 6378137.0f;
-	double mapsize = pow(2, quadkey.size() == 0 ? 1 : quadkey.size()) * 256;
+	double mapsize = pow(2, quadkey.size()) * 256;
 
 	double x1 = 0;
 	double x2 = mapsize;
@@ -235,7 +227,9 @@ void quadtile::getmap()
 	double lon = (360.0 / mapsize * centerx) - 180;
 
 
-	float b = 6356752.3f;
+	double test = ytolat(circumference / mapsize * (-256));
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                	float b = 6356752.3f;
 	float a = 6378137.0f;
 	float e2 = 1 - ((b*b) / (a*a));
 	float e = sqrt(e2);
@@ -302,10 +296,6 @@ void quadtile::getmap()
 			uvs.push_back(uvbottomleft);
 			uvs.push_back(uvtopright);
 
-			checkrange(uvtopleft);
-			checkrange(uvbottomleft);
-			checkrange(uvtopright);
-
 			normals.push_back(calc_normal(topleft, bottomleft, topright));//topleft
 			normals.push_back(calc_normal(bottomleft, topright, topleft));//bottomleft
 			normals.push_back(calc_normal(topright, topleft, bottomleft));//topright
@@ -315,7 +305,6 @@ void quadtile::getmap()
 			vertices.push_back(topright);
 
 			glm::vec2 uvbottomright = { ((i + 1) * xstep) / 256, -((x + 1) * ystep) / 256 };
-			checkrange(uvbottomright);
 
 			uvs.push_back(uvbottomleft);
 			uvs.push_back(uvbottomright);

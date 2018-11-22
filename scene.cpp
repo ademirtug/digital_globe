@@ -1,18 +1,12 @@
 #include "stdafx.h"
 
 #include <string>
+//#include <glm/gtx/vector_angle.hpp>
+
+
 
 extern engine eng;
 using namespace std;
-
-scene::scene()
-{
-	//bunu texture sýnýfýndan türeme shadow map yap
-	enable_dirlight = true;
-	width = 1024.0f;
-	height = 768.0f;
-}
-
 
 void search(string base, quadtile* tile)
 {
@@ -23,7 +17,25 @@ void search(string base, quadtile* tile)
 }
 
 int zl = 2;
-string currentfocus = "";   
+string currentfocus = "";
+
+float angleBetween(glm::vec3 a, glm::vec3 b, glm::vec3 origin = {0,0,0})
+{
+	glm::vec3 da = glm::normalize(a - origin);
+	glm::vec3 db = glm::normalize(b - origin);
+	return glm::acos(glm::dot(da, db));
+}
+
+
+scene::scene()
+{
+	//bunu texture sýnýfýndan türeme shadow map yap
+	enable_dirlight = true;
+	width = 1024.0f;
+	height = 768.0f;
+}
+
+
 void scene::draw()
 {
 	if (cam == nullptr)
@@ -53,7 +65,7 @@ void scene::draw()
 	glm::vec3 cameraPos = eng.sc->cam->getpos();
 	if (zl != eng.sc->cam->zoomlevel)
 	{
-		float min = 90;
+		float min = 90*4;
 		vector<float> acc;
 
 		quadtile* root = &earth->tiles;
@@ -61,8 +73,10 @@ void scene::draw()
 		string mintile = "";
 		string subtile = "";
 
+		vector<double> angles;
+		vector<double> angles1;
 		//focus bul
-		for (size_t i = 0; i < eng.sc->cam->zoomlevel-2; i++)
+		for (size_t i = 0; i < eng.sc->cam->zoomlevel-1; i++)
 		{
 			for (size_t x = 0; x < 4; x++)
 			{
@@ -70,32 +84,52 @@ void scene::draw()
 				subtile = z;
 				quadtile *t = root->gettile(subtile);
 
-				if (t == nullptr)
-				{
-					break;
-				}
+  				if (t == nullptr)
+ 					break;
 
-				int er = 0;
+				float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomleft)));
+				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomright)));
+				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperleft)));
+				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperright)));
 
-				float diff = glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomleft));
-				diff += glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomright));
-				diff += glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperleft));
-				diff += glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperright));
 
-				diff /= 4;
-				
-				//we dont like negative guys
-				if (diff < min && diff > 0)
+				float d1 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomleft)));
+				float d2 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.bottomright)));
+				float d3 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperleft)));
+				float d4 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(t->corners.upperright)));
+
+
+
+
+				normalspack corners = earth->getcornernormals(subtile);
+				float diff1 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
+				diff1 += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
+				diff1 += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
+				diff1 += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
+
+
+				float d5 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
+				float d6 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
+				float d7 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
+				float d8 = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
+
+
+				angles.push_back(diff);
+				angles1.push_back(diff1);
+				//we dont like negative guys and i don't know why the heck on earth mintile has the max angle 
+				if (diff < min)
 				{
 					mintile = z;
 					min = diff;
 				}
 			}
+
 			letter += mintile;
 			root = earth->tiles.gettile(letter);
 		}
+
 		zl = eng.sc->cam->zoomlevel;
-		std::cout << letter;
+		std::cout << letter << "-";
 
 		//for (std::vector<shared_ptr<imesh>>::iterator it = eng.sc->meshes.begin(); it!= eng.sc->meshes.end(); ++it)
 		//{

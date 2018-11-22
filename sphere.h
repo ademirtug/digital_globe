@@ -4,6 +4,8 @@
 #include "quadtile.h"
 #include "threadpool.h"
 
+
+
 class spheroid
 {
 	
@@ -13,6 +15,8 @@ public:
 	vector<shared_ptr<thread>> threads;
 	threadpool pool;
 	spheroid(double _a, double _b);
+	
+	normalspack getcornernormals(string quadkey);
 	
 };
 
