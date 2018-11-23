@@ -157,7 +157,7 @@ quadtile* quadtile::getchild(char c)
 	return nullptr;
 }
 
-quadtile* quadtile::gettile(string tile)
+quadtile* quadtile::gettile(string tile, bool forcenew)
 {
 	if (tile.size() == 0)
 	{
@@ -165,8 +165,16 @@ quadtile* quadtile::gettile(string tile)
 	}
 
 	quadtile* child = getchild(tile.at(0));
-	if (child == nullptr)
+	if (child == nullptr && forcenew)
+	{
+		init(quadkey);
+		child = getchild(tile.at(0));
+	}
+	else
+	{
 		return nullptr;
+	}
+	
 
 	return child->gettile(tile.substr(1));
 }
@@ -245,13 +253,11 @@ void quadtile::getmap()
 	{
 		for (size_t i = 0; i < platenum; i++)
 		{
-
 			double mercx1 = x1 + i * xstep;
 			double mercx2 = x1 + (i + 1) * xstep;
 
 			double mercy1 = y1 + x * ystep;
 			double mercy2 = y1 + (x + 1) * ystep;
-
 
 			//2d to lat long
 			double lat1 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
@@ -260,17 +266,14 @@ void quadtile::getmap()
 			glm::vec3 ecef = lla2ecef(lat1, lon1);
 			glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
 
-
 			double lat2 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
 			double lon2 = (360.0 / mapsize * mercx2) - 180;
 
 			ecef = lla2ecef(lat2, lon2);
 			glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
 
-
 			double lat3 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
 			double lon3 = (360.0 / mapsize * mercx1) - 180;
-
 
 			ecef = lla2ecef(lat3, lon3);
 			glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
@@ -278,10 +281,8 @@ void quadtile::getmap()
 			double lat4 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
 			double lon4 = (360.0 / mapsize * mercx2) - 180;
 
-
 			ecef = lla2ecef(lat4, lon4);
 			glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
-
 
 			vertices.push_back(topleft);
 			vertices.push_back(bottomleft);
@@ -290,7 +291,6 @@ void quadtile::getmap()
 			glm::vec2 uvtopleft = { (i * xstep) / 256,  -(x * ystep) / 256 };
 			glm::vec2 uvbottomleft = { (i * xstep) / 256,  -((x + 1) * ystep) / 256 };
 			glm::vec2 uvtopright = { ((i + 1) * xstep) / 256, -(x * ystep) / 256 };
-
 
 			uvs.push_back(uvtopleft);
 			uvs.push_back(uvbottomleft);

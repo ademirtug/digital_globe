@@ -93,7 +93,7 @@ void scene::draw()
 
 		}
 
-		currentfocus = tile;
+		currentfocus = tile; 
 	}
 
 

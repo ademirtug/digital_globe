@@ -12,11 +12,18 @@ spheroid::spheroid(double _a, double _b)
 		std::filesystem::create_directory("c:\\mapdata\\");
 
 	tiles.init("");
-	for (size_t i = 0; i < 4; i++)
-	{
-		shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i]));
-		pool.queue(tr);
-	}
+
+
+
+
+	//for (size_t i = 0; i < 4; i++)
+	//{
+	//	shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i]));
+	//	pool.queue(tr);
+	//}
+
+
+
 }
 
 
@@ -84,7 +91,7 @@ normalspack spheroid::getcornernormals(string quadkey)
 	double xstep = (x2 - x1) / platenum;
 	double ystep = (y2 - y1) / platenum;
 
-
+	//make a clean algo for this;
 	for (size_t x = 0; x < platenum; x++)
 	{
 		for (size_t i = 0; i < platenum; i++)

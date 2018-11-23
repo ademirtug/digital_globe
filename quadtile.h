@@ -32,7 +32,7 @@ public:
 	void init(string _quadkey = "");
 
 	quadtile* getchild(char c);
-	quadtile* gettile(string tile);
+	quadtile* gettile(string tile, bool forcenew = false);
 	void invalidate(string tile);
 	void getmap();
 };
