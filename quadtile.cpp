@@ -74,12 +74,12 @@ double N(double phi)
 	return a*a / sqrt(a*a * cos(phi)*cos(phi) + b*b*sin(phi)* sin(phi));
 }
 
-double* ecef2lla(double x, double y, double z) {
+std::array<double,3> ecef2lla(double x, double y, double z) {
 
 	double b = 6356752.3f;
 	double a = 6378137.0f;
 	double e2 = 0.00669437999013;
-	double lla[] = { 0, 0, 0 };
+	std::array<double, 3> lla = { 0, 0, 0 };
 	double lat, lon, height, N, theta, p;
 
 	lon = 2 * atan((sqrt(x*x + y*y) - x) / y);
@@ -102,6 +102,7 @@ double* ecef2lla(double x, double y, double z) {
 	lla[0] = lat;
 	lla[1] = lon;
 	lla[2] = height;
+
 
 	return lla;
 
@@ -138,7 +139,6 @@ quadtile::~quadtile()
 
 void quadtile::init(string _quadkey)
 {
-
 	if (_quadkey.size() > 0)
 		quadkey = _quadkey;
 
@@ -174,10 +174,32 @@ quadtile* quadtile::gettile(string tile, bool forcenew)
 	{
 		return nullptr;
 	}
-	
 
 	return child->gettile(tile.substr(1));
 }
+
+vector<quadtile*> quadtile::getdisplayedtiles()
+{
+	vector<quadtile*> tiles;
+
+	if (children != nullptr)
+	{ 
+		for (size_t i = 0; i < 4; i++)
+		{
+			//recursively search the tree
+			vector<quadtile*> subtile = children[i].getdisplayedtiles();
+			tiles.insert(tiles.end(), subtile.begin(), subtile.end());
+		}
+	}
+	else
+	{
+		//we should return this
+		tiles.push_back(this);
+	}
+
+	return tiles;
+}
+
 void quadtile::invalidate(string tile)
 {
 	quadtile* child = getchild(tile.at(0));
@@ -187,12 +209,10 @@ void quadtile::invalidate(string tile)
 	return child->invalidate(tile.substr(1));
 }
 
-
 void quadtile::getmap()
 {
 	if (quadkey.size() < 1)
 		return;
-
 
 	double circumference = 2 * glm::pi<double>() * 6378137.0f;
 	double mapsize = pow(2, quadkey.size()) * 256;
@@ -234,9 +254,7 @@ void quadtile::getmap()
 	double lat = ytolat(circumference / mapsize * (mapsize / 2 - centery));
 	double lon = (360.0 / mapsize * centerx) - 180;
 
-
 	double test = ytolat(circumference / mapsize * (-256));
-
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 	float b = 6356752.3f;
 	float a = 6378137.0f;
 	float e2 = 1 - ((b*b) / (a*a));

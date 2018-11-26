@@ -40,18 +40,19 @@ void scene::draw()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	eng.sc->mxqueuedmeshes.lock();
-	if (queuedmeshes.size() > 0)
-	{
-		for (auto tile : queuedmeshes)
-		{
-			tile->tm.reset(new texturemesh(tile->vertices, tile->normals, tile->uvs, string(tile->fname.begin(), tile->fname.end())));
-			tile->tm->position = { 0.0, 0.0, 0.0 };
-			eng.sc->meshes.push_back(tile->tm);
-		}
-		queuedmeshes.clear();
-	}
-	eng.sc->mxqueuedmeshes.unlock();
+	//eng.sc->mxqueuedmeshes.lock();
+	//if (queuedmeshes.size() > 0)
+	//{
+	//	for (auto tile : queuedmeshes)
+	//	{
+	//		tile->tm.reset(new texturemesh(tile->vertices, tile->normals, tile->uvs, string(tile->fname.begin(), tile->fname.end())));
+	//		tile->tm->position = { 0.0, 0.0, 0.0 };
+	//		eng.sc->meshes.push_back(tile->tm);
+	//	}
+	//	queuedmeshes.clear();
+	//}
+	//eng.sc->mxqueuedmeshes.unlock();
+
 
 	
 	glm::vec3 cameraPos = eng.sc->cam->getpos();

@@ -17,6 +17,7 @@ public:
 	spheroid(double _a, double _b);
 	
 	normalspack getcornernormals(string quadkey);
+	vector<quadtile*> getplates();
 	
 };
 

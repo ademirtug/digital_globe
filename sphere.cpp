@@ -14,16 +14,21 @@ spheroid::spheroid(double _a, double _b)
 	tiles.init("");
 
 
+}
+
+vector<quadtile*> spheroid::getplates()
+{
+	vector<quadtile*> t;
 
 
-	//for (size_t i = 0; i < 4; i++)
-	//{
-	//	shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i]));
-	//	pool.queue(tr);
-	//}
 
 
 
+
+
+
+
+	return t;
 }
 
 

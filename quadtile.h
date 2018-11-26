@@ -1,10 +1,12 @@
 #pragma once
+#include <array>
+
 
 float ytolat(float y);
 int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3);
 double N(double phi);
-double* ecef2lla(double x, double y, double z);
+std::array<double,3> ecef2lla(double x, double y, double z);
 glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees);
 
 struct normalspack
@@ -33,8 +35,10 @@ public:
 
 	quadtile* getchild(char c);
 	quadtile* gettile(string tile, bool forcenew = false);
+	vector<quadtile*> getdisplayedtiles();
 	void invalidate(string tile);
 	void getmap();
+	
 };
 
 
