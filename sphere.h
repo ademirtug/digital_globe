@@ -17,7 +17,7 @@ public:
 	spheroid(double _a, double _b);
 	
 	normalspack getcornernormals(string quadkey);
-	vector<quadtile*> getplates();
+	vector<quadtile*> getdisplayedtitles(glm::vec3 camerapos, int zoomlevel);
 	
 };
 

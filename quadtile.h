@@ -1,6 +1,10 @@
-#pragma once
+#ifndef __QUADTILE_H__
+#define __QUADTILE_H__
+
+
 #include <array>
 
+class spheroid;
 
 float ytolat(float y);
 int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
@@ -24,6 +28,8 @@ public:
 	vector<glm::vec2> uvs;
 	vector<glm::vec2> borderuvs;
 	normalspack corners;
+	//only accessed from MT
+	bool requested = false;
 
 	shared_ptr<texturemesh> tm;
 	wstring fname;
@@ -35,11 +41,11 @@ public:
 
 	quadtile* getchild(char c);
 	quadtile* gettile(string tile, bool forcenew = false);
-	vector<quadtile*> getdisplayedtiles();
+	vector<quadtile*> getdisplayedtiles(glm::vec3 camerapos, int zoomlevel);
 	void invalidate(string tile);
 	void getmap();
 	
 };
 
 
-
+#endif//__QUADTILE_H__

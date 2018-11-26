@@ -12,21 +12,20 @@ spheroid::spheroid(double _a, double _b)
 		std::filesystem::create_directory("c:\\mapdata\\");
 
 	tiles.init("");
-
-
+	for (size_t i = 0; i < 4; i++)
+	{
+		tiles.children[i].getmap();
+	}
 }
 
-vector<quadtile*> spheroid::getplates()
+vector<quadtile*> spheroid::getdisplayedtitles(glm::vec3 camerapos, int zoomlevel)
 {
 	vector<quadtile*> t;
-
-
-
-
-
-
-
-
+	//abcd yi doðrudan oluþtur oluþmuþ farzet 
+	//sonra alt katmanlarýný recursive çaðýr olmayanlarý 
+	//invalidate yap
+	//sonra geriye döndür hepsini
+	//ve hepsinin yüklemelerini baþlat
 
 	return t;
 }

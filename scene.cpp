@@ -39,63 +39,62 @@ void scene::draw()
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//eng.sc->mxqueuedmeshes.lock();
-	//if (queuedmeshes.size() > 0)
-	//{
-	//	for (auto tile : queuedmeshes)
-	//	{
-	//		tile->tm.reset(new texturemesh(tile->vertices, tile->normals, tile->uvs, string(tile->fname.begin(), tile->fname.end())));
-	//		tile->tm->position = { 0.0, 0.0, 0.0 };
-	//		eng.sc->meshes.push_back(tile->tm);
-	//	}
-	//	queuedmeshes.clear();
-	//}
-	//eng.sc->mxqueuedmeshes.unlock();
-
-
-	
 	glm::vec3 cameraPos = eng.sc->cam->getpos();
-	if (zl != eng.sc->cam->zoomlevel)
-	{
-		float min = 90*4;
-		string tile = "";
-		string mintile = "";
-		string subtile = "";
 
-		
-		//focus bul
-		for (size_t i = 0; i < eng.sc->cam->zoomlevel-2; i++)
-		{
-			for (size_t x = 0; x < 4; x++)
-			{
-				subtile = char(65 + x);
+	//this part collects all plates that needs to be shown
+	vector<quadtile*> tiles = earth->tiles.getdisplayedtiles(earth, cameraPos, zl);
+	//for (vector<quadtile*>::iterator it = tiles.begin(); it != tiles.end(); ++it)
+	//{
+	//	if ((**it).tm == nullptr)
+	//	{
+	//		if (!(**it).requested)
+	//		{
 
-				normalspack corners = earth->getcornernormals(tile + subtile);
-				float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
-				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
-				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
-				diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
+	//		}
+	//		tiles.erase(it);
+	//	}
+	//}
+	//
+	
+	//if (zl != eng.sc->cam->zoomlevel)
+	//{
+	//	float min = 90*4;
+	//	string tile = "";
+	//	string mintile = "";
+	//	string subtile = "";
+	//	
+	//	//find focus, compare normals against camera angle
+	//	for (size_t i = 0; i < eng.sc->cam->zoomlevel-2; i++)
+	//	{
+	//		for (size_t x = 0; x < 4; x++)
+	//		{
+	//			subtile = char(65 + x);
 
-				if (diff < min)
-				{
-					mintile = char(65 + x);
-					min = diff;
-				}
-			}
-			tile += mintile;
-		}
+	//			normalspack corners = earth->getcornernormals(tile + subtile);
+	//			float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
+	//			diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
+	//			diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
+	//			diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
 
-		zl = eng.sc->cam->zoomlevel;
-		std::cout << tile << "--";
+	//			if (diff < min)
+	//			{
+	//				mintile = char(65 + x);
+	//				min = diff;
+	//			}
+	//		}
+	//		tile += mintile;
+	//	}
 
-		if (tile != currentfocus)
-		{
+	//	zl = eng.sc->cam->zoomlevel;
+	//	std::cout << tile << "--";
 
-		}
+	//	if (tile != currentfocus)
+	//	{
 
-		currentfocus = tile; 
-	}
+	//	}
+
+	//	currentfocus = tile; 
+	//}
 
 
 	if (enable_dirlight)
@@ -107,10 +106,10 @@ void scene::draw()
 		glUseProgram(programs["dirlightshadowdepth"]->get_id());
 		programs["dirlightshadowdepth"]->setuniform("DirLightSpaceMatrix", dirlight.space);
 		
-		for (auto m : meshes)
+		for (auto m : tiles)
 		{
-			programs["dirlightshadowdepth"]->setuniform("model", m->model());
-			m->shadowdraw();
+			programs["dirlightshadowdepth"]->setuniform("model", m->tm->model());
+			m->tm->shadowdraw();
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -126,32 +125,55 @@ void scene::draw()
 
 	glBindVertexArray(vao_mesh_id);
 
-	for (auto m : meshes)
+	for (auto m : tiles)
 	{
-		glUseProgram(programs[m->spname()]->get_id());
-		programs[m->spname()]->setuniform("viewPos", cameraPos);
+		glUseProgram(programs[m->tm->spname()]->get_id());
+		programs[m->tm->spname()]->setuniform("viewPos", cameraPos);
 
 		if (enable_dirlight)
 		{
-			programs[m->spname()]->setuniform("dirLight.direction", dirlight.direction);
-			programs[m->spname()]->setuniform("dirLight.ambient", dirlight.ambient);
-			programs[m->spname()]->setuniform("dirLight.diffuse", dirlight.diffuse);
-			programs[m->spname()]->setuniform("dirLight.specular", dirlight.specular);
-			programs[m->spname()]->setuniform("DirLightSpaceMatrix", dirlight.space);
-			
+			programs[m->tm->spname()]->setuniform("dirLight.direction", dirlight.direction);
+			programs[m->tm->spname()]->setuniform("dirLight.ambient", dirlight.ambient);
+			programs[m->tm->spname()]->setuniform("dirLight.diffuse", dirlight.diffuse);
+			programs[m->tm->spname()]->setuniform("dirLight.specular", dirlight.specular);
+			programs[m->tm->spname()]->setuniform("DirLightSpaceMatrix", dirlight.space);
+
 			glActiveTexture(GL_TEXTURE3);
 			glBindTexture(GL_TEXTURE_2D, dirlight.sm.vboid_texture);
 
-			programs[m->spname()]->setuniform("far_plane", dirlight.far_plane);
-			programs[m->spname()]->setuniform("dldepthMap", 3);
+			programs[m->tm->spname()]->setuniform("far_plane", dirlight.far_plane);
+			programs[m->tm->spname()]->setuniform("dldepthMap", 3);
 		}
-	
-		m->draw(view, projection);
+
+		m->tm->draw(view, projection);
 
 		glUseProgram(0);
 	}
 
 	glBindVertexArray(0);
+
+	//for (auto m : meshes)
+	//{
+	//	glUseProgram(programs[m->spname()]->get_id());
+	//	programs[m->spname()]->setuniform("viewPos", cameraPos);
+	//	if (enable_dirlight)
+	//	{
+	//		programs[m->spname()]->setuniform("dirLight.direction", dirlight.direction);
+	//		programs[m->spname()]->setuniform("dirLight.ambient", dirlight.ambient);
+	//		programs[m->spname()]->setuniform("dirLight.diffuse", dirlight.diffuse);
+	//		programs[m->spname()]->setuniform("dirLight.specular", dirlight.specular);
+	//		programs[m->spname()]->setuniform("DirLightSpaceMatrix", dirlight.space);
+	//		
+	//		glActiveTexture(GL_TEXTURE3);
+	//		glBindTexture(GL_TEXTURE_2D, dirlight.sm.vboid_texture);
+	//		programs[m->spname()]->setuniform("far_plane", dirlight.far_plane);
+	//		programs[m->spname()]->setuniform("dldepthMap", 3);
+	//	}
+	//
+	//	m->draw(view, projection);
+	//	glUseProgram(0);
+	//}
+	//glBindVertexArray(0);
 
 
 	glfwSwapBuffers(eng.window);

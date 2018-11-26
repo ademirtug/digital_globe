@@ -178,24 +178,31 @@ quadtile* quadtile::gettile(string tile, bool forcenew)
 	return child->gettile(tile.substr(1));
 }
 
-vector<quadtile*> quadtile::getdisplayedtiles()
+vector<quadtile*> quadtile::getdisplayedtiles(glm::vec3 camerapos, int zoomlevel)
 {
 	vector<quadtile*> tiles;
 
-	if (children != nullptr)
-	{ 
-		for (size_t i = 0; i < 4; i++)
-		{
-			//recursively search the tree
-			vector<quadtile*> subtile = children[i].getdisplayedtiles();
-			tiles.insert(tiles.end(), subtile.begin(), subtile.end());
-		}
-	}
-	else
-	{
-		//we should return this
-		tiles.push_back(this);
-	}
+	if (zoomlevel >= quadkey.size())
+		return tiles;
+
+	
+	//zl = eng.sc->cam->zoomlevel;
+	//std::cout << tile << "--";
+	//currentfocus = tile;
+	//if (children != nullptr)
+	//{ 
+	//	for (size_t i = 0; i < 4; i++)
+	//	{
+	//		//recursively search the tree
+	//		vector<quadtile*> subtile = children[i].getdisplayedtiles();
+	//		tiles.insert(tiles.end(), subtile.begin(), subtile.end());
+	//	}
+	//}
+	//else
+	//{
+	//	//we should return this
+	//	tiles.push_back(this);
+	//}
 
 	return tiles;
 }

@@ -17,8 +17,4 @@ tilerequest::~tilerequest()
 void tilerequest::perform()
 {
 	__tile->getmap();
-
-	eng.sc->mxqueuedmeshes.lock();
-	eng.sc->queuedmeshes.push_back(__tile);
-	eng.sc->mxqueuedmeshes.unlock();
 }
