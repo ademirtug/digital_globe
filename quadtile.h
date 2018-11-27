@@ -13,10 +13,15 @@ double N(double phi);
 std::array<double,3> ecef2lla(double x, double y, double z);
 glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees);
 
+
+
 struct normalspack
 {
 	glm::vec3 upperleft, upperright, bottomleft, bottomright;
 };
+
+normalspack getcornernormals(string quadkey);
+
 
 class quadtile
 {
@@ -30,6 +35,7 @@ public:
 	normalspack corners;
 	//only accessed from MT
 	bool requested = false;
+	bool loadcomplete = false;
 
 	shared_ptr<texturemesh> tm;
 	wstring fname;
@@ -41,7 +47,7 @@ public:
 
 	quadtile* getchild(char c);
 	quadtile* gettile(string tile, bool forcenew = false);
-	vector<quadtile*> getdisplayedtiles(glm::vec3 camerapos, int zoomlevel);
+	vector<quadtile*> getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel);
 	void invalidate(string tile);
 	void getmap();
 	

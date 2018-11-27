@@ -816,6 +816,13 @@ string texturemesh::spname()
 }
 void texturemesh::draw(glm::mat4 view, glm::mat4 projection)
 {
+	if (vboid_vertices == 0)
+	{
+		init();
+	}
+
+
+
 	if (tex != NULL && tex->vboid_texture != NULL)
 	{
 		glActiveTexture(GL_TEXTURE0);

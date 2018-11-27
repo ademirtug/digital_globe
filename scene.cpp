@@ -42,7 +42,22 @@ void scene::draw()
 	glm::vec3 cameraPos = eng.sc->cam->getpos();
 
 	//this part collects all plates that needs to be shown
-	vector<quadtile*> tiles = earth->tiles.getdisplayedtiles(cameraPos, zl);
+	vector<quadtile*> tiles = earth->getdisplayedtiles(cameraPos, zl);
+
+
+	for (vector<quadtile*>::iterator it = tiles.begin(); it != tiles.end(); ++it)
+	{
+		
+		if ((*it)->tm == nullptr && (*it)->loadcomplete)
+		{
+			(*it)->tm.reset( new texturemesh((*it)->vertices, (*it)->normals, (*it)->uvs, "C:\\mapdata\\" + (*it)->quadkey + ".bmp") );
+		}
+		else if (!(*it)->loadcomplete)
+		{
+			tiles.erase(it);
+		}
+	}
+
 
 
 	if (enable_dirlight)
