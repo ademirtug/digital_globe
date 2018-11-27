@@ -109,7 +109,6 @@ std::array<double,3> ecef2lla(double x, double y, double z) {
 
 }
 
-
 normalspack getcornernormals(string quadkey)
 {
 	normalspack corners;
@@ -247,8 +246,6 @@ normalspack getcornernormals(string quadkey)
 	return corners;
 }
 
-
-
 glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 {
 	double a = 6378137.0f;
@@ -280,9 +277,6 @@ quadtile::~quadtile()
 
 void quadtile::init(string _quadkey)
 {
-	if (_quadkey.size() > 0)
-		quadkey = _quadkey;
-
 	if (children != nullptr)
 		return;
 
@@ -324,7 +318,11 @@ quadtile* quadtile::gettile(string tile, bool forcenew)
 
 vector<quadtile*> quadtile::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel)
 {
-	if ((zoomlevel -1) == quadkey.size())
+	//everytile represented by its own subtiles
+	//so root yields four subtile; A B C D
+	
+	
+	if (( zoomlevel ) == quadkey.size())
 	{
 		vector<quadtile*> t;
 		t.push_back(this);
@@ -355,21 +353,33 @@ vector<quadtile*> quadtile::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel
 	subtile = (char)(65 + mintile);
 	//ok we now know that user has zoomed to mintile, now the rest should be invalidated
 	//because we don't want them to cumulate and fill up all the memory the computer have
-	if (children != nullptr)
+
+	vector<quadtile*> t;
+
+	if (children == nullptr)
+		init(quadkey);
+
+	for (size_t i = 0; i < 4; i++)
 	{
-		for (size_t i = 0; i < 4; i++)
+		if (i != mintile)
 		{
-			if (i != mintile)
-				children[i].invalidate("");
-			else
-				children[i].init(quadkey + subtile);//children[mintile]...
+			//destroy its children and add it to list
+			children[i].invalidate("");
+			t.push_back(&children[i]);
 		}
+		//else
+		//{
+		//	children[i].init(quadkey + subtile);//children[mintile]...
+		//}
 	}
+
 
 	//now lets go deeper in mintile and figure out which subtiles are needed to be shown
 	vector<quadtile*> subtiles = children[mintile].getdisplayedtiles(cameraPos, zoomlevel);
 
-	return subtiles;
+	t.insert(t.end(), subtiles.begin(), subtiles.end());
+
+	return t;
 }
 
 void quadtile::invalidate(string tile)
