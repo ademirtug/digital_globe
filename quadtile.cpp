@@ -209,6 +209,16 @@ vector<quadtile*> quadtile::getdisplayedtiles(glm::vec3 camerapos, int zoomlevel
 
 void quadtile::invalidate(string tile)
 {
+	if (tile.size() == 0)
+	{
+		if (children != nullptr)
+		{
+			delete[] children;
+		}
+		return;
+	}
+
+
 	quadtile* child = getchild(tile.at(0));
 	if (child == nullptr)
 		return;

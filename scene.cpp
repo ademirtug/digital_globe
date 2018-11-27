@@ -42,59 +42,7 @@ void scene::draw()
 	glm::vec3 cameraPos = eng.sc->cam->getpos();
 
 	//this part collects all plates that needs to be shown
-	vector<quadtile*> tiles = earth->tiles.getdisplayedtiles(earth, cameraPos, zl);
-	//for (vector<quadtile*>::iterator it = tiles.begin(); it != tiles.end(); ++it)
-	//{
-	//	if ((**it).tm == nullptr)
-	//	{
-	//		if (!(**it).requested)
-	//		{
-
-	//		}
-	//		tiles.erase(it);
-	//	}
-	//}
-	//
-	
-	//if (zl != eng.sc->cam->zoomlevel)
-	//{
-	//	float min = 90*4;
-	//	string tile = "";
-	//	string mintile = "";
-	//	string subtile = "";
-	//	
-	//	//find focus, compare normals against camera angle
-	//	for (size_t i = 0; i < eng.sc->cam->zoomlevel-2; i++)
-	//	{
-	//		for (size_t x = 0; x < 4; x++)
-	//		{
-	//			subtile = char(65 + x);
-
-	//			normalspack corners = earth->getcornernormals(tile + subtile);
-	//			float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
-	//			diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
-	//			diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
-	//			diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
-
-	//			if (diff < min)
-	//			{
-	//				mintile = char(65 + x);
-	//				min = diff;
-	//			}
-	//		}
-	//		tile += mintile;
-	//	}
-
-	//	zl = eng.sc->cam->zoomlevel;
-	//	std::cout << tile << "--";
-
-	//	if (tile != currentfocus)
-	//	{
-
-	//	}
-
-	//	currentfocus = tile; 
-	//}
+	vector<quadtile*> tiles = earth->tiles.getdisplayedtiles(cameraPos, zl);
 
 
 	if (enable_dirlight)

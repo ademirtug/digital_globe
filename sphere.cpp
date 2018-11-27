@@ -18,14 +18,58 @@ spheroid::spheroid(double _a, double _b)
 	}
 }
 
-vector<quadtile*> spheroid::getdisplayedtitles(glm::vec3 camerapos, int zoomlevel)
+vector<quadtile*> spheroid::getdisplayedtitles(glm::vec3 cameraPos, int zoomlevel)
 {
 	vector<quadtile*> t;
-	//abcd yi doðrudan oluþtur oluþmuþ farzet 
-	//sonra alt katmanlarýný recursive çaðýr olmayanlarý 
-	//invalidate yap
-	//sonra geriye döndür hepsini
-	//ve hepsinin yüklemelerini baþlat
+	//add a b c d directly because they represent the bare bones of the earth
+	t.push_back(&tiles.children[0]);
+	t.push_back(&tiles.children[1]);
+	t.push_back(&tiles.children[2]);
+	t.push_back(&tiles.children[3]);
+
+	float min = 90*4;
+	int mintile = 0;
+	string subtile = "";
+		
+	for (size_t x = 0; x < 4; x++)
+	{
+		subtile = char(65 + x);
+
+		normalspack corners = getcornernormals(subtile);
+		float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
+		diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
+		diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
+		diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
+
+		if (diff < min)
+		{
+			mintile = x;
+			min = diff;
+		}
+	}
+	
+	//ok we now know that user has zoomed to mintile, now the rest should be invalidated
+	//because we don't want them to cumulate and fill up all the memory the computer have
+	for (size_t i = 0; i < 4; i++)
+	{
+		if (i != mintile)
+			tiles.children[i].invalidate("");
+	}
+
+	//now lets goo deeper in mintile and figure out which subtiles are needed to be shown
+	vector<quadtile*> subtiles =  tiles.children[mintile].getdisplayedtiles(cameraPos, zoomlevel);
+
+
+	//ok we got all the subtiles we need , now summ them all up;
+	t.insert(t.end(), subtiles.begin(), subtiles.end());
+
+	//the fact is that we got the subtiles but we didnt made any request for them
+	//to build plates and request required maps to map on their surface 
+
+
+
+
+
 
 	return t;
 }
