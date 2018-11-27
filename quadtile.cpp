@@ -367,10 +367,6 @@ vector<quadtile*> quadtile::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel
 			children[i].invalidate("");
 			t.push_back(&children[i]);
 		}
-		//else
-		//{
-		//	children[i].init(quadkey + subtile);//children[mintile]...
-		//}
 	}
 
 

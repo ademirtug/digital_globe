@@ -21,7 +21,7 @@ spheroid::spheroid(double _a, double _b)
 
 vector<quadtile*> spheroid::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel)
 {
-	vector<quadtile*> t = tiles.getdisplayedtiles(cameraPos, zoomlevel);
+	vector<quadtile*> t = tiles.getdisplayedtiles(cameraPos, 3);
 
 	////add a b c d directly because they represent the bare bones of the earth
 	//t.push_back(&tiles.children[0]);
