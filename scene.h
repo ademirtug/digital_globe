@@ -12,17 +12,11 @@ public:
 	void generate_shaders();
 	void draw();
 	
-	std::mutex mxpreparedtiles;
-
 	shared_ptr<spheroid> earth;
-
 	shared_ptr<camera> cam;
 	GLuint vao_mesh_id, vao_lights_id;
-
 	std::vector<shared_ptr<imesh>> meshes;
 	
-	std::vector<quadtile*> preparedtiles;
-
 	directionallight dirlight;
 	std::vector<pointlight> plights;
 	std::map<std::string, program*> programs;

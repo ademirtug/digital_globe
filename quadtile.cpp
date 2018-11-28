@@ -270,13 +270,19 @@ quadtile::quadtile()
 quadtile::~quadtile()
 {
 	if (children != nullptr)
+	{
 		delete[] children;
+		children = nullptr;
+	}
 	if (tm != nullptr)
 		tm.reset();
 }
 
 void quadtile::initchildren(string _quadkey)
 {
+	if (_quadkey.size() > 0)
+		quadkey = _quadkey;
+
 	if (children != nullptr)
 		return;
 
@@ -295,7 +301,7 @@ quadtile* quadtile::getchild(char c)
 	return nullptr;
 }
 
-quadtile* quadtile::gettile(string tile, bool forcenew)
+quadtile* quadtile::gettile(string tile)
 {
 	if (tile.size() == 0)
 	{
@@ -303,30 +309,26 @@ quadtile* quadtile::gettile(string tile, bool forcenew)
 	}
 
 	quadtile* child = getchild(tile.at(0));
-	if (child == nullptr && forcenew)
-	{
-		initchildren(quadkey);
-		child = getchild(tile.at(0));
-	}
-	else
+	if (child == nullptr)
 	{
 		return nullptr;
 	}
 
-	return child->gettile(tile.substr(1), forcenew);
+	return child->gettile(tile.substr(1));
 }
 
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel)
 {
 	//everytile represented by its own subtiles
 	//so root yields four subtile; A B C D
+
 	if (( zoomlevel ) == quadkey.size())
 	{
 		vector<quadtile*> t;
 		t.push_back(this);
 		return t;
 	}
-
+	
 
 	float min = 90 * 4;
 	int mintile = 0;
@@ -349,16 +351,26 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		}
 	}
 	subtile = (char)(65 + mintile);
+
 	//ok we now know that user has zoomed to mintile, now the rest should be invalidated
 	//because we don't want them to cumulate and fill up all the memory the computer have
-
 	vector<quadtile*> t;
 
 	if (children == nullptr)
 		initchildren(quadkey);
 
+
 	for (size_t i = 0; i < 4; i++)
 	{
+		string ct = "";
+		ct = ((char)(65 + i));
+
+		if (!children[i].requested)
+		{
+			eng.sc->earth->pool.queue(shared_ptr<tilerequest>(new tilerequest(quadkey + ct)));
+			children[i].requested = true;
+		}
+
 		if (i != mintile)
 		{
 			//destroy its children and add it to list
@@ -384,6 +396,7 @@ void quadtile::invalidate(string tile)
 		if (children != nullptr)
 		{
 			delete[] children;
+			children = nullptr;
 		}
 		return;
 	}

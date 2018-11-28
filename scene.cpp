@@ -42,20 +42,7 @@ void scene::draw()
 	glm::vec3 cameraPos = eng.sc->cam->getpos();
 
 	//this part collects all plates that needs to be shown
-	vector<quadtile*> tiles = earth->getdisplayedtiles(cameraPos, zl);
-
-	//for (vector<quadtile*>::iterator it = tiles.begin(); it != tiles.end(); ++it)
-	//{
-	//	if ((*it)->tm == nullptr && (*it)->loadcomplete)
-	//	{
-	//		(*it)->tm.reset( new texturemesh((*it)->vertices, (*it)->normals, (*it)->uvs, "C:\\mapdata\\" + (*it)->quadkey + ".bmp") );
-	//	}
-	//	else if (!(*it)->loadcomplete)
-	//	{
-	//		tiles.erase(it);
-	//	}
-	//}
-
+	vector<quadtile*> tiles = earth->getdisplayedtiles(cameraPos, cam->getzoomlevel());
 
 	if (enable_dirlight)
 	{
@@ -68,6 +55,8 @@ void scene::draw()
 		
 		for (auto m : tiles)
 		{
+			if (m->tm == nullptr)
+				continue;
 			programs["dirlightshadowdepth"]->setuniform("model", m->tm->model());
 			m->tm->shadowdraw();
 		}
@@ -87,6 +76,9 @@ void scene::draw()
 
 	for (auto m : tiles)
 	{
+		if (m->tm == nullptr)
+			continue;
+
 		glUseProgram(programs[m->tm->spname()]->get_id());
 		programs[m->tm->spname()]->setuniform("viewPos", cameraPos);
 
@@ -111,29 +103,6 @@ void scene::draw()
 	}
 
 	glBindVertexArray(0);
-
-	//for (auto m : meshes)
-	//{
-	//	glUseProgram(programs[m->spname()]->get_id());
-	//	programs[m->spname()]->setuniform("viewPos", cameraPos);
-	//	if (enable_dirlight)
-	//	{
-	//		programs[m->spname()]->setuniform("dirLight.direction", dirlight.direction);
-	//		programs[m->spname()]->setuniform("dirLight.ambient", dirlight.ambient);
-	//		programs[m->spname()]->setuniform("dirLight.diffuse", dirlight.diffuse);
-	//		programs[m->spname()]->setuniform("dirLight.specular", dirlight.specular);
-	//		programs[m->spname()]->setuniform("DirLightSpaceMatrix", dirlight.space);
-	//		
-	//		glActiveTexture(GL_TEXTURE3);
-	//		glBindTexture(GL_TEXTURE_2D, dirlight.sm.vboid_texture);
-	//		programs[m->spname()]->setuniform("far_plane", dirlight.far_plane);
-	//		programs[m->spname()]->setuniform("dldepthMap", 3);
-	//	}
-	//
-	//	m->draw(view, projection);
-	//	glUseProgram(0);
-	//}
-	//glBindVertexArray(0);
 
 
 	glfwSwapBuffers(eng.window);

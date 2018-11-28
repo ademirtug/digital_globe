@@ -22,7 +22,6 @@ struct normalspack
 
 normalspack getcornernormals(string quadkey);
 
-
 class quadtile
 {
 public:
@@ -35,7 +34,6 @@ public:
 	normalspack corners;
 	//only accessed from MT
 	bool requested = false;
-	bool loadcomplete = false;
 
 	shared_ptr<texturemesh> tm;
 	wstring fname;
@@ -49,7 +47,7 @@ public:
 	void initchildren(string _quadkey = "");
 
 	quadtile* getchild(char c);
-	quadtile* gettile(string tile, bool forcenew = false);
+	quadtile* gettile(string tile);
 	vector<quadtile*> calculatesubtiles(glm::vec3 cameraPos, int zoomlevel);
 	void invalidate(string tile);
 	void buildplates();

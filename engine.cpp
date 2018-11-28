@@ -89,6 +89,7 @@ void engine::run()
 			{
 				std::stringstream ss;
 				ss << "3d_engine - fps: " << fps;
+				ss << "---- zoom: " << sc->cam->getzoomlevel();
 
 				glfwSetWindowTitle(window, ss.str().c_str());
 				timer2 = glfwGetTime();

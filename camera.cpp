@@ -103,13 +103,10 @@ glm::mat4 qball_camera::getview()
 
 	return (glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -cdist)) * glm::mat4_cast(currot));
 }
-
 glm::vec3 qball_camera::getpos()
 {
 	return inverse(getview())[3];
 }
-
-
 void qball_camera::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
@@ -143,7 +140,7 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 		glm::vec3 rightaxis = glm::normalize(glm::cross(mouseaxis, up));
 		glm::vec3 rotaxis = glm::normalize(glm::cross(mouseaxis, rightaxis));
 
-		glm::quat newrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(dx, dy, 0))/((10*log2f(zoomlevel)))), rotaxis);
+		glm::quat newrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(dx, dy, 0))/((zoomlevel*10*log2f(zoomlevel)))), rotaxis);
 		currot = newrot * currot;
 
 		lastx = xpos;
@@ -155,10 +152,11 @@ void qball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, doub
 	zoomlevel += yoffset;
 	zoomlevel = zoomlevel < 2 ? 2 : zoomlevel;
 	zoomlevel = zoomlevel > 19 ? 19 : zoomlevel;
-
-	
 }
-
+int qball_camera::getzoomlevel()
+{
+	return zoomlevel;
+}
 
 
 eu_orbit_camera::eu_orbit_camera()

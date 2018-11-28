@@ -6,12 +6,9 @@
 extern engine eng;
 
 
-tilerequest::tilerequest(shared_ptr<scene> _sc, string _quadkey, double lat_center, double lon_center)
+tilerequest::tilerequest(string _quadkey)
 {
-	sc = _sc;
 	quadkey = _quadkey;
-	lat = lat_center;
-	lon = lon_center;
 }
 
 tilerequest::~tilerequest()
@@ -20,11 +17,15 @@ tilerequest::~tilerequest()
 
 void tilerequest::perform()
 {
-	quadtile* tile = new quadtile();
+	shared_ptr<quadtile> tile;
+	tile.reset(new quadtile());
 	tile->quadkey = quadkey;
 
-
 	tile->buildplates();
+
+	unique_lock<std::mutex> lk(eng.sc->earth->mxpreparedtiles);
+	eng.sc->earth->preparedtiles.push_back(tile);
+
 
 
 }

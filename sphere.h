@@ -12,11 +12,13 @@ class spheroid
 public:
 	int a, b;
 	quadtile tiles;
-	vector<shared_ptr<thread>> threads;
+	
+	std::mutex mxpreparedtiles;
+	std::vector<shared_ptr<quadtile>> preparedtiles;
+
 	threadpool pool;
 	spheroid(double _a, double _b);
 	
-	//normalspack getcornernormals(string quadkey);
 	vector<quadtile*> getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel);
 	
 };

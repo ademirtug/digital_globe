@@ -24,10 +24,8 @@ class tilerequest : public iwork
 {
 public:
 	string quadkey;
-	double lat, lon;
-	shared_ptr<scene> sc;
 
-	tilerequest(shared_ptr<scene> _sc, string _quadkey, double lat_center = 0, double lon_center = 0);
+	tilerequest( string _quadkey);
 	~tilerequest();
 	virtual void perform();
 };
