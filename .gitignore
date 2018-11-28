@@ -9,7 +9,7 @@
 *.lastbuildstate
 *.opensdf
 *.sdf
-
+*.suo
 
 # Prerequisites
 *.d
