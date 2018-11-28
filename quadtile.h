@@ -40,16 +40,19 @@ public:
 	shared_ptr<texturemesh> tm;
 	wstring fname;
 	int platenum;
+	double lat_center = 0;
+	double lon_center = 0;
+
 
 	quadtile();
 	~quadtile();
-	void init(string _quadkey = "");
+	void initchildren(string _quadkey = "");
 
 	quadtile* getchild(char c);
 	quadtile* gettile(string tile, bool forcenew = false);
-	vector<quadtile*> getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel);
+	vector<quadtile*> calculatesubtiles(glm::vec3 cameraPos, int zoomlevel);
 	void invalidate(string tile);
-	void getmap();
+	void buildplates();
 	
 };
 

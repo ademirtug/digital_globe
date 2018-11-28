@@ -1,5 +1,35 @@
 #include "stdafx.h"
 #include "threadpool.h"
+#include <filesystem>
+
+
+extern engine eng;
+
+
+tilerequest::tilerequest(shared_ptr<scene> _sc, string _quadkey, double lat_center, double lon_center)
+{
+	sc = _sc;
+	quadkey = _quadkey;
+	lat = lat_center;
+	lon = lon_center;
+}
+
+tilerequest::~tilerequest()
+{
+}
+
+void tilerequest::perform()
+{
+	quadtile* tile = new quadtile();
+	tile->quadkey = quadkey;
+
+
+	tile->buildplates();
+
+
+}
+
+
 
 
 threadpool::threadpool() : maxallowed(5), running(true)

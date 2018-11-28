@@ -104,9 +104,6 @@
     <ClCompile Include="quadtile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="work.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="threadpool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

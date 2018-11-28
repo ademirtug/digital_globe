@@ -22,10 +22,12 @@ public:
 
 class tilerequest : public iwork
 {
-	quadtile* __tile;
 public:
-	tilerequest();
-	tilerequest(quadtile* tile);
+	string quadkey;
+	double lat, lon;
+	shared_ptr<scene> sc;
+
+	tilerequest(shared_ptr<scene> _sc, string _quadkey, double lat_center = 0, double lon_center = 0);
 	~tilerequest();
 	virtual void perform();
 };

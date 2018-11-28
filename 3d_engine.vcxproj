@@ -178,7 +178,6 @@
     </ClCompile>
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="threadpool.cpp" />
-    <ClCompile Include="work.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data\pointshadowdepth.frag" />

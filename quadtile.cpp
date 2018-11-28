@@ -275,7 +275,7 @@ quadtile::~quadtile()
 		tm.reset();
 }
 
-void quadtile::init(string _quadkey)
+void quadtile::initchildren(string _quadkey)
 {
 	if (children != nullptr)
 		return;
@@ -305,7 +305,7 @@ quadtile* quadtile::gettile(string tile, bool forcenew)
 	quadtile* child = getchild(tile.at(0));
 	if (child == nullptr && forcenew)
 	{
-		init(quadkey);
+		initchildren(quadkey);
 		child = getchild(tile.at(0));
 	}
 	else
@@ -316,12 +316,10 @@ quadtile* quadtile::gettile(string tile, bool forcenew)
 	return child->gettile(tile.substr(1), forcenew);
 }
 
-vector<quadtile*> quadtile::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel)
+vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel)
 {
 	//everytile represented by its own subtiles
 	//so root yields four subtile; A B C D
-	
-	
 	if (( zoomlevel ) == quadkey.size())
 	{
 		vector<quadtile*> t;
@@ -357,7 +355,7 @@ vector<quadtile*> quadtile::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel
 	vector<quadtile*> t;
 
 	if (children == nullptr)
-		init(quadkey);
+		initchildren(quadkey);
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -371,7 +369,8 @@ vector<quadtile*> quadtile::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel
 
 
 	//now lets go deeper in mintile and figure out which subtiles are needed to be shown
-	vector<quadtile*> subtiles = children[mintile].getdisplayedtiles(cameraPos, zoomlevel);
+	//if the subchildren are not loaded completely then the tile displays itself instead
+	vector<quadtile*> subtiles = children[mintile].calculatesubtiles(cameraPos, zoomlevel);
 
 	t.insert(t.end(), subtiles.begin(), subtiles.end());
 
@@ -397,7 +396,7 @@ void quadtile::invalidate(string tile)
 	child->invalidate(tile.substr(1));
 }
 
-void quadtile::getmap()
+void quadtile::buildplates()
 {
 	if (quadkey.size() < 1)
 		return;
@@ -439,11 +438,11 @@ void quadtile::getmap()
 	double centerx = (x2 + x1) / 2;
 	double centery = (y2 + y1) / 2;
 
-	double lat = ytolat(circumference / mapsize * (mapsize / 2 - centery));
-	double lon = (360.0 / mapsize * centerx) - 180;
+	lat_center = ytolat(circumference / mapsize * (mapsize / 2 - centery));
+	lon_center = (360.0 / mapsize * centerx) - 180;
 
-	double test = ytolat(circumference / mapsize * (-256));
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                	float b = 6356752.3f;
+
+	float b = 6356752.3f;
 	float a = 6378137.0f;
 	float e2 = 1 - ((b*b) / (a*a));
 	float e = sqrt(e2);
@@ -540,9 +539,9 @@ void quadtile::getmap()
 	}
 
 
-	//haritalarý yükle
+	////haritalarý yükle
 	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=kAGxoy8TfqxNPPXu1Va54jWMoYMkRCbG&format=png&center=" +
-		to_string(lat) + "," + to_string(lon) +
+		to_string(lat_center) + "," + to_string(lon_center) +
 		"&size=256,256&zoom=" + to_string(quadkey.size());
 
 	fname = L"C:\\mapdata\\" + wstring(quadkey.begin(), quadkey.end()) + L".bmp";
