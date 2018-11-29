@@ -100,8 +100,8 @@ std::array<double,3> ecef2lla(double x, double y, double z) {
 
 	lon = lon * 180 / glm::pi<double>();
 	lat = lat * 180 / glm::pi<double>();
-	lla[0] = lat;
-	lla[1] = lon;
+	lla[0] = lat != lat ? 0 : lat;
+	lla[1] = lon != lon ? 0 : lon;
 	lla[2] = height;
 
 
@@ -550,6 +550,8 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	{
 		int zzz = 5;
 	}
+
+
 	float min = 90 * 400;
 	int mintile = 0;
 	string subtile = "";
