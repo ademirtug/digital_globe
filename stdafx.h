@@ -1,8 +1,3 @@
-// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently, but
-// are changed infrequently
-//
-
 #pragma once
 
 #include "targetver.h"
@@ -48,11 +43,9 @@
 #include "scene.h"
 #include "engine.h"
 #include "http_client.h"
-#include "bingmapquery.h"
 
 
 #pragma comment(lib,"ws2_32.lib")
 #pragma comment(lib,"winhttp.lib")
 #pragma comment(lib,"wininet.lib")
 #pragma comment (lib, "gdiplus.lib")
-// TODO: reference additional headers your program requires here

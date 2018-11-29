@@ -14,6 +14,7 @@ class camera
 public:
 	double cdist;
 	int zoomlevel;
+	int cameralevel;
 
 	virtual int getzoomlevel() { return 2; };
 	virtual glm::mat4 getview() = 0;
@@ -41,6 +42,7 @@ public:
 class qball_camera : public camera
 {
 public:
+	glm::quat currot;
 
 	qball_camera();
 	~qball_camera();

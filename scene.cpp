@@ -41,6 +41,12 @@ void scene::draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::vec3 cameraPos = eng.sc->cam->getpos();
 
+	if (zl != cam->getzoomlevel())
+	{
+		cout << "" << endl;
+		zl = cam->getzoomlevel();
+	}
+
 	//this part collects all plates that needs to be shown
 	vector<quadtile*> tiles = earth->getdisplayedtiles(cameraPos, cam->getzoomlevel());
 

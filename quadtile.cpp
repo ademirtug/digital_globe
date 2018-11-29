@@ -109,11 +109,109 @@ std::array<double,3> ecef2lla(double x, double y, double z) {
 
 }
 
-normalspack getcornernormals(string quadkey)
+normalspack getcornernormals1(string quadkey)
 {
 	normalspack corners;
 	if (quadkey.size() < 1)
 		return corners;
+
+	if (quadkey.size() > 1)
+	{
+		int x = 5;
+	}
+
+	double platenum = 32;
+	double circumference = 2 * glm::pi<double>() * 6378137.0f;
+	double mapsize = pow(2, quadkey.size()) * 256;
+
+	double x1 = 0;
+	double x2 = mapsize;
+	double y1 = 0;
+	double y2 = mapsize;
+
+
+	//2 üzeri seviye kadar en boy parça
+	for (size_t i = 0; i < quadkey.size(); i++)
+	{
+		if (quadkey[i] == 'A')
+		{
+			y2 = (y2 + y1) / 2;
+			x2 = (x2 + x1) / 2;
+		}
+		else if (quadkey[i] == 'B')
+		{
+			x1 = (x2 + x1) / 2;
+			y2 = (y2 + y1) / 2;
+		}
+		else if (quadkey[i] == 'C')
+		{
+			x2 = (x2 + x1) / 2;
+			y1 = (y2 + y1) / 2;
+		}
+		else if (quadkey[i] == 'D')
+		{
+			x1 = (x2 + x1) / 2;
+			y1 = (y2 + y1) / 2;
+		}
+	}
+
+	//2d to lat long
+	double lat1 = ytolat(circumference / mapsize * (mapsize / 2 - y1));
+	double lon1 = (360.0 / mapsize * x1) - 180;
+
+	glm::vec3 ecef = lla2ecef(lat1, lon1);
+	glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
+	corners.upperleft = topleft;
+
+
+
+
+
+	double lat2 = ytolat(circumference / mapsize * (mapsize / 2 - y1));
+	double lon2 = (360.0 / mapsize * x2) - 180;
+
+	ecef = lla2ecef(lat2, lon2);
+	glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
+	corners.upperright = topright;
+
+
+
+
+
+	double lat3 = ytolat(circumference / mapsize * (mapsize / 2 -y2));
+	double lon3 = (360.0 / mapsize * x1) - 180;
+
+
+	ecef = lla2ecef(lat3, lon3);
+	glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
+	corners.bottomleft = bottomleft;
+
+
+
+
+
+
+	double lat4 = ytolat(circumference / mapsize * (mapsize / 2 - y2));
+	double lon4 = (360.0 / mapsize * x2) - 180;
+
+
+	ecef = lla2ecef(lat4, lon4);
+	glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
+	corners.bottomright = bottomright;
+
+	
+	
+	return corners;
+}
+
+
+double getcornerdiff(string quadkey, glm::vec3 cameraPos)
+{
+	double diff = 1;
+	normalspack corners;
+
+	if (quadkey.size() < 1)
+		return diff;
 
 	if (quadkey.size() > 1)
 	{
@@ -161,8 +259,6 @@ normalspack getcornernormals(string quadkey)
 	double lat = ytolat(circumference / mapsize * (mapsize / 2 - centery));
 	double lon = (360.0 / mapsize * centerx) - 180;
 
-
-	double test = ytolat(circumference / mapsize * (-256));
 
 	float b = 6356752.3f;
 	float a = 6378137.0f;
@@ -219,8 +315,6 @@ normalspack getcornernormals(string quadkey)
 				glm::vec2 uvtopleft = { (i * xstep) / 256,  -(x * ystep) / 256 };
 				glm::vec2 uvbottomleft = { (i * xstep) / 256,  -((x + 1) * ystep) / 256 };
 				glm::vec2 uvtopright = { ((i + 1) * xstep) / 256, -(x * ystep) / 256 };
-
-
 				glm::vec2 uvbottomright = { ((i + 1) * xstep) / 256, -((x + 1) * ystep) / 256 };
 
 
@@ -243,8 +337,134 @@ normalspack getcornernormals(string quadkey)
 			}
 		}
 	}
-	return corners;
+	diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
+	diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
+	diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
+	diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
+
+	return diff;
 }
+
+
+double lon2mercx(double lon, double mapsize = 1024)
+{
+	//lon range is -180 to 180
+	return mapsize * ((lon + 180) / 360);
+}
+
+double lat2mercy(double lat, double mapsize = 1024)
+{
+	float a = 6378137.0f;
+	float b = 6356752.3f;
+
+	float e2 = 1 - ((b / a) * (b / a));
+	float e = sqrt(e2);
+
+	double phi = lat * glm::pi<double>()/180;
+
+	double sinphi = sin(phi);
+
+	double con = e * sinphi;
+
+	con = pow((1.0 - con) / (1.0 + con), e/2);
+
+	double ts = tan(0.5 * (glm::pi<double>() * 0.5 - phi)) / con;
+
+	double distance = 0 - a * log(ts);
+	double circumference = 2 * glm::pi<double>() * 6378137.0f;
+	//0 to circumference
+	distance += circumference / 2;
+	//now take the complement.
+	distance = circumference - distance;
+
+	distance = (distance / circumference) * mapsize;
+
+	//sanity check
+	distance = distance < 0 ? 0 : distance;
+	distance = distance > mapsize ? mapsize : distance;
+
+	return distance;
+}
+
+
+double getcornerdistance(string quadkey, double lat, double lon)
+{
+	double distance = 0;
+
+	if (quadkey.size() < 1)
+		return 1;
+
+	if (quadkey.size() > 1)
+	{
+		int x = 5;
+	}
+
+	double mapsize = 1024;
+
+	double x1 = 0;
+	double x2 = mapsize;
+	double y1 = 0;
+	double y2 = mapsize;
+	double mercx = lon2mercx(lon, mapsize);
+	double mercy = lat2mercy(lat, mapsize);
+
+	std::array<double, 4> distances;
+
+	//2 üzeri seviye kadar en boy parça
+	for (size_t i = 0; i < quadkey.size(); i++)
+	{
+		if (quadkey[i] == 'A')
+		{
+			y2 = (y2 + y1) / 2;
+			x2 = (x2 + x1) / 2;
+		}
+		else if (quadkey[i] == 'B')
+		{
+			x1 = (x2 + x1) / 2;
+			y2 = (y2 + y1) / 2;
+		}
+		else if (quadkey[i] == 'C')
+		{
+			x2 = (x2 + x1) / 2;
+			y1 = (y2 + y1) / 2;
+		}
+		else if (quadkey[i] == 'D')
+		{
+			x1 = (x2 + x1) / 2;
+			y1 = (y2 + y1) / 2;
+		}
+	}
+
+	double a, b;
+	
+	//topleft
+	a = x1 - mercx;
+	b = y1 - mercy;
+	distance += sqrt(pow(a, 2) + pow(b, 2));
+
+	
+	//topright
+	a = x2 - mercx;
+	b = y1 - mercy;
+	distance += sqrt(pow(a, 2) + pow(b, 2));
+
+	
+	//bottomleft
+	a = x1 - mercx;
+	b = y2 - mercy;
+	distance += sqrt(pow(a, 2) + pow(b, 2));
+
+	
+	//bottomright
+	a = x2 - mercx;
+	b = y2 - mercy;
+	distance += sqrt(pow(a, 2) + pow(b, 2));
+
+
+	return distance;
+}
+
+
 
 glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 {
@@ -269,11 +489,8 @@ quadtile::quadtile()
 
 quadtile::~quadtile()
 {
-	if (children != nullptr)
-	{
-		delete[] children;
-		children = nullptr;
-	}
+	invalidate("");
+
 	if (tm != nullptr)
 		tm.reset();
 }
@@ -328,9 +545,12 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		t.push_back(this);
 		return t;
 	}
-	
 
-	float min = 90 * 4;
+	if (zoomlevel == 2)
+	{
+		int zzz = 5;
+	}
+	float min = 90 * 400;
 	int mintile = 0;
 	string subtile = "";
 
@@ -338,11 +558,9 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	{
 		subtile = char(65 + x);
 
-		normalspack corners = getcornernormals(quadkey+subtile);
-		float diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
-		diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
-		diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
-		diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
+		//float diff = getcornerdiff(quadkey+subtile, cameraPos);
+		std::array<double, 3> lla = ecef2lla(cameraPos.x, cameraPos.y, cameraPos.z);
+		float diff = getcornerdistance(quadkey + subtile, lla[0], lla[1]);
 
 		if (diff < min)
 		{
@@ -481,7 +699,12 @@ void quadtile::buildplates()
 			double lat1 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
 			double lon1 = (360.0 / mapsize * mercx1) - 180;
 
-			glm::vec3 ecef = lla2ecef(lat1, lon1);
+			double dx = lon2mercx(lon1, mapsize);
+			double dy = lat2mercy(lat1, mapsize);
+			
+
+
+ 			glm::vec3 ecef = lla2ecef(lat1, lon1);
 			glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
 
 			double lat2 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));

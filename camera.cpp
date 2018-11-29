@@ -89,14 +89,17 @@ float getAltitude(float mapzoom) {
 qball_camera::qball_camera()
 {
 	zoomlevel = 2;
+	cameralevel = 2;
+	currot.w = 1;
+	currot.x = 0;
+	currot.y = 0;
+	currot.z = 0;
 	cdist = getAltitude(zoomlevel);
 }
 qball_camera::~qball_camera()
 {
-
 }
 
-glm::quat currot(1, 0, 0, 0);
 glm::mat4 qball_camera::getview()
 {
 	cdist = 6378137.0f + getAltitude(zoomlevel);
@@ -140,7 +143,7 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 		glm::vec3 rightaxis = glm::normalize(glm::cross(mouseaxis, up));
 		glm::vec3 rotaxis = glm::normalize(glm::cross(mouseaxis, rightaxis));
 
-		glm::quat newrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(dx, dy, 0))/((zoomlevel*10*log2f(zoomlevel)))), rotaxis);
+		glm::quat newrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(dx, dy, 0)) / (float)(2.1 * pow(2, zoomlevel - 1)) ), rotaxis);
 		currot = newrot * currot;
 
 		lastx = xpos;
