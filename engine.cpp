@@ -95,10 +95,7 @@ void engine::run()
 				std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
 
 				ss << " / lat:" << lla[0] << " lon:" << lla[1];
-
 				ss << " / x:" << to_string(cameraPos.x) << " y:" << to_string(cameraPos.y) << " z:" << to_string(cameraPos.z);
-				
-
 
 				glfwSetWindowTitle(window, ss.str().c_str());
 				timer2 = glfwGetTime();

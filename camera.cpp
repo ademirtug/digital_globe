@@ -81,7 +81,7 @@ float getAltitude(int mapzoom) {
 	switch (mapzoom)
 	{
 	case 1:
-		height = 8000000;
+		height = 18000000;
 		break;
 	case 2:
 		height = 8000000;
@@ -111,31 +111,31 @@ float getAltitude(int mapzoom) {
 		height = 50000;
 		break;
 	case 11:
-		height = 10000;
+		height = 25000;
 		break;
 	case 12:
-		height = 7000;
+		height = 13000;
 		break;
 	case 13:
-		height = 3500;
+		height = 6500;
 		break;
 	case 14:
-		height = 1500;
+		height = 3750;
 		break;
 	case 15:
-		height = 750;
+		height = 1900;
 		break;
 	case 16:
-		height = 400;
+		height = 800;
 		break;
 	case 17:
-		height = 200;
+		height = 400;
 		break;
 	case 18:
-		height = 100;
+		height = 200;
 		break;
 	case 19:
-		height = 50;
+		height = 10;
 		break;
 	default:
 		height = 50000000;
@@ -215,8 +215,8 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 void qball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	zoomlevel += yoffset;
-	zoomlevel = zoomlevel < 2 ? 2 : zoomlevel;
-	zoomlevel = zoomlevel > 19 ? 19 : zoomlevel;
+	zoomlevel = zoomlevel < 1 ? 1 : zoomlevel;
+	zoomlevel = zoomlevel > 17 ? 17 : zoomlevel;
 }
 int qball_camera::getzoomlevel()
 {

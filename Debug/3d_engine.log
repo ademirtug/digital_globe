@@ -3,10 +3,7 @@ c:\users\akn\documents\github\3d_engine\camera.cpp(55): warning C4244: 'initiali
 c:\users\akn\documents\github\3d_engine\camera.cpp(56): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\camera.cpp(57): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\camera.cpp(58): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(196): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(197): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\camera.cpp(221): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-  scene.cpp
-c:\users\akn\documents\github\3d_engine\scene.cpp(75): warning C4244: 'argument': conversion from 'float' to 'GLsizei', possible loss of data
-  Generating Code...
+c:\users\akn\documents\github\3d_engine\camera.cpp(192): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(193): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(217): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
