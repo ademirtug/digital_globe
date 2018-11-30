@@ -17,7 +17,7 @@ public:
 	int cameralevel;
 
 	virtual int getzoomlevel() { return 2; };
-	virtual glm::mat4 getview() = 0;
+	virtual glm::mat4 getview(double lat, double lon) = 0;
 	virtual glm::vec3 getpos() = 0;
 	virtual void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) = 0;
 	virtual void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) = 0;
@@ -47,7 +47,7 @@ public:
 	qball_camera();
 	~qball_camera();
 
-	glm::mat4 getview();
+	glm::mat4 getview(double lat, double lon);
 	glm::vec3 getpos();
 	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 	void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos);

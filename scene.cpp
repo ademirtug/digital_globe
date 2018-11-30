@@ -76,7 +76,10 @@ void scene::draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 projection = glm::perspective(45.0f, width/height, 100.0f, 50000000.0f);
-	glm::mat4 view = eng.sc->cam->getview();
+
+	std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
+
+	glm::mat4 view = eng.sc->cam->getview(lla[0], lla[1]);
 
 	glBindVertexArray(vao_mesh_id);
 

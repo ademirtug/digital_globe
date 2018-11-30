@@ -160,9 +160,11 @@ qball_camera::~qball_camera()
 {
 }
 
-glm::mat4 qball_camera::getview()
+glm::mat4 qball_camera::getview(double lat = 0, double lon = 0)
 {
-	cdist = 6378137.0f + getAltitude(zoomlevel);
+	glm::vec3 ecef = lla2ecef(lat, lon);
+	double groundlevel = sqrt(pow(ecef.x, 2) + pow(ecef.y, 2) + pow(ecef.z, 2));
+	cdist = groundlevel + getAltitude(zoomlevel);
 
 	return (glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -cdist)) * glm::mat4_cast(currot));
 }
