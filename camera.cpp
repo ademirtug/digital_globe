@@ -76,13 +76,73 @@ float toRadians(float degree)
 {
 	return degree * (glm::pi<float>() / 180);
 }
-float getAltitude(float mapzoom) {
-	//this equation is a transformation of the angular size equation solving for D. See: http://en.wikipedia.org/wiki/Forced_perspective
-	float googleearthaltitude;
-	float firstPartOfEq = (float)(.05 * ((591657550.5 / (pow(2, (mapzoom -2)))) / 2));//amount displayed is .05 meters and map scale =591657550.5/(Math.pow(2,(mapzoom-1))))
-																					   //this bit ^ essentially gets the h value in the angular size eq then divides it by 2
-	googleearthaltitude = (firstPartOfEq) * ((float)(cos(toRadians(85.362 / 2))) / (float)(sin(toRadians(85.362 / 2))));//85.362 is angle which google maps displays on a 5cm wide screen
-	return googleearthaltitude;
+float getAltitude(int mapzoom) {
+	float height = 0;
+	switch (mapzoom)
+	{
+	case 1:
+		height = 8000000;
+		break;
+	case 2:
+		height = 8000000;
+		break;
+	case 3:
+		height = 4000000;
+		break;
+	case 4:
+		height = 3000000;
+		break;
+	case 5:
+		height = 2000000;
+		break;
+	case 6:
+		height = 1000000;
+		break;
+	case 7:
+		height = 500000;
+		break;
+	case 8:
+		height = 250000;
+		break;
+	case 9:
+		height = 100000;
+		break;
+	case 10:
+		height = 50000;
+		break;
+	case 11:
+		height = 10000;
+		break;
+	case 12:
+		height = 7000;
+		break;
+	case 13:
+		height = 3500;
+		break;
+	case 14:
+		height = 1500;
+		break;
+	case 15:
+		height = 750;
+		break;
+	case 16:
+		height = 400;
+		break;
+	case 17:
+		height = 200;
+		break;
+	case 18:
+		height = 100;
+		break;
+	case 19:
+		height = 50;
+		break;
+	default:
+		height = 50000000;
+		break;
+	}
+
+	return height;
 }
 
 
