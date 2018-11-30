@@ -10,13 +10,6 @@ spheroid::spheroid(double _a, double _b)
 
 	if (!std::filesystem::exists("c:\\mapdata\\"))
 		std::filesystem::create_directory("c:\\mapdata\\");
-
-	//tiles.init("");
-	//for (size_t i = 0; i < 4; i++)
-	//{
-	//	shared_ptr<tilerequest> tr(new tilerequest(&tiles.children[i]));
-	//	pool.queue(tr);
-	//}
 }
 
 vector<quadtile*> spheroid::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel)

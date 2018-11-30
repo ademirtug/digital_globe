@@ -92,7 +92,7 @@ void engine::run()
 				ss << " / zoom: " << sc->cam->getzoomlevel();
 				
 				glm::vec3 cameraPos = sc->cam->getpos();
-				std::array<double, 3> lla = ecef2lla(cameraPos.x, cameraPos.y, cameraPos.z);
+				std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
 
 				ss << " / lat:" << lla[0] << " lon:" << lla[1];
 

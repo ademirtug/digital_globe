@@ -142,278 +142,68 @@ std::array<double, 3> linespheroid1(double xa, double ya, double za)
 }
 
 
-std::array<double,3> ecef2lla(double x, double y, double z) {
-
-	double b = 6356752.3f;
-	double a = 6378137.0f;
-	double e2 = 0.00669437999013;
-	std::array<double, 3> lla = { 0, 0, 0 };
-	double lat, lon, height, N, theta, p;
-
-	lon = 2 * atan((sqrt(x*x + y*y) - x) / y);
-
-	p = sqrt(x*x + y*y);
-
-	theta = atan((z * a) / (p * b));
-
-	//what the heck is this?
-	//note to myself: dont copy-paste code from internet
-	//lon = atan(y / x);
 
 
+//long live copy paste codes from internet!
+std::array<double, 3> ecef_to_geo(std::array<double,3> ecef) {
 
-	lat = atan(((z + e2*e2 * b * pow(sin(theta), 3)) / ((p - pow(e2, 2) * a * pow(cos(theta), 3)))));
-	N = a / (sqrt(1 - (pow(e2, 2) * pow(sin(lat), 2))));
+	double  a = 6378137.0;              //WGS-84 semi-major axis
+	double e2 = 6.6943799901377997e-3;  //WGS-84 first eccentricity squared
+	double a1 = 4.2697672707157535e+4;  //a1 = a*e2
+	double a2 = 1.8230912546075455e+9;  //a2 = a1*a1
+	double a3 = 1.4291722289812413e+2;  //a3 = a1*e2/2
+	double a4 = 4.5577281365188637e+9;  //a4 = 2.5*a2
+	double a5 = 4.2840589930055659e+4;  //a5 = a1+a3
+	double a6 = 9.9330562000986220e-1;  //a6 = 1-e2
+	double zp, w2, w, r2, r, s2, c2, s, c, ss;
+	double g, rg, rf, u, v, m, f, p, x, y, z;
+	double n, lat, lon, alt;
 
-	double m = (p / cos(lat));
-	height = m - N;
 
-
-	lon = lon * 180 / glm::pi<double>();
-   	lat = lat * 180 / glm::pi<double>();
-	lla[0] = lat != lat ? 0 : lat;
-	lla[1] = lon != lon ? 0 : lon;
-	lla[2] = height;
-
-
-	return lla;
-
-}
-
-normalspack getcornernormals1(string quadkey)
-{
-	normalspack corners;
-	if (quadkey.size() < 1)
-		return corners;
-
-	if (quadkey.size() > 1)
-	{
-		int x = 5;
+	std::array<double,3> geo;   //Results go here (Lat, Lon, Altitude)
+	x = ecef[0];
+	y = ecef[1];
+	z = ecef[2];
+	zp = abs(z);
+	w2 = x * x + y * y;
+	w = sqrt(w2);
+	r2 = w2 + z * z;
+	r = sqrt(r2);
+	geo[1] = atan2(y, x);       //Lon (final)
+	s2 = z * z / r2;
+	c2 = w2 / r2;
+	u = a2 / r;
+	v = a3 - a4 / r;
+	if (c2 > 0.3) {
+		s = (zp / r)*(1.0 + c2 * (a1 + u + s2 * v) / r);
+		geo[0] = asin(s);      //Lat
+		ss = s * s;
+		c = sqrt(1.0 - ss);
+	}
+	else {
+		c = (w / r)*(1.0 - s2 * (a5 - u - c2 * v) / r);
+		geo[0] = acos(c);      //Lat
+		ss = 1.0 - c * c;
+		s = sqrt(ss);
+	}
+	g = 1.0 - e2 * ss;
+	rg = a / sqrt(g);
+	rf = a6 * rg;
+	u = w - rg * c;
+	v = zp - rf * s;
+	f = c * u + s * v;
+	m = c * v - s * u;
+	p = m / (rf / g + f);
+	geo[0] = geo[0] + p;      //Lat
+	geo[2] = f + m * p / 2.0;     //Altitude
+	if (z < 0.0) {
+		geo[0] *= -1.0;     //Lat
 	}
 
-	double platenum = 32;
-	double circumference = 2 * glm::pi<double>() * 6378137.0f;
-	double mapsize = pow(2, quadkey.size()) * 256;
+	geo[0] = geo[0] * 180 / glm::pi<double>();
+	geo[1] = geo[1] * 180 / glm::pi<double>();
 
-	double x1 = 0;
-	double x2 = mapsize;
-	double y1 = 0;
-	double y2 = mapsize;
-
-
-	//2 üzeri seviye kadar en boy parça
-	for (size_t i = 0; i < quadkey.size(); i++)
-	{
-		if (quadkey[i] == 'A')
-		{
-			y2 = (y2 + y1) / 2;
-			x2 = (x2 + x1) / 2;
-		}
-		else if (quadkey[i] == 'B')
-		{
-			x1 = (x2 + x1) / 2;
-			y2 = (y2 + y1) / 2;
-		}
-		else if (quadkey[i] == 'C')
-		{
-			x2 = (x2 + x1) / 2;
-			y1 = (y2 + y1) / 2;
-		}
-		else if (quadkey[i] == 'D')
-		{
-			x1 = (x2 + x1) / 2;
-			y1 = (y2 + y1) / 2;
-		}
-	}
-
-	//2d to lat long
-	double lat1 = ytolat(circumference / mapsize * (mapsize / 2 - y1));
-	double lon1 = (360.0 / mapsize * x1) - 180;
-
-	glm::vec3 ecef = lla2ecef(lat1, lon1);
-	glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
-	corners.upperleft = topleft;
-
-
-
-
-
-	double lat2 = ytolat(circumference / mapsize * (mapsize / 2 - y1));
-	double lon2 = (360.0 / mapsize * x2) - 180;
-
-	ecef = lla2ecef(lat2, lon2);
-	glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
-	corners.upperright = topright;
-
-
-
-
-
-	double lat3 = ytolat(circumference / mapsize * (mapsize / 2 -y2));
-	double lon3 = (360.0 / mapsize * x1) - 180;
-
-
-	ecef = lla2ecef(lat3, lon3);
-	glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
-	corners.bottomleft = bottomleft;
-
-
-
-
-
-
-	double lat4 = ytolat(circumference / mapsize * (mapsize / 2 - y2));
-	double lon4 = (360.0 / mapsize * x2) - 180;
-
-
-	ecef = lla2ecef(lat4, lon4);
-	glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
-	corners.bottomright = bottomright;
-
-	
-	
-	return corners;
-}
-
-
-double getcornerdiff(string quadkey, glm::vec3 cameraPos)
-{
-	double diff = 1;
-	normalspack corners;
-
-	if (quadkey.size() < 1)
-		return diff;
-
-	if (quadkey.size() > 1)
-	{
-		int x = 5;
-	}
-
-	double platenum = 32;
-	double circumference = 2 * glm::pi<double>() * 6378137.0f;
-	double mapsize = pow(2, quadkey.size()) * 256;
-
-	double x1 = 0;
-	double x2 = mapsize;
-	double y1 = 0;
-	double y2 = mapsize;
-
-
-	//2 üzeri seviye kadar en boy parça
-	for (size_t i = 0; i < quadkey.size(); i++)
-	{
-		if (quadkey[i] == 'A')
-		{
-			y2 = (y2 + y1) / 2;
-			x2 = (x2 + x1) / 2;
-		}
-		else if (quadkey[i] == 'B')
-		{
-			x1 = (x2 + x1) / 2;
-			y2 = (y2 + y1) / 2;
-		}
-		else if (quadkey[i] == 'C')
-		{
-			x2 = (x2 + x1) / 2;
-			y1 = (y2 + y1) / 2;
-		}
-		else if (quadkey[i] == 'D')
-		{
-			x1 = (x2 + x1) / 2;
-			y1 = (y2 + y1) / 2;
-		}
-	}
-
-	double centerx = (x2 + x1) / 2;
-	double centery = (y2 + y1) / 2;
-
-	double lat = ytolat(circumference / mapsize * (mapsize / 2 - centery));
-	double lon = (360.0 / mapsize * centerx) - 180;
-
-
-	float b = 6356752.3f;
-	float a = 6378137.0f;
-	float e2 = 1 - ((b*b) / (a*a));
-	float e = sqrt(e2);
-
-	double xstep = (x2 - x1) / platenum;
-	double ystep = (y2 - y1) / platenum;
-
-	//make a clean algo for this;
-	for (size_t x = 0; x < platenum; x++)
-	{
-		for (size_t i = 0; i < platenum; i++)
-		{
-			if ((x == 0 && i == 0) || (x == 0 && i == (platenum - 1)) || (x == (platenum - 1) && i == 0) || (x == (platenum - 1) && i == (platenum - 1)))
-			{
-				double mercx1 = x1 + i * xstep;
-				double mercx2 = x1 + (i + 1) * xstep;
-
-				double mercy1 = y1 + x * ystep;
-				double mercy2 = y1 + (x + 1) * ystep;
-
-
-				//2d to lat long
-				double lat1 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
-				double lon1 = (360.0 / mapsize * mercx1) - 180;
-
-				glm::vec3 ecef = lla2ecef(lat1, lon1);
-				glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
-
-
-				double lat2 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
-				double lon2 = (360.0 / mapsize * mercx2) - 180;
-
-				ecef = lla2ecef(lat2, lon2);
-				glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
-
-
-				double lat3 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
-				double lon3 = (360.0 / mapsize * mercx1) - 180;
-
-
-				ecef = lla2ecef(lat3, lon3);
-				glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
-
-				double lat4 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
-				double lon4 = (360.0 / mapsize * mercx2) - 180;
-
-
-				ecef = lla2ecef(lat4, lon4);
-				glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
-
-
-				glm::vec2 uvtopleft = { (i * xstep) / 256,  -(x * ystep) / 256 };
-				glm::vec2 uvbottomleft = { (i * xstep) / 256,  -((x + 1) * ystep) / 256 };
-				glm::vec2 uvtopright = { ((i + 1) * xstep) / 256, -(x * ystep) / 256 };
-				glm::vec2 uvbottomright = { ((i + 1) * xstep) / 256, -((x + 1) * ystep) / 256 };
-
-
-				if (x == 0 && i == 0)
-				{
-					corners.upperleft = calc_normal(topleft, bottomleft, topright);
-				}
-				if (x == 0 && i == (platenum - 1))
-				{
-					corners.bottomleft = calc_normal(bottomleft, topright, topleft);
-				}
-				if (x == (platenum - 1) && i == 0)
-				{
-					corners.upperright = calc_normal(topright, topleft, bottomleft);
-				}
-				if (x == (platenum - 1) && i == (platenum - 1))
-				{
-					corners.bottomright = calc_normal(bottomright, topright, bottomleft);
-				}
-			}
-		}
-	}
-	diff = (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomleft)));
-	diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.bottomright)));
-	diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperleft)));
-	diff += (180 / glm::pi<float>()) * acos(glm::dot(glm::normalize(cameraPos), glm::normalize(corners.upperright)));
-
-	return diff;
+	return(geo);    //Return Lat, Lon, Altitude in that order
 }
 
 
@@ -636,8 +426,9 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		subtile = char(65 + x);
 
 		//float diff = getcornerdiff(quadkey+subtile, cameraPos);
-		std::array<double, 3> lla = ecef2lla(cameraPos.x, cameraPos.y, cameraPos.z);
-		
+		//std::array<double, 3> lla = ecef2lla(cameraPos.x, cameraPos.y, cameraPos.z);
+		std::array<double, 3> lla  = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
+
 		//std::array<double, 3> _xyz = linespheroid1(cameraPos.x, cameraPos.y, cameraPos.z);
 		//std::array<double, 3> lla2 = ecef2lla(_xyz[0], _xyz[1], _xyz[2]);
 
@@ -835,23 +626,6 @@ void quadtile::buildplates()
 			normals.push_back(calc_normal(bottomleft, bottomright, topright));//bottomleft
 			normals.push_back(calc_normal(bottomright, topright, bottomleft));//bottomright
 			normals.push_back(calc_normal(topright, bottomleft, bottomright));//topright
-
-			if (x == 0 && i == 0)
-			{
-				corners.upperleft = calc_normal(topleft, bottomleft, topright);
-			}
-			if (x == 0 && i == (platenum - 1))
-			{
-				corners.bottomleft = calc_normal(bottomleft, topright, topleft);
-			}
-			if (x == (platenum - 1) && i == 0)
-			{
-				corners.upperright = calc_normal(topright, topleft, bottomleft);
-			}
-			if (x == (platenum - 1) && i == (platenum - 1))
-			{
-				corners.bottomright = calc_normal(bottomright, topright, bottomleft);
-			}
 		}
 	}
 
