@@ -89,7 +89,16 @@ void engine::run()
 			{
 				std::stringstream ss;
 				ss << "3d_engine - fps: " << fps;
-				ss << "---- zoom: " << sc->cam->getzoomlevel();
+				ss << " / zoom: " << sc->cam->getzoomlevel();
+				
+				glm::vec3 cameraPos = sc->cam->getpos();
+				std::array<double, 3> lla = ecef2lla(cameraPos.x, cameraPos.y, cameraPos.z);
+
+				ss << " / lat:" << lla[0] << " lon:" << lla[1];
+
+				ss << " / x:" << to_string(cameraPos.x) << " y:" << to_string(cameraPos.y) << " z:" << to_string(cameraPos.z);
+				
+
 
 				glfwSetWindowTitle(window, ss.str().c_str());
 				timer2 = glfwGetTime();

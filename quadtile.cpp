@@ -75,6 +75,73 @@ double N(double phi)
 	return a*a / sqrt(a*a * cos(phi)*cos(phi) + b*b*sin(phi)* sin(phi));
 }
 
+
+std::array<double, 3> linespheroid1(double xa, double ya, double za)
+{
+
+	double a = 6371008.7714;
+	double b = 6371008.7714;
+	double c = 6356752.314245;
+
+	double x = 0;
+	double y = 0;
+	double z = 0;
+
+	double u = -xa;
+	double v = ya;
+	double w = -za;
+
+	double value = -pow(a, 2) * pow(b, 2) * w*z - pow(a, 2) * pow(c, 2) * v*y - pow(b, 2) * pow(c, 2) * u*x;
+	double radical = pow(a, 2) * pow(b, 2) * pow(w, 2) + pow(a, 2) * pow(c, 2) * pow(v, 2) - pow(a, 2) * pow(v, 2) * pow(z,2) + 2 * pow(a, 2) * v*w*y*z - pow(a, 2) * pow(w, 2) * pow(y,2) + pow(b, 2) * pow(c, 2) * pow(u, 2) - pow(b, 2) * pow(u, 2) * pow(z,2) + 2 * pow(b, 2) * u*w*x*z - pow(b, 2) * pow(w, 2) * pow(x,2) - pow(c, 2) * pow(u, 2) * pow(y,2) + 2 * pow(c, 2) * u*v*x*y - pow(c, 2) * pow(v, 2) * pow(x,2);
+	double magnitude = pow(a, 2) * pow(b, 2) * pow(w, 2) + pow(a, 2) * pow(c, 2) * pow(v, 2) + pow(b, 2) * pow(c, 2) * pow(u, 2);
+
+
+	//	if radical < 0:
+	//raise ValueError("The Line-of-Sight vector does not point toward the Earth")
+	double	d = (value - a * b*c* sqrt(radical)) / magnitude;
+
+	//	if d < 0 :
+	//		raise ValueError("The Line-of-Sight vector does not point toward the Earth")
+
+	//		return np.array([
+	//			x + d * u,
+	//				y + d * v,
+	//				z + d * w,
+	//		])
+
+	std::array<double, 3> lla = { x + d * u , y + d * v, z + d * w };
+	return lla;
+
+
+
+
+
+
+
+
+
+	//double x0 = xa;
+	//double y0 = ya;
+	//double z0 = za;
+	//double k = 1;
+	//double l = 1;
+	//double a = 6378137.0;//x - y
+	//double b = 6378137.0;//x - y
+	//double c = 6356752.3;//z
+	//double x = x0 + (-pow(a, 2)*pow(b, 2)*l*z0 - pow(a, 2)*pow(c, 2)*k*y0 - pow(b, 2)*pow(c, 2)*x0 + sqrt(pow(a, 2)*pow(b, 2)*pow(c, 2)*(pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) - pow(a, 2)*pow(k, 2)*pow(z0, 2) + 2 * pow(a, 2)*k*l*y0*z0 - pow(a, 2)*pow(l, 2)*pow(y0, 2) + pow(b, 2)*pow(c, 2) - pow(b, 2)*pow(l, 2)*pow(x0, 2) + 2 * pow(b, 2)*l*x0*z0 - pow(b, 2)*pow(z0, 2) - pow(c, 2)*pow(k, 2)*pow(x0, 2) + 2 * pow(c, 2)*k*x0*y0 - pow(c, 2)*pow(y0, 2)))) / (pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) + pow(b, 2)*pow(c, 2));
+	//double y = k * (-pow(a, 2)*pow(b, 2)*l*z0 - pow(a, 2)*pow(c, 2)*k*y0 - pow(b, 2)*pow(c, 2)*x0 + sqrt(pow(a, 2)*pow(b, 2)*pow(c, 2)*(pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) - pow(a, 2)*pow(k, 2)*pow(z0, 2) + 2 * pow(a, 2)*k*l*y0*z0 - pow(a, 2)*pow(l, 2)*pow(y0, 2) + pow(b, 2)*pow(c, 2) - pow(b, 2)*pow(l, 2)*pow(x0, 2) + 2 * pow(b, 2)*l*x0*z0 - pow(b, 2)*pow(z0, 2) - pow(c, 2)*pow(k, 2)*pow(x0, 2) + 2 * pow(c, 2)*k*x0*y0 - pow(c, 2)*pow(y0, 2)))) / (pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) + pow(b, 2)*pow(c, 2)) + y0;
+	//double z = l * (-pow(a, 2)*pow(b, 2)*l*z0 - pow(a, 2)*pow(c, 2)*k*y0 - pow(b, 2)*pow(c, 2)*x0 + sqrt(pow(a, 2)*pow(b, 2)*pow(c, 2)*(pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) - pow(a, 2)*pow(k, 2)*pow(z0, 2) + 2 * pow(a, 2)*k*l*y0*z0 - pow(a, 2)*pow(l, 2)*pow(y0, 2) + pow(b, 2)*pow(c, 2) - pow(b, 2)*pow(l, 2)*pow(x0, 2) + 2 * pow(b, 2)*l*x0*z0 - pow(b, 2)*pow(z0, 2) - pow(c, 2)*pow(k, 2)*pow(x0, 2) + 2 * pow(c, 2)*k*x0*y0 - pow(c, 2)*pow(y0, 2)))) / (pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) + pow(b, 2)*pow(c, 2)) + z0;
+
+	//std::array<double, 3> lla;
+
+	//lla[0] = x;
+	//lla[1] = y;
+	//lla[2] = z;
+
+	//return lla;
+}
+
+
 std::array<double,3> ecef2lla(double x, double y, double z) {
 
 	double b = 6356752.3f;
@@ -89,7 +156,11 @@ std::array<double,3> ecef2lla(double x, double y, double z) {
 
 	theta = atan((z * a) / (p * b));
 
-	lon = atan(y / x);
+	//what the heck is this?
+	//note to myself: dont copy-paste code from internet
+	//lon = atan(y / x);
+
+
 
 	lat = atan(((z + e2*e2 * b * pow(sin(theta), 3)) / ((p - pow(e2, 2) * a * pow(cos(theta), 3)))));
 	N = a / (sqrt(1 - (pow(e2, 2) * pow(sin(lat), 2))));
@@ -99,7 +170,7 @@ std::array<double,3> ecef2lla(double x, double y, double z) {
 
 
 	lon = lon * 180 / glm::pi<double>();
-	lat = lat * 180 / glm::pi<double>();
+   	lat = lat * 180 / glm::pi<double>();
 	lla[0] = lat != lat ? 0 : lat;
 	lla[1] = lon != lon ? 0 : lon;
 	lla[2] = height;
@@ -354,6 +425,10 @@ double lon2mercx(double lon, double mapsize = 1024)
 
 double lat2mercy(double lat, double mapsize = 1024)
 {
+	if (lat < -85.08)
+		lat = -85.08;
+
+
 	float a = 6378137.0f;
 	float b = 6356752.3f;
 
@@ -562,6 +637,10 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 
 		//float diff = getcornerdiff(quadkey+subtile, cameraPos);
 		std::array<double, 3> lla = ecef2lla(cameraPos.x, cameraPos.y, cameraPos.z);
+		
+		//std::array<double, 3> _xyz = linespheroid1(cameraPos.x, cameraPos.y, cameraPos.z);
+		//std::array<double, 3> lla2 = ecef2lla(_xyz[0], _xyz[1], _xyz[2]);
+
 		float diff = getcornerdistance(quadkey + subtile, lla[0], lla[1]);
 
 		if (diff < min)
