@@ -163,6 +163,7 @@ qball_camera::~qball_camera()
 glm::mat4 qball_camera::getview(double lat = 0, double lon = 0)
 {
 	glm::vec3 ecef = lla2ecef(lat, lon);
+	//calculate ground level ecef by latitude
 	double groundlevel = sqrt(pow(ecef.x, 2) + pow(ecef.y, 2) + pow(ecef.z, 2));
 	cdist = groundlevel + getAltitude(zoomlevel);
 
@@ -205,7 +206,7 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 		glm::vec3 rightaxis = glm::normalize(glm::cross(mouseaxis, up));
 		glm::vec3 rotaxis = glm::normalize(glm::cross(mouseaxis, rightaxis));
 
-		glm::quat newrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(dx, dy, 0)) / (float)(2.1 * pow(2, zoomlevel - 1)) ), rotaxis);
+		glm::quat newrot = glm::angleAxis(glm::radians(glm::length(glm::vec3(dx, dy, 0)) / (float)(4.1 * pow(2, zoomlevel - 1)) ), rotaxis);
 		currot = newrot * currot;
 
 		lastx = xpos;
