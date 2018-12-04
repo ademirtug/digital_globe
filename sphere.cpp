@@ -14,7 +14,7 @@ spheroid::spheroid(double _a, double _b)
 
 vector<quadtile*> spheroid::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel)
 {
-	vector<quadtile*> dt = tiles.calculatesubtiles(cameraPos, zoomlevel);
+	vector<quadtile*> dt = tiles.calculatesubtiles1(cameraPos, zoomlevel);
 
 	for (auto tt : dt)
 	{

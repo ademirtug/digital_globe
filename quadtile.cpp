@@ -149,8 +149,7 @@ double lat2mercy(double lat, double mapsize = 1024)
 {
 	if (lat < -85.08)
 		lat = -85.08;
-
-
+	
 	float a = 6378137.0f;
 	float b = 6356752.3f;
 
@@ -158,9 +157,7 @@ double lat2mercy(double lat, double mapsize = 1024)
 	float e = sqrt(e2);
 
 	double phi = lat * glm::pi<double>()/180;
-
 	double sinphi = sin(phi);
-
 	double con = e * sinphi;
 
 	con = pow((1.0 - con) / (1.0 + con), e/2);
@@ -257,7 +254,6 @@ double getcornerdistance(string quadkey, double lat, double lon)
 	b = y2 - mercy;
 	distance += sqrt(pow(a, 2) + pow(b, 2));
 
-
 	return distance;
 }
 
@@ -335,19 +331,12 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 {
 	//everytile represented by its own subtiles
 	//so root yields four subtile; A B C D
-
 	if (( zoomlevel ) == quadkey.size())
 	{
 		vector<quadtile*> t;
 		t.push_back(this);
 		return t;
 	}
-
-	if (zoomlevel == 2)
-	{
-		int zzz = 5;
-	}
-
 
 	float min = 90 * 400;
 	int mintile = 0;
@@ -441,12 +430,6 @@ vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomleve
 		return t;
 	}
 
-	if (zoomlevel == 2)
-	{
-		int zzz = 5;
-	}
-
-
 	float min = 90 * 400;
 	int mintile = 0;
 	string subtile = "";
@@ -454,9 +437,6 @@ vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomleve
 	for (size_t x = 0; x < 4; x++)
 	{
 		subtile = char(65 + x);
-
-		//float diff = getcornerdiff(quadkey+subtile, cameraPos);
-		//std::array<double, 3> lla = ecef2lla
 		std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
 		float diff = getcornerdistance(quadkey + subtile, lla[0], lla[1]);
 
@@ -504,8 +484,6 @@ vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomleve
 
 	return t;
 }
-
-
 
 
 
