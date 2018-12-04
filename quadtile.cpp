@@ -76,74 +76,6 @@ double N(double phi)
 }
 
 
-std::array<double, 3> linespheroid1(double xa, double ya, double za)
-{
-
-	double a = 6371008.7714;
-	double b = 6371008.7714;
-	double c = 6356752.314245;
-
-	double x = 0;
-	double y = 0;
-	double z = 0;
-
-	double u = -xa;
-	double v = ya;
-	double w = -za;
-
-	double value = -pow(a, 2) * pow(b, 2) * w*z - pow(a, 2) * pow(c, 2) * v*y - pow(b, 2) * pow(c, 2) * u*x;
-	double radical = pow(a, 2) * pow(b, 2) * pow(w, 2) + pow(a, 2) * pow(c, 2) * pow(v, 2) - pow(a, 2) * pow(v, 2) * pow(z,2) + 2 * pow(a, 2) * v*w*y*z - pow(a, 2) * pow(w, 2) * pow(y,2) + pow(b, 2) * pow(c, 2) * pow(u, 2) - pow(b, 2) * pow(u, 2) * pow(z,2) + 2 * pow(b, 2) * u*w*x*z - pow(b, 2) * pow(w, 2) * pow(x,2) - pow(c, 2) * pow(u, 2) * pow(y,2) + 2 * pow(c, 2) * u*v*x*y - pow(c, 2) * pow(v, 2) * pow(x,2);
-	double magnitude = pow(a, 2) * pow(b, 2) * pow(w, 2) + pow(a, 2) * pow(c, 2) * pow(v, 2) + pow(b, 2) * pow(c, 2) * pow(u, 2);
-
-
-	//	if radical < 0:
-	//raise ValueError("The Line-of-Sight vector does not point toward the Earth")
-	double	d = (value - a * b*c* sqrt(radical)) / magnitude;
-
-	//	if d < 0 :
-	//		raise ValueError("The Line-of-Sight vector does not point toward the Earth")
-
-	//		return np.array([
-	//			x + d * u,
-	//				y + d * v,
-	//				z + d * w,
-	//		])
-
-	std::array<double, 3> lla = { x + d * u , y + d * v, z + d * w };
-	return lla;
-
-
-
-
-
-
-
-
-
-	//double x0 = xa;
-	//double y0 = ya;
-	//double z0 = za;
-	//double k = 1;
-	//double l = 1;
-	//double a = 6378137.0;//x - y
-	//double b = 6378137.0;//x - y
-	//double c = 6356752.3;//z
-	//double x = x0 + (-pow(a, 2)*pow(b, 2)*l*z0 - pow(a, 2)*pow(c, 2)*k*y0 - pow(b, 2)*pow(c, 2)*x0 + sqrt(pow(a, 2)*pow(b, 2)*pow(c, 2)*(pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) - pow(a, 2)*pow(k, 2)*pow(z0, 2) + 2 * pow(a, 2)*k*l*y0*z0 - pow(a, 2)*pow(l, 2)*pow(y0, 2) + pow(b, 2)*pow(c, 2) - pow(b, 2)*pow(l, 2)*pow(x0, 2) + 2 * pow(b, 2)*l*x0*z0 - pow(b, 2)*pow(z0, 2) - pow(c, 2)*pow(k, 2)*pow(x0, 2) + 2 * pow(c, 2)*k*x0*y0 - pow(c, 2)*pow(y0, 2)))) / (pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) + pow(b, 2)*pow(c, 2));
-	//double y = k * (-pow(a, 2)*pow(b, 2)*l*z0 - pow(a, 2)*pow(c, 2)*k*y0 - pow(b, 2)*pow(c, 2)*x0 + sqrt(pow(a, 2)*pow(b, 2)*pow(c, 2)*(pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) - pow(a, 2)*pow(k, 2)*pow(z0, 2) + 2 * pow(a, 2)*k*l*y0*z0 - pow(a, 2)*pow(l, 2)*pow(y0, 2) + pow(b, 2)*pow(c, 2) - pow(b, 2)*pow(l, 2)*pow(x0, 2) + 2 * pow(b, 2)*l*x0*z0 - pow(b, 2)*pow(z0, 2) - pow(c, 2)*pow(k, 2)*pow(x0, 2) + 2 * pow(c, 2)*k*x0*y0 - pow(c, 2)*pow(y0, 2)))) / (pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) + pow(b, 2)*pow(c, 2)) + y0;
-	//double z = l * (-pow(a, 2)*pow(b, 2)*l*z0 - pow(a, 2)*pow(c, 2)*k*y0 - pow(b, 2)*pow(c, 2)*x0 + sqrt(pow(a, 2)*pow(b, 2)*pow(c, 2)*(pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) - pow(a, 2)*pow(k, 2)*pow(z0, 2) + 2 * pow(a, 2)*k*l*y0*z0 - pow(a, 2)*pow(l, 2)*pow(y0, 2) + pow(b, 2)*pow(c, 2) - pow(b, 2)*pow(l, 2)*pow(x0, 2) + 2 * pow(b, 2)*l*x0*z0 - pow(b, 2)*pow(z0, 2) - pow(c, 2)*pow(k, 2)*pow(x0, 2) + 2 * pow(c, 2)*k*x0*y0 - pow(c, 2)*pow(y0, 2)))) / (pow(a, 2)*pow(b, 2)*pow(l, 2) + pow(a, 2)*pow(c, 2)*pow(k, 2) + pow(b, 2)*pow(c, 2)) + z0;
-
-	//std::array<double, 3> lla;
-
-	//lla[0] = x;
-	//lla[1] = y;
-	//lla[2] = z;
-
-	//return lla;
-}
-
-
-
-
 //long live copy paste codes from internet!
 std::array<double, 3> ecef_to_geo(std::array<double,3> ecef) {
 
@@ -158,7 +90,7 @@ std::array<double, 3> ecef_to_geo(std::array<double,3> ecef) {
 	double zp, w2, w, r2, r, s2, c2, s, c, ss;
 	double g, rg, rf, u, v, m, f, p, x, y, z;
 	double n, lat, lon, alt;
-
+	
 
 	std::array<double,3> geo;   //Results go here (Lat, Lon, Altitude)
 	x = ecef[0];
@@ -420,18 +352,112 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	float min = 90 * 400;
 	int mintile = 0;
 	string subtile = "";
+	std::array<double, 4> distances;
+	
+
+	for (size_t x = 0; x < 4; x++)
+	{
+		subtile = char(65 + x);
+
+		std::array<double, 3> lla  = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
+		float diff = getcornerdistance(quadkey + subtile, lla[0], lla[1]);
+		
+		distances[x] = diff;
+
+		if (diff < min)
+		{
+			mintile = x;
+			min = diff;
+		}
+	}
+
+	vector<int> closetiles;
+	for (size_t x = 0; x < 4; x++)
+	{
+		if ((min * 1.3) > distances[x])
+		{
+			//close to mintile or itself
+			closetiles.push_back(x);
+		}
+	}
+	
+	//ok we now know that user has zoomed to mintile, now the rest should be invalidated
+	//because we don't want them to cumulate and fill up all the memory the computer have
+	vector<quadtile*> t;
+
+	if (children == nullptr)
+		initchildren(quadkey);
+
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		string ct = "";
+		ct = ((char)(65 + i));
+
+		if (!children[i].requested)
+		{
+			eng.sc->earth->pool.queue(shared_ptr<tilerequest>(new tilerequest(quadkey + ct)));
+			children[i].requested = true;
+		}
+
+		bool found = false;
+		for (auto ct : closetiles)
+		{
+			if (i == ct)
+			{
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+		{
+			//destroy its children and add it to list
+			children[i].invalidate("");
+			t.push_back(&children[i]);
+		}
+	}
+
+
+	//now lets go deeper in mintile and figure out which subtiles are needed to be shown
+	//if the subchildren are not loaded completely then the tile displays itself instead
+	for (auto ct : closetiles)
+	{
+		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel);
+		t.insert(t.end(), subtiles.begin(), subtiles.end());
+	}
+	return t;
+}
+
+
+vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel)
+{
+	//everytile represented by its own subtiles
+	//so root yields four subtile; A B C D
+
+	if ((zoomlevel) == quadkey.size())
+	{
+		vector<quadtile*> t;
+		t.push_back(this);
+		return t;
+	}
+
+	if (zoomlevel == 2)
+	{
+		int zzz = 5;
+	}
+
+
+	float min = 90 * 400;
+	int mintile = 0;
+	string subtile = "";
 
 	for (size_t x = 0; x < 4; x++)
 	{
 		subtile = char(65 + x);
 
 		//float diff = getcornerdiff(quadkey+subtile, cameraPos);
-		//std::array<double, 3> lla = ecef2lla(cameraPos.x, cameraPos.y, cameraPos.z);
-		std::array<double, 3> lla  = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
-
-		//std::array<double, 3> _xyz = linespheroid1(cameraPos.x, cameraPos.y, cameraPos.z);
-		//std::array<double, 3> lla2 = ecef2lla(_xyz[0], _xyz[1], _xyz[2]);
-
+		//std::array<double, 3> lla = ecef2lla
+		std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
 		float diff = getcornerdistance(quadkey + subtile, lla[0], lla[1]);
 
 		if (diff < min)
@@ -478,6 +504,10 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 
 	return t;
 }
+
+
+
+
 
 void quadtile::invalidate(string tile)
 {

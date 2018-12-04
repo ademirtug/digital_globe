@@ -12,7 +12,6 @@ int main()
 	bool  status = eng.init(1024, 768);
 	eng.maxfps = 25;
 
-
 	eng.sc->generate_shaders();
 	eng.run();
 
