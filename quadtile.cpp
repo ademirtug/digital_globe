@@ -327,6 +327,67 @@ quadtile* quadtile::gettile(string tile)
 	return child->gettile(tile.substr(1));
 }
 
+double getdelta(int zoomlevel)
+{
+	//find a formula for this?
+	//or handcraft?
+	switch (zoomlevel)
+	{
+	case 1:
+		return 2.0;
+		break;
+	case 2:
+		return 2.0;
+		break;
+	case 3:
+		return 1.5;
+		break;
+	case 4:
+		return 1.4;
+		break;
+	case 5:
+		return 1.3;
+		break;
+	case 6:
+		return 1.3;
+		break;
+	case 7:
+		return 1.1;
+		break;
+	case 8:
+		return 1.06;
+		break;
+	case 9:
+		return 1.05;
+		break;
+	case 10:
+		return 1.04;
+		break;
+	case 11:
+		return 1.03;
+		break;
+	case 12:
+		return 1.02;
+		break;
+	case 13:
+		return 1.01;
+		break;
+	case 14:
+		return 1.0;
+		break;
+	case 15:
+		return 1.0;
+		break;
+	case 16:
+		return 1.0;
+		break;
+	default:
+		return 1.0;
+		break;
+	}
+}
+
+
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
 	//everytile represented by its own subtiles
@@ -410,7 +471,7 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	//if the subchildren are not loaded completely then the tile displays itself instead
 	for (auto ct : closetiles)
 	{
-		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, ct == mintile ? delta : (1.0 + 0.2/pow(2, zoomlevel)));
+		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, ct == mintile ? delta : getdelta(zoomlevel)/*(1.0 + 0.25/log2(zoomlevel))*/  );
 		t.insert(t.end(), subtiles.begin(), subtiles.end());
 	}
 	return t;
