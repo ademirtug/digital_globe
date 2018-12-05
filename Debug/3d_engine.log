@@ -9,7 +9,8 @@ c:\users\akn\documents\github\3d_engine\quadtile.cpp(92): warning C4101: 'n': un
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(205): warning C4101: 'distances': unreferenced local variable
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(302): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(352): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(441): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(413): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(440): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(552): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(568): warning C4018: '<': signed/unsigned mismatch
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(570): warning C4018: '<': signed/unsigned mismatch

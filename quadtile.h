@@ -28,7 +28,7 @@ public:
 
 	shared_ptr<texturemesh> tm;
 	wstring fname;
-	int platenum;
+	int platebase;
 	double lat_center = 0;
 	double lon_center = 0;
 
@@ -39,8 +39,8 @@ public:
 
 	quadtile* getchild(char c);
 	quadtile* gettile(string tile);
-	vector<quadtile*> calculatesubtiles(glm::vec3 cameraPos, int zoomlevel);
-	vector<quadtile*> calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel);
+	vector<quadtile*> calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta = 1.2f);
+	vector<quadtile*> calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta = 1.2f);
 	void invalidate(string tile);
 	void buildplates();
 	

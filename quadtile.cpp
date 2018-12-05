@@ -277,7 +277,7 @@ glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 quadtile::quadtile()
 {
 	children = nullptr;	
-	platenum = 32;
+	platebase = 16;
 }
 
 quadtile::~quadtile()
@@ -327,7 +327,7 @@ quadtile* quadtile::gettile(string tile)
 	return child->gettile(tile.substr(1));
 }
 
-vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel)
+vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
 	//everytile represented by its own subtiles
 	//so root yields four subtile; A B C D
@@ -363,7 +363,7 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	vector<int> closetiles;
 	for (size_t x = 0; x < 4; x++)
 	{
-		if ((min * 1.3) > distances[x])
+		if ((min * delta) >= distances[x])
 		{
 			//close to mintile or itself
 			closetiles.push_back(x);
@@ -406,19 +406,18 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		}
 	}
 
-
 	//now lets go deeper in mintile and figure out which subtiles are needed to be shown
 	//if the subchildren are not loaded completely then the tile displays itself instead
 	for (auto ct : closetiles)
 	{
-		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel);
+		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, ct == mintile ? delta : (1.0 + 0.2/pow(2, zoomlevel)));
 		t.insert(t.end(), subtiles.begin(), subtiles.end());
 	}
 	return t;
 }
 
 
-vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel)
+vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
 	//everytile represented by its own subtiles
 	//so root yields four subtile; A B C D
@@ -486,7 +485,6 @@ vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomleve
 }
 
 
-
 void quadtile::invalidate(string tile)
 {
 	if (tile.size() == 0)
@@ -511,6 +509,8 @@ void quadtile::buildplates()
 {
 	if (quadkey.size() < 1)
 		return;
+
+	int platenum = platebase - quadkey.size() > 4 ? platebase - quadkey.size() : 4;
 
 	double circumference = 2 * glm::pi<double>() * 6378137.0f;
 	double mapsize = pow(2, quadkey.size()) * 256;
@@ -647,6 +647,7 @@ void quadtile::buildplates()
 
 	if (!std::filesystem::exists("C:\\mapdata\\" + quadkey + ".bmp"))
 	{
+		cout << "requested: " << quadkey << endl;
 		http_client hc;
 		vector<unsigned char> png = hc.get_binary_page(req);
 		GdiplusStartupInput gdiplusStartupInput;
