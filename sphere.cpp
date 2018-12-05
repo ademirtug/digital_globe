@@ -16,12 +16,7 @@ vector<quadtile*> spheroid::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel
 {
 	vector<quadtile*> dt = tiles.calculatesubtiles(cameraPos, zoomlevel);
 
-	for (auto tt : dt)
-	{
-		rtiles.insert(tt->quadkey);
-	}
-
-	//attach all loaded tile
+	//attach all loaded tiles
 	unique_lock<std::mutex> lk(mxpreparedtiles);
 	for (auto pt : preparedtiles)
 	{
