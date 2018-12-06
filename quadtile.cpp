@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "quadtile.h"
-#include "sphere.h";
+#include "sphere.h"
 #include <filesystem>
 
 
@@ -340,16 +340,16 @@ double getdelta(int zoomlevel)
 		return 2.0;
 		break;
 	case 3:
-		return 1.5;
+		return 2.0;
 		break;
 	case 4:
 		return 1.4;
 		break;
 	case 5:
-		return 1.3;
+		return 1.2;
 		break;
 	case 6:
-		return 1.3;
+		return 1.15;
 		break;
 	case 7:
 		return 1.1;
@@ -358,28 +358,7 @@ double getdelta(int zoomlevel)
 		return 1.06;
 		break;
 	case 9:
-		return 1.05;
-		break;
-	case 10:
-		return 1.04;
-		break;
-	case 11:
-		return 1.03;
-		break;
-	case 12:
 		return 1.02;
-		break;
-	case 13:
-		return 1.01;
-		break;
-	case 14:
-		return 1.0;
-		break;
-	case 15:
-		return 1.0;
-		break;
-	case 16:
-		return 1.0;
 		break;
 	default:
 		return 1.0;
@@ -467,8 +446,8 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		}
 	}
 
-	//now lets go deeper in mintile and figure out which subtiles are needed to be shown
-	//if the subchildren are not loaded completely then the tile displays itself instead
+	//now lets go deeper in mintile and qualified closest tiles and figure out which subtiles are needed to be shown
+	//if the subchildren are not loaded completely then the tile should displays itself instead, or we get black areas when loading
 	for (auto ct : closetiles)
 	{
 		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, ct == mintile ? delta : getdelta(zoomlevel)/*(1.0 + 0.25/log2(zoomlevel))*/  );
