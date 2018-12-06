@@ -217,7 +217,7 @@ void qball_camera::mouse_wheel_callback(GLFWwindow* window, double xoffset, doub
 {
 	zoomlevel += yoffset;
 	zoomlevel = zoomlevel < 1 ? 1 : zoomlevel;
-	zoomlevel = zoomlevel > 17 ? 17 : zoomlevel;
+	zoomlevel = zoomlevel > 16 ? 16 : zoomlevel;
 }
 int qball_camera::getzoomlevel()
 {

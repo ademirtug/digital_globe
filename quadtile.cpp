@@ -345,21 +345,6 @@ double getdelta(int zoomlevel)
 	case 4:
 		return 1.4;
 		break;
-	case 5:
-		return 1.2;
-		break;
-	case 6:
-		return 1.15;
-		break;
-	case 7:
-		return 1.1;
-		break;
-	case 8:
-		return 1.06;
-		break;
-	case 9:
-		return 1.02;
-		break;
 	default:
 		return 1.0;
 		break;
@@ -516,7 +501,7 @@ vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomleve
 
 
 	//now lets go deeper in mintile and figure out which subtiles are needed to be shown
-	//if the subchildren are not loaded completely then the tile displays itself instead
+	//if the subchildren have not loaded completely then the tile should displays itself instead
 	vector<quadtile*> subtiles = children[mintile].calculatesubtiles(cameraPos, zoomlevel);
 
 	t.insert(t.end(), subtiles.begin(), subtiles.end());
