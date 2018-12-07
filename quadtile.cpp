@@ -740,6 +740,7 @@ void quadtile::buildplates()
 		int ff = 5;
 
 	}
+
 	double centerx = (x2 + x1) / 2;
 	double centery = (y2 + y1) / 2;
 
@@ -798,7 +799,7 @@ void quadtile::buildplates()
 			vertices.push_back(bottomleft);
 			vertices.push_back(topright);
 
-
+		
 			glm::vec2 uvtopleft = { (x * xstep) / 256.0,  1.0 - (y * ystep) / 256.0 };
 			glm::vec2 uvbottomleft = { (x * xstep) / 256.0,  1.0 - (y + 1) * ystep / 256.0 };
 			glm::vec2 uvtopright = { (x + 1) * xstep / 256.0, 1.0 - (y * ystep) / 256.0 };

@@ -1,3 +1,6 @@
-﻿  threadpool.cpp
-  LINK : C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe not found or not built by the last incremental link; performing full link
+﻿  texture.cpp
+c:\users\akn\documents\github\3d_engine\texture.cpp(110): warning C4101: 'datastart': unreferenced local variable
+c:\users\akn\documents\github\3d_engine\texture.cpp(111): warning C4700: uninitialized local variable 'imgsize' used
+c:\users\akn\documents\github\3d_engine\texture.cpp(117): warning C4700: uninitialized local variable 'h' used
+c:\users\akn\documents\github\3d_engine\texture.cpp(117): warning C4700: uninitialized local variable 'w' used
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
