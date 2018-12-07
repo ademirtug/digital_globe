@@ -420,7 +420,7 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 				break;
 			}
 		}
-		if (!found)
+		if (!found) 
 		{
 			//destroy its children and add it to list
 			children[i].invalidate("");
@@ -595,7 +595,7 @@ void quadtile::buildplates()
 
 
 	////haritalarý yükle
-	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=kAGxoy8TfqxNPPXu1Va54jWMoYMkRCbG&format=png&center=" +
+	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=y5i8o8QO8e8AsZ2k2I4VKPifkxkd1lJd&format=png&center=" +
 		to_string(lat_center) + "," + to_string(lon_center) +
 		"&size=256,256&zoom=" + to_string(quadkey.size());
 
