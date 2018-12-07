@@ -49,3 +49,6 @@
 #pragma comment(lib,"winhttp.lib")
 #pragma comment(lib,"wininet.lib")
 #pragma comment (lib, "gdiplus.lib")
+#pragma comment (lib, "glfw3dll.lib")
+#pragma comment (lib, "glew32.lib")
+#pragma comment (lib, "opengl32.lib")

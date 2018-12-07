@@ -188,11 +188,6 @@ double getcornerdistance(string quadkey, double lat, double lon)
 	if (quadkey.size() < 1)
 		return 1;
 
-	if (quadkey.size() > 1)
-	{
-		int x = 5;
-	}
-
 	double mapsize = 1024;
 
 	double x1 = 0;
@@ -276,7 +271,9 @@ glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 
 quadtile::quadtile()
 {
-	children = nullptr;	
+	children = nullptr;
+	///BUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//make this 12 and entire system going nuts at 13rd zoom level
 	platebase = 16;
 }
 
@@ -435,79 +432,11 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	//if the subchildren are not loaded completely then the tile should displays itself instead, or we get black areas when loading
 	for (auto ct : closetiles)
 	{
-		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, ct == mintile ? delta : getdelta(zoomlevel)/*(1.0 + 0.25/log2(zoomlevel))*/  );
+		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, ct == mintile ? delta : 1.00  );
 		t.insert(t.end(), subtiles.begin(), subtiles.end());
 	}
 	return t;
 }
-
-
-vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta)
-{
-	//everytile represented by its own subtiles
-	//so root yields four subtile; A B C D
-
-	if ((zoomlevel) == quadkey.size())
-	{
-		vector<quadtile*> t;
-		t.push_back(this);
-		return t;
-	}
-
-	float min = 90 * 400;
-	int mintile = 0;
-	string subtile = "";
-
-	for (size_t x = 0; x < 4; x++)
-	{
-		subtile = char(65 + x);
-		std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
-		float diff = getcornerdistance(quadkey + subtile, lla[0], lla[1]);
-
-		if (diff < min)
-		{
-			mintile = x;
-			min = diff;
-		}
-	}
-	subtile = (char)(65 + mintile);
-
-	//ok we now know that user has zoomed to mintile, now the rest should be invalidated
-	//because we don't want them to cumulate and fill up all the memory the computer have
-	vector<quadtile*> t;
-
-	if (children == nullptr)
-		initchildren(quadkey);
-
-
-	for (size_t i = 0; i < 4; i++)
-	{
-		string ct = "";
-		ct = ((char)(65 + i));
-
-		if (!children[i].requested)
-		{
-			eng.sc->earth->pool.queue(shared_ptr<tilerequest>(new tilerequest(quadkey + ct)));
-			children[i].requested = true;
-		}
-
-		if (i != mintile)
-		{
-			//destroy its children and add it to list
-			children[i].invalidate("");
-			t.push_back(&children[i]);
-		}
-	}
-	
-	//now lets go deeper in mintile and figure out which subtiles are needed to be shown
-	//if the subchildren have not loaded completely then the tile should displays itself instead
-	vector<quadtile*> subtiles = children[mintile].calculatesubtiles(cameraPos, zoomlevel);
-
-	t.insert(t.end(), subtiles.begin(), subtiles.end());
-
-	return t;
-}
-
 
 void quadtile::invalidate(string tile)
 {
@@ -528,170 +457,6 @@ void quadtile::invalidate(string tile)
 
 	child->invalidate(tile.substr(1));
 }
-
-//void quadtile::buildplates()
-//{
-//	if (quadkey.size() < 1)
-//		return;
-//
-//	int platenum = platebase - quadkey.size() > 4 ? platebase - quadkey.size() : 4;
-//
-//	double circumference = 2 * glm::pi<double>() * 6378137.0f;
-//	double mapsize = pow(2, quadkey.size()) * 256;
-//
-//	double x1 = 0;
-//	double x2 = mapsize;
-//	double y1 = 0;
-//	double y2 = mapsize;
-//
-//
-//	//2 üzeri seviye kadar en boy parça
-//	for (size_t i = 0; i < quadkey.size(); i++)
-//	{
-//		if (quadkey[i] == 'A')
-//		{
-//			y2 = (y2 + y1) / 2;
-//			x2 = (x2 + x1) / 2;
-//		}
-//		else if (quadkey[i] == 'B')
-//		{
-//			x1 = (x2 + x1) / 2;
-//			y2 = (y2 + y1) / 2;
-//		}
-//		else if (quadkey[i] == 'C')
-//		{
-//			x2 = (x2 + x1) / 2;
-//			y1 = (y2 + y1) / 2;
-//		}
-//		else if (quadkey[i] == 'D')
-//		{
-//			x1 = (x2 + x1) / 2;
-//			y1 = (y2 + y1) / 2;
-//		}
-//	}
-//
-//	double centerx = (x2 + x1) / 2;
-//	double centery = (y2 + y1) / 2;
-//
-//	lat_center = ytolat(circumference / mapsize * (mapsize / 2 - centery));
-//	lon_center = (360.0 / mapsize * centerx) - 180;
-//
-//
-//	double b = 6356752.3f;
-//	double a = 6378137.0f;
-//	double e2 = 1 - ((b*b) / (a*a));
-//	double e = sqrt(e2);
-//
-//	double xstep = (x2 - x1) / platenum;
-//	double ystep = (y2 - y1) / platenum;
-//
-//	int px = -1;
-//	int py = -1;
-//
-//
-//	for (size_t x = 0; x < platenum; x++)
-//	{
-//		for (size_t i = 0; i < platenum; i++)
-//		{
-//			double mercx1 = x1 + i * xstep;
-//			double mercx2 = x1 + (i + 1) * xstep;
-//
-//			double mercy1 = y1 + x * ystep;
-//			double mercy2 = y1 + (x + 1) * ystep;
-//
-//			//2d to lat long
-//			double lat1 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
-//			double lon1 = (360.0 / mapsize * mercx1) - 180;
-//
-//			double dx = lon2mercx(lon1, mapsize);
-//			double dy = lat2mercy(lat1, mapsize);
-//			
-// 			glm::vec3 ecef = lla2ecef(lat1, lon1);
-//			glm::vec3 topleft = { ecef.x, ecef.y, ecef.z };
-//
-//			double lat2 = ytolat(circumference / mapsize * (mapsize / 2 - mercy1));
-//			double lon2 = (360.0 / mapsize * mercx2) - 180;
-//
-//			ecef = lla2ecef(lat2, lon2);
-//			glm::vec3 topright = { ecef.x, ecef.y, ecef.z };
-//
-//			double lat3 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
-//			double lon3 = (360.0 / mapsize * mercx1) - 180;
-//
-//			ecef = lla2ecef(lat3, lon3);
-//			glm::vec3 bottomleft = { ecef.x, ecef.y, ecef.z };
-//
-//			double lat4 = ytolat(circumference / mapsize * (mapsize / 2 - mercy2));
-//			double lon4 = (360.0 / mapsize * mercx2) - 180;
-//
-//			ecef = lla2ecef(lat4, lon4);
-//			glm::vec3 bottomright = { ecef.x, ecef.y, ecef.z };
-//
-//			vertices.push_back(topleft);
-//			vertices.push_back(bottomleft);
-//			vertices.push_back(topright);
-//
-//			glm::vec2 uvtopleft = { (i * xstep) / 256,  -(x * ystep) / 256 };
-//			glm::vec2 uvbottomleft = { (i * xstep) / 256,  -((x + 1) * ystep) / 256 };
-//			glm::vec2 uvtopright = { ((i + 1) * xstep) / 256, -(x * ystep) / 256 };
-//
-//			uvs.push_back(uvtopleft);
-//			uvs.push_back(uvbottomleft);
-//			uvs.push_back(uvtopright);
-//
-//			normals.push_back(calc_normal(topleft, bottomleft, topright));//topleft
-//			normals.push_back(calc_normal(bottomleft, topright, topleft));//bottomleft
-//			normals.push_back(calc_normal(topright, topleft, bottomleft));//topright
-//
-//			vertices.push_back(bottomleft);
-//			vertices.push_back(bottomright);
-//			vertices.push_back(topright);
-//
-//			glm::vec2 uvbottomright = { ((i + 1) * xstep) / 256, -((x + 1) * ystep) / 256 };
-//
-//			uvs.push_back(uvbottomleft);
-//			uvs.push_back(uvbottomright);
-//			uvs.push_back(uvtopright);
-//
-//			normals.push_back(calc_normal(bottomleft, bottomright, topright));//bottomleft
-//			normals.push_back(calc_normal(bottomright, topright, bottomleft));//bottomright
-//			normals.push_back(calc_normal(topright, bottomleft, bottomright));//topright
-//		}
-//	}
-//
-//
-//	////haritalarý yükle
-//	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=kAGxoy8TfqxNPPXu1Va54jWMoYMkRCbG&format=png&center=" +
-//		to_string(lat_center) + "," + to_string(lon_center) +
-//		"&size=256,256&zoom=" + to_string(quadkey.size());
-//
-//	fname = L"C:\\mapdata\\" + wstring(quadkey.begin(), quadkey.end()) + L".bmp";
-//
-//	if (!std::filesystem::exists("C:\\mapdata\\" + quadkey + ".bmp"))
-//	{
-//		cout << "requested: " << quadkey << endl;
-//		http_client hc;
-//		vector<unsigned char> png = hc.get_binary_page(req);
-//		GdiplusStartupInput gdiplusStartupInput;
-//		ULONG_PTR gdiplusToken;
-//		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-//		CLSID   encoderClsid;
-//		Status  stat;
-//		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, png.size());
-//
-//		PVOID pMem = GlobalLock(hMem);
-//		RtlMoveMemory(pMem, &png[0], png.size());
-//		IStream *pStream = 0;
-//		HRESULT hr = CreateStreamOnHGlobal(hMem, TRUE, &pStream);
-//
-//		Image* img = new Gdiplus::Image(pStream);
-//		GetEncoderClsid(L"image/bmp", &encoderClsid);
-//
-//		stat = img->Save(fname.c_str(), &encoderClsid, NULL);
-//		delete img;
-//		GdiplusShutdown(gdiplusToken);
-//	}
-//}
 
 void quadtile::buildplates()
 {

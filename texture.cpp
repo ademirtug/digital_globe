@@ -41,19 +41,15 @@ void bmp::load(const std::string& filename)
 	unsigned char* data;
 	unsigned char* uchdr = new unsigned char[54+1];
 
-
 	fstream f;
 	f.open(filename, std::fstream::in | std::fstream::binary);
 	if (!f.is_open())
 		return;
 
-
 	f.read((char*)uchdr, 54);
 	hdr = (BITMAPFILEHEADER*)uchdr;
 	info = (BITMAPINFOHEADER*)(uchdr + sizeof(BITMAPFILEHEADER));
 
-
-	//sanity check yapalım
 	if (uchdr[0] != 'B' || uchdr[1] != 'M')
 		return;
 
@@ -65,7 +61,6 @@ void bmp::load(const std::string& filename)
 
 	load(data, info->biWidth, info->biHeight, info->biBitCount);
 
-	//yükleme tamam ram üzerindekini silelim.
 	delete[] uchdr;
 	delete[] data;
 
@@ -82,9 +77,12 @@ void bmp::load(unsigned char* data, int w, int h, int bitcount)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, type, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	//trilinear filtreleme standart komut grubu
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 }
