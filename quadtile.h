@@ -40,7 +40,7 @@ public:
 
 	quadtile* getchild(char c);
 	quadtile* gettile(string tile);
-	vector<quadtile*> calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta = 1.35);
+	vector<quadtile*> calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta = 1.05);
 	void invalidate(string tile);
 	void buildplates();
 

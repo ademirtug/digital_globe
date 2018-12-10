@@ -334,19 +334,26 @@ double getdelta(int zoomlevel)
 		return 2.0;
 		break;
 	case 2:
-		return 2.0;
-		break;
-	case 3:
-		return 2.0;
-		break;
-	case 4:
 		return 1.4;
 		break;
+	case 3:
+		return 1.1;
+		break;
+	case 4:
+		return 1.1;
+		break;
+	case 5:
+		return 1.1;
+		break;	
+	case 6:
+		return 1.1;
+		break;
 	default:
-		return 1.0;
+		return 1.1;
 		break;
 	}
 }
+
 
 
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
@@ -365,7 +372,10 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	string subtile = "";
 	std::array<double, 4> distances;
 	
-
+	if (quadkey.size() == 2)
+	{
+		int er = 4;
+	}
 	for (size_t x = 0; x < 4; x++)
 	{
 		subtile = char(65 + x);
@@ -385,7 +395,7 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	vector<int> closetiles;
 	for (size_t x = 0; x < 4; x++)
 	{
-		if ((min * delta) >= distances[x])
+		if ((min * getdelta(zoomlevel)) >= distances[x])
 		{
 			//close to mintile or itself
 			closetiles.push_back(x);
@@ -432,7 +442,7 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	//if the subchildren are not loaded completely then the tile should displays itself instead, or we get black areas when loading
 	for (auto ct : closetiles)
 	{
-		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, ct == mintile ? delta : 1.00  );
+		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, ct == mintile ? getdelta(zoomlevel) : 1.15 );
 		t.insert(t.end(), subtiles.begin(), subtiles.end());
 	}
 	return t;
@@ -595,7 +605,7 @@ void quadtile::buildplates()
 
 
 	////haritalarý yükle
-	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=y5i8o8QO8e8AsZ2k2I4VKPifkxkd1lJd&format=png&center=" +
+	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=tGyflWkBSo8sNTv0PsRPD1F0OAxX11Yh&format=png&center=" +
 		to_string(lat_center) + "," + to_string(lon_center) +
 		"&size=256,256&zoom=" + to_string(quadkey.size());
 
@@ -624,5 +634,9 @@ void quadtile::buildplates()
 		stat = img->Save(fname.c_str(), &encoderClsid, NULL);
 		delete img;
 		GdiplusShutdown(gdiplusToken);
+	}
+	else
+	{
+		cout << "requestedD: " << quadkey << endl;
 	}
 }
