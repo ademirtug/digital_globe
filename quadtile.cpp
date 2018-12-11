@@ -272,9 +272,7 @@ glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 quadtile::quadtile()
 {
 	children = nullptr;
-	///BUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//make this 12 and entire system going nuts at 13rd zoom level
-	platebase = 16;
+	platebase = 12;
 }
 
 quadtile::~quadtile()
@@ -336,20 +334,8 @@ double getdelta(int zoomlevel)
 	case 2:
 		return 1.4;
 		break;
-	case 3:
-		return 1.1;
-		break;
-	case 4:
-		return 1.1;
-		break;
-	case 5:
-		return 1.1;
-		break;	
-	case 6:
-		return 1.1;
-		break;
 	default:
-		return 1.1;
+		return 1.15;
 		break;
 	}
 }
@@ -476,7 +462,7 @@ void quadtile::buildplates()
 	if (quadkey.size() < 1)
 		return;
 
-	int platenum = platebase - quadkey.size() > 4 ? platebase - quadkey.size() : 4;
+	int platenum = platebase -quadkey.size() > 4 ? platebase - quadkey.size() : 4;
 
 	
 	double circumference = 2 * glm::pi<double>() * 6378137.0f;
