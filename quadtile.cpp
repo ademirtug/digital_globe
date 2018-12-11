@@ -395,7 +395,7 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	vector<int> closetiles;
 	for (size_t x = 0; x < 4; x++)
 	{
-		if ((min * getdelta(zoomlevel)) >= distances[x])
+		if ((min * delta) >= distances[x])
 		{
 			//close to mintile or itself
 			closetiles.push_back(x);
@@ -442,7 +442,10 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	//if the subchildren are not loaded completely then the tile should displays itself instead, or we get black areas when loading
 	for (auto ct : closetiles)
 	{
-		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, ct == mintile ? getdelta(zoomlevel) : 1.15 );
+		double tdelta = ct == mintile ? getdelta(zoomlevel) : 1.0;
+		tdelta = tdelta > delta ? delta : tdelta;
+
+		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, tdelta );
 		t.insert(t.end(), subtiles.begin(), subtiles.end());
 	}
 	return t;

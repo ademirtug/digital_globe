@@ -8,12 +8,12 @@ c:\users\akn\documents\github\3d_engine\quadtile.cpp(92): warning C4101: 'n': un
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(200): warning C4101: 'distances': unreferenced local variable
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(299): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(384): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(445): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(522): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(538): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(540): warning C4018: '<': signed/unsigned mismatch
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(549): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(555): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(561): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\akn\documents\github\3d_engine\quadtile.cpp(567): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(448): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(525): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(541): warning C4018: '<': signed/unsigned mismatch
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(543): warning C4018: '<': signed/unsigned mismatch
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(552): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(558): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(564): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\quadtile.cpp(570): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
