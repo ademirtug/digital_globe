@@ -272,7 +272,7 @@ glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 quadtile::quadtile()
 {
 	children = nullptr;
-	platebase = 12;
+	platebase = 16;
 }
 
 quadtile::~quadtile()
@@ -356,9 +356,35 @@ std::array<int, 2> tile2pos(string quadkey)
 }
 
 
-string pos2tile(int x, int y)
+string pos2tile(int x, int y, int zoomlevel)
 {
 	string quadkey = "";
+
+	
+
+	for (size_t i = 0; i < zoomlevel; i++)
+	{
+		int sc = pow(2, zoomlevel-(i+1));
+		int t = 0;
+
+		//A-C or B-D?
+		if (x >= sc)
+		{
+			t += 1;
+			x = x % sc;
+		}
+		
+
+		//if A-C then A or C, if B-D pair then B or D?
+		if (y >= sc)
+		{
+			t += 2;
+			y = y % sc;
+		}
+		
+		quadkey += (char)(65+t);
+	}
+	 
 
 
 	return quadkey;
@@ -366,6 +392,10 @@ string pos2tile(int x, int y)
 
 vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
+	 
+
+
+
 	//everytile represented by its own subtiles
 	//so root yields four subtile; A B C D
 	if ((zoomlevel) == quadkey.size())
@@ -409,6 +439,9 @@ vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomleve
 
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
+	array<int, 2>  pos = tile2pos("DABBDB");
+	string q = pos2tile(pos[0], pos[1], 6);
+
 	//everytile represented by its own subtiles
 	//so root yields four subtile; A B C D
 	if (( zoomlevel ) == quadkey.size())
