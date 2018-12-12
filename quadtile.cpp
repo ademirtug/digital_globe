@@ -360,8 +360,6 @@ string pos2tile(int x, int y, int zoomlevel)
 {
 	string quadkey = "";
 
-	
-
 	for (size_t i = 0; i < zoomlevel; i++)
 	{
 		int sc = pow(2, zoomlevel-(i+1));
@@ -384,9 +382,6 @@ string pos2tile(int x, int y, int zoomlevel)
 		
 		quadkey += (char)(65+t);
 	}
-	 
-
-
 	return quadkey;
 }
 
@@ -595,12 +590,6 @@ void quadtile::buildplates()
 			x1 = (x2 + x1) / 2;
 			y1 = (y2 + y1) / 2;
 		}
-	}
-
-	if (quadkey == "A")
-	{
-		int ff = 5;
-
 	}
 
 	double centerx = (x2 + x1) / 2;
