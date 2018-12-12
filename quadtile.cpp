@@ -340,7 +340,72 @@ double getdelta(int zoomlevel)
 	}
 }
 
+std::array<int, 2> tile2pos(string quadkey)
+{
+	array<int, 2> pos = {0,0};
 
+	int x = 0;
+	int y = 0;
+	for (size_t i = 0; i < quadkey.size(); i++)
+	{
+		pos[0] += ((quadkey.at(i) - 65) & 1) * pow(2, quadkey.size() - (i+1));
+		pos[1] += ((quadkey.at(i) - 65) / 2) * pow(2, quadkey.size() - (i+1));
+	}
+
+	return pos;
+}
+
+
+string pos2tile(int x, int y)
+{
+	string quadkey = "";
+
+
+	return quadkey;
+}
+
+vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta)
+{
+	//everytile represented by its own subtiles
+	//so root yields four subtile; A B C D
+	if ((zoomlevel) == quadkey.size())
+	{
+		vector<quadtile*> t;
+		t.push_back(this);
+		return t;
+	}
+
+	float min = 90 * 400;
+	int mintile = 0;
+	string subtile = "";
+	std::array<double, 4> distances;
+
+	if (quadkey.size() == 2)
+	{
+		int er = 4;
+	}
+	for (size_t x = 0; x < 4; x++)
+	{
+		subtile = char(65 + x);
+
+		std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
+		float diff = getcornerdistance(quadkey + subtile, lla[0], lla[1]);
+
+		distances[x] = diff;
+
+		if (diff < min)
+		{
+			mintile = x;
+			min = diff;
+		}
+	}
+
+
+	vector<quadtile*> t;
+
+
+	return t;
+}
 
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
