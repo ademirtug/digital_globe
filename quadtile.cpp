@@ -328,18 +328,12 @@ double getdelta(int zoomlevel)
 	//or handcraft?
 	switch (zoomlevel)
 	{
-	case 1:
-		return 2.0;
-		break;
-	case 2:
-		return 1.4;
-		break;
 	default:
 		return 1.15;
 		break;
 	}
 }
-
+ 
 std::array<int, 2> tile2pos(string quadkey)
 {
 	array<int, 2> pos = {0,0};
@@ -370,8 +364,7 @@ string pos2tile(int x, int y, int zoomlevel)
 		{
 			t += 1;
 			x = x % sc;
-		}
-		
+		}	
 
 		//if A-C then A or C, if B-D pair then B or D?
 		if (y >= sc)
@@ -387,46 +380,48 @@ string pos2tile(int x, int y, int zoomlevel)
 
 vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
-	 
-
-
-
-	//everytile represented by its own subtiles
-	//so root yields four subtile; A B C D
-	if ((zoomlevel) == quadkey.size())
-	{
-		vector<quadtile*> t;
-		t.push_back(this);
-		return t;
-	}
-
 	float min = 90 * 400;
-	int mintile = 0;
-	string subtile = "";
-	std::array<double, 4> distances;
 
-	if (quadkey.size() == 2)
+	string q = "";
+	std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
+
+	for (size_t i = 0; i < zoomlevel; i++)
 	{
-		int er = 4;
-	}
-	for (size_t x = 0; x < 4; x++)
-	{
-		subtile = char(65 + x);
+		int mintile = 0;
+		string subtile = "";
 
-		std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
-		float diff = getcornerdistance(quadkey + subtile, lla[0], lla[1]);
-
-		distances[x] = diff;
-
-		if (diff < min)
+		for (size_t x = 0; x < 4; x++)
 		{
-			mintile = x;
-			min = diff;
+			subtile = char(65 + x);
+
+			float diff = getcornerdistance(q + subtile, lla[0], lla[1]);
+
+			if (diff < min)
+			{
+				mintile = x;
+				min = diff;
+			}
+		}
+		q += char(65 + mintile);
+	}
+
+	string center = q;
+
+	unsigned int w = 0;
+	w -= 1;
+
+	vector<quadtile*> t;
+
+	for (size_t x = -1; x < 2; x++)
+	{
+		for (size_t y = -1; y < 2; y++)
+		{
+
+
+
 		}
 	}
 
-
-	vector<quadtile*> t;
 
 
 	return t;
@@ -434,9 +429,6 @@ vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomleve
 
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
-	array<int, 2>  pos = tile2pos("DABBDB");
-	string q = pos2tile(pos[0], pos[1], 6);
-
 	//everytile represented by its own subtiles
 	//so root yields four subtile; A B C D
 	if (( zoomlevel ) == quadkey.size())
