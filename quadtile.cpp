@@ -354,6 +354,17 @@ string pos2tile(int x, int y, int zoomlevel)
 {
 	string quadkey = "";
 
+	if (x == pow(2, zoomlevel))
+		x = 0;
+	else if (x < 0)//-1 situation
+		x = pow(2, zoomlevel) - 1;
+
+	if (y == pow(2, zoomlevel))
+		y = 0;
+	else if (y < 0)//-1 situation
+		y = pow(2, zoomlevel) - 1;
+
+
 	for (size_t i = 0; i < zoomlevel; i++)
 	{
 		int sc = pow(2, zoomlevel-(i+1));
@@ -409,6 +420,8 @@ vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomleve
 
 	unsigned int w = 0;
 	w -= 1;
+
+	array<int, 2> c = tile2pos(q);
 
 	vector<quadtile*> t;
 
