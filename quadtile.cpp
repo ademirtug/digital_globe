@@ -329,11 +329,12 @@ double getdelta(int zoomlevel)
 	switch (zoomlevel)
 	{
 	default:
-		return 1.15;
+		return 1.25;
 		break;
 	}
 }
  
+
 std::array<int, 2> tile2pos(string quadkey)
 {
 	array<int, 2> pos = {0,0};
@@ -352,17 +353,23 @@ std::array<int, 2> tile2pos(string quadkey)
 
 string pos2tile(int x, int y, int zoomlevel)
 {
+	if (zoomlevel < 2)
+		return "";
+
 	string quadkey = "";
 
+	//no solution for these yet
+	y = y == -1 ? 0 : y;
+	y = y >= pow(2, zoomlevel) ? pow(2, zoomlevel) - 1 : y;
+
+
+
+	
 	if (x == pow(2, zoomlevel))
 		x = 0;
 	else if (x < 0)//-1 situation
 		x = pow(2, zoomlevel) - 1;
 
-	if (y == pow(2, zoomlevel))
-		y = 0;
-	else if (y < 0)//-1 situation
-		y = pow(2, zoomlevel) - 1;
 
 
 	for (size_t i = 0; i < zoomlevel; i++)
@@ -389,7 +396,7 @@ string pos2tile(int x, int y, int zoomlevel)
 	return quadkey;
 }
 
-vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta)
+vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
 	float min = 90 * 400;
 
@@ -424,23 +431,28 @@ vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomleve
 	array<int, 2> c = tile2pos(q);
 
 	vector<quadtile*> t;
+	set<string> surroundingtiles;
 
-	for (size_t x = -1; x < 2; x++)
+
+	for (int x = -1; x < 2; x++)
 	{
-		for (size_t y = -1; y < 2; y++)
+		for (int y = -1; y < 2; y++)
 		{
-
-
-
+			string tile = pos2tile(c[0] + x, c[1] + y, q.size());
+			if (tile.size() > 0)
+				surroundingtiles.insert(tile);
 		}
 	}
 
+	for (size_t i = 0; i < surroundingtiles.size(); i++)
+	{
 
+	}
 
 	return t;
 }
 
-vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
+vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
 	//everytile represented by its own subtiles
 	//so root yields four subtile; A B C D
@@ -456,10 +468,6 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	string subtile = "";
 	std::array<double, 4> distances;
 	
-	if (quadkey.size() == 2)
-	{
-		int er = 4;
-	}
 	for (size_t x = 0; x < 4; x++)
 	{
 		subtile = char(65 + x);
@@ -561,7 +569,6 @@ void quadtile::buildplates()
 		return;
 
 	int platenum = platebase -quadkey.size() > 4 ? platebase - quadkey.size() : 4;
-
 	
 	double circumference = 2 * glm::pi<double>() * 6378137.0f;
 	double mapsize = pow(2, quadkey.size()) * 256;
