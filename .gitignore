@@ -44,3 +44,5 @@
 *.exe
 *.out
 *.app
+.vs/3d_engine/v15/.suo
+*.log

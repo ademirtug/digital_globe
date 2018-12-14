@@ -413,7 +413,7 @@ string pos2tile(int x, int y, int zoomlevel)
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
 
-	quadtile* bab = dive("BAB");
+	//quadtile* bab = dive("BAB");
 
 	float min = 90 * 400;
 
