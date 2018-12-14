@@ -322,6 +322,20 @@ quadtile* quadtile::gettile(string tile)
 	return child->gettile(tile.substr(1));
 }
 
+quadtile* quadtile::dive(string tile)
+{
+	if (tile.size() == 0)
+		return this;
+
+	quadtile* child = getchild(tile.at(0));
+	if (child == nullptr)
+	{
+		initchildren();
+		child = getchild(tile.at(0));
+	}
+	return child->dive(tile.substr(1));
+}
+
 double getdelta(int zoomlevel)
 {
 	//find a formula for this?
@@ -398,6 +412,9 @@ string pos2tile(int x, int y, int zoomlevel)
 
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
+
+	quadtile* bab = dive("BAB");
+
 	float min = 90 * 400;
 
 	string q = "";
@@ -424,16 +441,11 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	}
 
 	string center = q;
-
-	unsigned int w = 0;
-	w -= 1;
-
 	array<int, 2> c = tile2pos(q);
 
 	vector<quadtile*> t;
 	set<string> surroundingtiles;
-
-
+	
 	for (int x = -1; x < 2; x++)
 	{
 		for (int y = -1; y < 2; y++)
@@ -444,9 +456,9 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		}
 	}
 
-	for (size_t i = 0; i < surroundingtiles.size(); i++)
+	for (set<string>::iterator it = surroundingtiles.begin(); it != surroundingtiles.end(); ++it)
 	{
-
+		t.push_back(dive(*it));
 	}
 
 	return t;

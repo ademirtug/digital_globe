@@ -35,3 +35,27 @@ vector<quadtile*> spheroid::getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel
 
 	return dt;
 }
+
+vector<quadtile*> spheroid::getdisplayedtiles1(glm::vec3 cameraPos, int zoomlevel)
+{
+	vector<quadtile*> dt = tiles.calculatesubtiles(cameraPos, zoomlevel);
+
+	//attach all loaded tiles
+	unique_lock<std::mutex> lk(mxpreparedtiles);
+	for (auto pt : preparedtiles)
+	{
+		quadtile* t = tiles.gettile(pt->quadkey);
+		if (t == nullptr)
+			continue;
+
+		t->normals = pt->normals;
+		t->uvs = pt->uvs;
+		t->vertices = pt->vertices;
+		string fname(pt->fname.begin(), pt->fname.end());
+		t->tm.reset(new texturemesh(t->vertices, t->normals, t->uvs, fname));
+	}
+	preparedtiles.clear();
+
+
+	return dt;
+}
