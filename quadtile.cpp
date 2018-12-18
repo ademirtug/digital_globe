@@ -452,13 +452,16 @@ string pos2tile(int x, int y, int zoomlevel)
 
 
 
-set<quadtile*> getfulltree(quadtile* root)
+set<quadtile*> getcompletetree(quadtile* root)
 {
 	set<quadtile*> tiles;
 
 
 	if (root->children == nullptr)
+	{
+		tiles.insert(root);
 		return tiles;
+	}
 
 	int ltc = 0;
 	for (int i = 0; i < 4; i++)
@@ -471,20 +474,27 @@ set<quadtile*> getfulltree(quadtile* root)
 
 	if (ltc < 4)
 	{
-		tiles.insert(root);
+		if(root->quadkey.size() > 0)
+			tiles.insert(root);
+
 		return tiles;
 	}
 
 
 	for (int i = 0; i < 4; i++)
 	{
-		set<quadtile*> subtiles = getfulltree(&root->children[i]);
+		set<quadtile*> subtiles = getcompletetree(&root->children[i]);
 		tiles.insert(subtiles.begin(), subtiles.end());
 	}
 	
 	return tiles;
 }
 
+
+void prunetree(quadtile* root)
+{
+
+}
 
 
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel)
@@ -535,7 +545,7 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	for (set<string>::iterator it = surroundingtiles.begin(); it != surroundingtiles.end(); ++it)
 		germinate1(*it);
 
-	tiles = getfulltree(this);
+	tiles = getcompletetree(this);
 
 
 	for (auto tx : tiles)
@@ -548,24 +558,6 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 			tx->requested = true;
 		}
 	}
-
-	//for (set<string>::iterator it = surroundingtiles.begin(); it != surroundingtiles.end(); ++it)
-	//{
-	//	set<quadtile*> subtiles = germinate(*it);
-	//	tiles.insert(subtiles.begin(), subtiles.end());
-	//}
-
-
-	//for (auto tx : tiles)
-	//{
-	//	t.push_back(tx);
-
-	//	if (!tx->requested)
-	//	{
-	//		eng.sc->earth->pool.queue(shared_ptr<tilerequest>(new tilerequest(tx->quadkey)));
-	//		tx->requested = true;
-	//	}
-	//}
 
 	return t;
 }
