@@ -317,7 +317,7 @@ quadtile* quadtile::gettile(string tile)
 	return child->gettile(tile.substr(1));
 }
 
-void quadtile::germinate1(string tile)
+void quadtile::germinate(string tile)
 {
 	if (tile.size() == 0)
 		return;
@@ -338,42 +338,9 @@ void quadtile::germinate1(string tile)
 		}
 	}
 
-	child->germinate1(tile.substr(1));
+	child->germinate(tile.substr(1));
 
 	return;
-}
-
-set<quadtile*> quadtile::germinate(string tile)
-{
-	set<quadtile*> tiles;
-
-	if (tile.size() == 0)
-	{
-		tiles.insert(this);
-		return tiles;
-	}
-
-
-	quadtile* child = getchild(tile.at(0));
-	if (child == nullptr)
-	{
-		initchildren();
-		child = getchild(tile.at(0));
-	}
-
-
-	for (int i = 0; i < 4; i++)
-	{
-		if ((tile.at(0) - 65) != i)
-			tiles.insert(&children[i]);
-	}
-
-
-	set<quadtile*> subtiles = child->germinate(tile.substr(1));
-
-	tiles.insert(subtiles.begin(), subtiles.end());
-
-	return tiles;
 }
 
 double getdelta(int zoomlevel)
@@ -543,7 +510,7 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	set<quadtile*> tiles;
 
 	for (set<string>::iterator it = surroundingtiles.begin(); it != surroundingtiles.end(); ++it)
-		germinate1(*it);
+		germinate(*it);
 
 	tiles = getcompletetree(this);
 
