@@ -75,7 +75,6 @@ double N(double phi)
 	return a*a / sqrt(a*a * cos(phi)*cos(phi) + b*b*sin(phi)* sin(phi));
 }
 
-
 //long live copy paste codes from internet!
 std::array<double, 3> ecef_to_geo(std::array<double,3> ecef) {
 
@@ -138,7 +137,6 @@ std::array<double, 3> ecef_to_geo(std::array<double,3> ecef) {
 	return(geo);    //Return Lat, Lon, Altitude in that order
 }
 
-
 double lon2mercx(double lon, double mapsize = 1024)
 {
 	//lon range is -180 to 180
@@ -179,7 +177,6 @@ double lat2mercy(double lat, double mapsize = 1024)
 
 	return distance;
 }
-
 
 double getcornerdistance(string quadkey, double lat, double lon)
 {
@@ -252,8 +249,6 @@ double getcornerdistance(string quadkey, double lat, double lon)
 	return distance;
 }
 
-
-
 glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 {
 	double a = 6378137.0f;
@@ -322,6 +317,32 @@ quadtile* quadtile::gettile(string tile)
 	return child->gettile(tile.substr(1));
 }
 
+void quadtile::germinate1(string tile)
+{
+	if (tile.size() == 0)
+		return;
+
+	quadtile* child = getchild(tile.at(0));
+	if (child == nullptr)
+	{
+		initchildren();
+		child = getchild(tile.at(0));
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (!children[i].requested)
+		{
+			eng.sc->earth->pool.queue(shared_ptr<tilerequest>(new tilerequest(children[i].quadkey)));
+			children[i].requested = true;
+		}
+	}
+
+	child->germinate1(tile.substr(1));
+
+	return;
+}
+
 set<quadtile*> quadtile::germinate(string tile)
 {
 	set<quadtile*> tiles;
@@ -332,6 +353,7 @@ set<quadtile*> quadtile::germinate(string tile)
 		return tiles;
 	}
 
+
 	quadtile* child = getchild(tile.at(0));
 	if (child == nullptr)
 	{
@@ -339,14 +361,13 @@ set<quadtile*> quadtile::germinate(string tile)
 		child = getchild(tile.at(0));
 	}
 
-	if (tile.size() == 1)
+
+	for (int i = 0; i < 4; i++)
 	{
-		for (int i = 0; i < 4; i++)
-		{
-			if ((tile.at(0) - 65) != i)
-				tiles.insert(&children[i]);
-		}
+		if ((tile.at(0) - 65) != i)
+			tiles.insert(&children[i]);
 	}
+
 
 	set<quadtile*> subtiles = child->germinate(tile.substr(1));
 
@@ -429,7 +450,44 @@ string pos2tile(int x, int y, int zoomlevel)
 	return quadkey;
 }
 
-vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
+
+
+set<quadtile*> getfulltree(quadtile* root)
+{
+	set<quadtile*> tiles;
+
+
+	if (root->children == nullptr)
+		return tiles;
+
+	int ltc = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		if (root->children[i].tm != nullptr)
+		{
+			ltc++;
+		}
+	}
+
+	if (ltc < 4)
+	{
+		tiles.insert(root);
+		return tiles;
+	}
+
+
+	for (int i = 0; i < 4; i++)
+	{
+		set<quadtile*> subtiles = getfulltree(&root->children[i]);
+		tiles.insert(subtiles.begin(), subtiles.end());
+	}
+	
+	return tiles;
+}
+
+
+
+vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel)
 {
 	float min = 90 * 400;
 
@@ -475,10 +533,9 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	set<quadtile*> tiles;
 
 	for (set<string>::iterator it = surroundingtiles.begin(); it != surroundingtiles.end(); ++it)
-	{
-		set<quadtile*> subtiles = germinate(*it);
-		tiles.insert(subtiles.begin(), subtiles.end());
-	}
+		germinate1(*it);
+
+	tiles = getfulltree(this);
 
 
 	for (auto tx : tiles)
@@ -492,99 +549,27 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		}
 	}
 
+	//for (set<string>::iterator it = surroundingtiles.begin(); it != surroundingtiles.end(); ++it)
+	//{
+	//	set<quadtile*> subtiles = germinate(*it);
+	//	tiles.insert(subtiles.begin(), subtiles.end());
+	//}
+
+
+	//for (auto tx : tiles)
+	//{
+	//	t.push_back(tx);
+
+	//	if (!tx->requested)
+	//	{
+	//		eng.sc->earth->pool.queue(shared_ptr<tilerequest>(new tilerequest(tx->quadkey)));
+	//		tx->requested = true;
+	//	}
+	//}
+
 	return t;
 }
 
-vector<quadtile*> quadtile::calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta)
-{
-	//everytile represented by its own subtiles
-	//so root yields four subtile; A B C D
-	if (( zoomlevel ) == quadkey.size())
-	{
-		vector<quadtile*> t;
-		t.push_back(this);
-		return t;
-	}
-
-	float min = 90 * 400;
-	int mintile = 0;
-	string subtile = "";
-	std::array<double, 4> distances;
-	
-	for (size_t x = 0; x < 4; x++)
-	{
-		subtile = char(65 + x);
-
-		std::array<double, 3> lla  = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
-		float diff = getcornerdistance(quadkey + subtile, lla[0], lla[1]);
-		
-		distances[x] = diff;
-
-		if (diff < min)
-		{
-			mintile = x;
-			min = diff;
-		}
-	}
-
-	vector<int> closetiles;
-	for (size_t x = 0; x < 4; x++)
-	{
-		if ((min * delta) >= distances[x])
-		{
-			//close to mintile or itself
-			closetiles.push_back(x);
-		}
-	}
-	
-	//ok we now know that user has zoomed to mintile, now the rest should be invalidated
-	//because we don't want them to cumulate and fill up all the memory the computer have
-	vector<quadtile*> t;
-
-	if (children == nullptr)
-		initchildren(quadkey);
-
-
-	for (size_t i = 0; i < 4; i++)
-	{
-		string ct = "";
-		ct = ((char)(65 + i));
-
-		if (!children[i].requested)
-		{
-			eng.sc->earth->pool.queue(shared_ptr<tilerequest>(new tilerequest(quadkey + ct)));
-			children[i].requested = true;
-		}
-
-		bool found = false;
-		for (auto ct : closetiles)
-		{
-			if (i == ct)
-			{
-				found = true;
-				break;
-			}
-		}
-		if (!found) 
-		{
-			//destroy its children and add it to list
-			children[i].invalidate("");
-			t.push_back(&children[i]);
-		}
-	}
-
-	//now lets go deeper in mintile and qualified closest tiles and figure out which subtiles are needed to be shown
-	//if the subchildren are not loaded completely then the tile should displays itself instead, or we get black areas when loading
-	for (auto ct : closetiles)
-	{
-		double tdelta = ct == mintile ? getdelta(zoomlevel) : 1.0;
-		tdelta = tdelta > delta ? delta : tdelta;
-
-		vector<quadtile*> subtiles = children[ct].calculatesubtiles(cameraPos, zoomlevel, tdelta );
-		t.insert(t.end(), subtiles.begin(), subtiles.end());
-	}
-	return t;
-}
 
 void quadtile::invalidate(string tile)
 {

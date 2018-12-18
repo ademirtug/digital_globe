@@ -41,9 +41,9 @@ public:
 	quadtile* getchild(char c);
 	quadtile* gettile(string tile);
 	set<quadtile*> germinate(string tile);
+	void germinate1(string tile);
 
-	vector<quadtile*> calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta = 1.1);
-	vector<quadtile*> calculatesubtiles1(glm::vec3 cameraPos, int zoomlevel, float delta = 1.1);
+	vector<quadtile*> calculatesubtiles(glm::vec3 cameraPos, int zoomlevel);
 	void invalidate(string tile);
 	void buildplates();
 
