@@ -339,10 +339,13 @@ set<quadtile*> quadtile::germinate(string tile)
 		child = getchild(tile.at(0));
 	}
 
-	for (int i = 0; i < 4; i++)
+	if (tile.size() == 1)
 	{
-		if ((tile.at(0)-65) != i)
-			tiles.insert(&children[i]);
+		for (int i = 0; i < 4; i++)
+		{
+			if ((tile.at(0) - 65) != i)
+				tiles.insert(&children[i]);
+		}
 	}
 
 	set<quadtile*> subtiles = child->germinate(tile.substr(1));
