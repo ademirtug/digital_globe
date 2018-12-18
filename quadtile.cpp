@@ -322,10 +322,15 @@ quadtile* quadtile::gettile(string tile)
 	return child->gettile(tile.substr(1));
 }
 
-quadtile* quadtile::dive(string tile)
+set<quadtile*> quadtile::germinate(string tile)
 {
+	set<quadtile*> tiles;
+
 	if (tile.size() == 0)
-		return this;
+	{
+		tiles.insert(this);
+		return tiles;
+	}
 
 	quadtile* child = getchild(tile.at(0));
 	if (child == nullptr)
@@ -333,7 +338,18 @@ quadtile* quadtile::dive(string tile)
 		initchildren();
 		child = getchild(tile.at(0));
 	}
-	return child->dive(tile.substr(1));
+
+	for (int i = 0; i < 4; i++)
+	{
+		if ((tile.at(0)-65) != i)
+			tiles.insert(&children[i]);
+	}
+
+	set<quadtile*> subtiles = child->germinate(tile.substr(1));
+
+	tiles.insert(subtiles.begin(), subtiles.end());
+
+	return tiles;
 }
 
 double getdelta(int zoomlevel)
@@ -412,9 +428,6 @@ string pos2tile(int x, int y, int zoomlevel)
 
 vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel, float delta)
 {
-
-	//quadtile* bab = dive("BAB");
-
 	float min = 90 * 400;
 
 	string q = "";
@@ -456,9 +469,24 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		}
 	}
 
+	set<quadtile*> tiles;
+
 	for (set<string>::iterator it = surroundingtiles.begin(); it != surroundingtiles.end(); ++it)
 	{
-		t.push_back(dive(*it));
+		set<quadtile*> subtiles = germinate(*it);
+		tiles.insert(subtiles.begin(), subtiles.end());
+	}
+
+
+	for (auto tx : tiles)
+	{
+		t.push_back(tx);
+
+		if (!tx->requested)
+		{
+			eng.sc->earth->pool.queue(shared_ptr<tilerequest>(new tilerequest(tx->quadkey)));
+			tx->requested = true;
+		}
 	}
 
 	return t;
