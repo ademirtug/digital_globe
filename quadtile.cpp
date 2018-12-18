@@ -458,9 +458,12 @@ set<quadtile*> getcompletetree(quadtile* root)
 }
 
 
-void prunetree(quadtile* root)
+void quadtile::prunetree(quadtile* root, set<string> surroundingtiles)
 {
+	for (size_t i = 0; i < surroundingtiles.size(); i++)
+	{
 
+	}
 }
 
 
@@ -514,6 +517,10 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 
 	tiles = getcompletetree(this);
 
+	//for (auto tx : tiles)
+	//{
+	//	children->invalidate(tx->quadkey);
+	//}
 
 	for (auto tx : tiles)
 	{
