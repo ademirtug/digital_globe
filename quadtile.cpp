@@ -459,11 +459,37 @@ set<quadtile*> getcompletetree(quadtile* root)
 }
 
 
-void quadtile::prunetree(quadtile* root, set<string> surroundingtiles)
+void quadtile::prunetree(string root, set<string>& sprouts)
 {
-	for (size_t i = 0; i < surroundingtiles.size(); i++)
-	{
+	if (children == nullptr)
+		return;
 
+	for (size_t i = 0; i < 4; i++)
+	{
+		char cc = 65 + i;
+		string leaf = root + cc;
+		bool found = false;
+
+		for (auto tile : sprouts )
+		{
+			if (tile.find(leaf) == 0)
+			{
+				found = true;
+				break;
+			}
+		}
+
+		if (found)
+		{
+			quadtile* c = getchild(cc);
+
+			if( c != nullptr )
+				prunetree(leaf, sprouts);
+		}
+		else
+		{
+			invalidate(leaf);
+		}
 	}
 }
 
@@ -511,28 +537,18 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		}
 	}
 
+	prunetree("", surroundingtiles);
+
 	set<quadtile*> tiles;
 
 	for (set<string>::iterator it = surroundingtiles.begin(); it != surroundingtiles.end(); ++it)
 		germinate(*it);
 
+	
 	tiles = getcompletetree(this);
 
-	//for (auto tx : tiles)
-	//{
-	//	children->invalidate(tx->quadkey);
-	//}
-
 	for (auto tx : tiles)
-	{
 		t.push_back(tx);
-
-		if (!tx->requested)
-		{
-			eng.sc->earth->pool.queue(shared_ptr<tilerequest>(new tilerequest(tx->quadkey)));
-			tx->requested = true;
-		}
-	}
 
 	return t;
 }

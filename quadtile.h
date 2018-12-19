@@ -42,7 +42,7 @@ public:
 	quadtile* gettile(string tile);
 	void germinate(string tile);
 
-	void prunetree(quadtile* root, set<string> surroundingtiles);
+	void prunetree(string root, set<string>& sprouts);
 	vector<quadtile*> calculatesubtiles(glm::vec3 cameraPos, int zoomlevel);
 	void invalidate(string tile);
 	void buildplates();
