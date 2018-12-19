@@ -343,18 +343,6 @@ void quadtile::germinate(string tile)
 
 	return;
 }
-
-double getdelta(int zoomlevel)
-{
-	//find a formula for this?
-	//or handcraft?
-	switch (zoomlevel)
-	{
-	default:
-		return 1.25;
-		break;
-	}
-}
  
 std::array<int, 2> tile2pos(string quadkey)
 {
