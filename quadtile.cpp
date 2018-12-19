@@ -459,7 +459,7 @@ set<quadtile*> getcompletetree(quadtile* root)
 }
 
 
-void quadtile::prunetree(string root, set<string>& sprouts)
+void quadtile::prune(string root, set<string>& sprouts, int zoomlevel)
 {
 	if (children == nullptr)
 		return;
@@ -476,15 +476,17 @@ void quadtile::prunetree(string root, set<string>& sprouts)
 			{
 				found = true;
 				break;
-			}
+			} 
 		}
 
 		if (found)
 		{
 			quadtile* c = getchild(cc);
 
-			if( c != nullptr )
-				prunetree(leaf, sprouts);
+			if (c != nullptr && leaf.size() < zoomlevel)
+				prune(leaf, sprouts, zoomlevel);
+			else
+				invalidate(leaf);
 		}
 		else
 		{
@@ -500,6 +502,11 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 
 	string q = "";
 	std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
+
+	if (zoomlevel == 2)
+	{
+		int bc = 4;
+	}
 
 	for (size_t i = 0; i < zoomlevel; i++)
 	{
@@ -537,8 +544,10 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 		}
 	}
 
-	prunetree("", surroundingtiles);
+	
 
+	prune("", surroundingtiles, zoomlevel);
+		
 	set<quadtile*> tiles;
 
 	for (set<string>::iterator it = surroundingtiles.begin(); it != surroundingtiles.end(); ++it)
