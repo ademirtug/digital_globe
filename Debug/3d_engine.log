@@ -1,4 +1,18 @@
-﻿  quadtile.cpp
+﻿  stdafx.cpp
+  buffers.cpp
+  camera.cpp
+c:\users\akn\documents\github\3d_engine\camera.cpp(55): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(56): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(57): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(58): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(193): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(194): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\akn\documents\github\3d_engine\camera.cpp(218): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+  engine.cpp
+  light.cpp
+  main.cpp
+  mesh.cpp
+  quadtile.cpp
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(32): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(92): warning C4101: 'lon': unreferenced local variable
@@ -33,4 +47,16 @@ c:\users\akn\documents\github\3d_engine\quadtile.cpp(646): warning C4244: 'argum
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(652): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(658): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 c:\users\akn\documents\github\3d_engine\quadtile.cpp(664): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  3d_engine.vcxproj -> C:\Users\akn\Documents\GitHub\3d_engine\Debug\3d_engine.exe
+  scene.cpp
+c:\users\akn\documents\github\3d_engine\scene.cpp(75): warning C4244: 'argument': conversion from 'float' to 'GLsizei', possible loss of data
+  shader.cpp
+  sphere.cpp
+c:\users\akn\documents\github\3d_engine\sphere.cpp(8): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\akn\documents\github\3d_engine\sphere.cpp(9): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  texture.cpp
+c:\users\akn\documents\github\3d_engine\texture.cpp(108): warning C4101: 'datastart': unreferenced local variable
+  threadpool.cpp
+  Generating Code...
+c:\users\akn\documents\github\3d_engine\texture.cpp(109): warning C4700: uninitialized local variable 'imgsize' used
+c:\users\akn\documents\github\3d_engine\texture.cpp(115): warning C4700: uninitialized local variable 'h' used
+c:\users\akn\documents\github\3d_engine\texture.cpp(115): warning C4700: uninitialized local variable 'w' used

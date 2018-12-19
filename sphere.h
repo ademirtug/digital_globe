@@ -20,7 +20,6 @@ public:
 	spheroid(double _a, double _b);
 	
 	vector<quadtile*> getdisplayedtiles(glm::vec3 cameraPos, int zoomlevel);
-	vector<quadtile*> getdisplayedtiles1(glm::vec3 cameraPos, int zoomlevel);
 	
 };
 
