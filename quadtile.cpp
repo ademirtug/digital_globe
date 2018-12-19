@@ -708,6 +708,12 @@ void quadtile::buildplates()
 		to_string(lat_center) + "," + to_string(lon_center) +
 		"&size=256,256&zoom=" + to_string(quadkey.size());
 
+	//string req = "https://www.mapquestapi.com/staticmap/v5/map?key=y5i8o8QO8e8AsZ2k2I4VKPifkxkd1lJd&format=png&center=" +
+	//	to_string(lat_center) + "," + to_string(lon_center) +
+	//	"&size=256,256&zoom=" + to_string(quadkey.size());
+
+	
+
 	fname = L"C:\\mapdata\\" + wstring(quadkey.begin(), quadkey.end()) + L".bmp";
 
 	if (!std::filesystem::exists("C:\\mapdata\\" + quadkey + ".bmp"))
