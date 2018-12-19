@@ -356,7 +356,6 @@ double getdelta(int zoomlevel)
 	}
 }
  
-
 std::array<int, 2> tile2pos(string quadkey)
 {
 	array<int, 2> pos = {0,0};
@@ -371,7 +370,6 @@ std::array<int, 2> tile2pos(string quadkey)
 
 	return pos;
 }
-
 
 string pos2tile(int x, int y, int zoomlevel)
 {
@@ -417,8 +415,6 @@ string pos2tile(int x, int y, int zoomlevel)
 	}
 	return quadkey;
 }
-
-
 
 set<quadtile*> getcompletetree(quadtile* root)
 {
@@ -503,11 +499,6 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 	string q = "";
 	std::array<double, 3> lla = ecef_to_geo({ cameraPos.x, cameraPos.y, cameraPos.z });
 
-	if (zoomlevel == 2)
-	{
-		int bc = 4;
-	}
-
 	for (size_t i = 0; i < zoomlevel; i++)
 	{
 		int mintile = 0;
@@ -543,8 +534,6 @@ vector<quadtile*> quadtile::calculatesubtiles(glm::vec3 cameraPos, int zoomlevel
 				surroundingtiles.insert(tile);
 		}
 	}
-
-	
 
 	prune("", surroundingtiles, zoomlevel);
 		
