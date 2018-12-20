@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3d_engine", "3d_engine.vcxproj", "{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "digital_globe", "digital_globe.vcxproj", "{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,8 +13,8 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}.Debug|x64.ActiveCfg = Debug|Win32
-		{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}.Debug|x64.Build.0 = Debug|Win32
+		{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}.Debug|x64.ActiveCfg = Debug|x64
+		{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}.Debug|x64.Build.0 = Debug|x64
 		{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}.Debug|x86.ActiveCfg = Debug|Win32
 		{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}.Debug|x86.Build.0 = Debug|Win32
 		{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}.Release|x64.ActiveCfg = Release|x64
@@ -24,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {690FF223-6B0A-4831-A1F6-DF96CDBCA0ED}
 	EndGlobalSection
 EndGlobal
