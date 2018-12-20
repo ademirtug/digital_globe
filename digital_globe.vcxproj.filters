@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="threadpool.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="sphere.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="quadtile.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="light.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="engine.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="buffers.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="buffers.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="http_client.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="sphere.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="quadtile.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="threadpool.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\pointshadowdepth.frag" />
+    <None Include="data\pointshadowdepth.geo" />
+    <None Include="data\pointshadowdepth.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="headers">
+      <UniqueIdentifier>{f3c14d49-9eb7-4fd2-add5-670815a1233f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{d054febe-2918-463e-8dcf-8d435586d2c8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
