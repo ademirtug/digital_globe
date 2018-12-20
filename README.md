@@ -1,3 +1,3 @@
-# 3d_engine
+# digital_globe
 
-this repository contains a digital earth application akin to google earth
+this repository contains a digital globe application akin to google earth
