@@ -200,7 +200,7 @@ void qball_camera::cursor_pos_callback(GLFWwindow* window, double xpos, double y
 		glm::vec3 up = mouseaxis;
 
 		glm::mat4 temp_rotmat(1);
-		temp_rotmat = glm::rotate(temp_rotmat, 45.0f, glm::vec3(0.0, 0.0, 1.0));
+		temp_rotmat = glm::rotate(temp_rotmat, 1.0f, glm::vec3(0.0, 0.0, 1.0));
 		up = glm::vec3(temp_rotmat * glm::vec4(up, 1.0f));
 
 		glm::vec3 rightaxis = glm::normalize(glm::cross(mouseaxis, up));
