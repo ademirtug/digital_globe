@@ -29,7 +29,7 @@ public:
 
 	shared_ptr<texturemesh> tm;
 	wstring fname;
-	int platebase;
+	unsigned int platebase;
 	double lat_center = 0;
 	double lon_center = 0;
 

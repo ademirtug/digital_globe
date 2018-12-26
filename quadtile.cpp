@@ -268,7 +268,7 @@ glm::vec3 lla2ecef(double lat_indegrees, double lon_indegrees)
 quadtile::quadtile()
 {
 	children = nullptr;
-	platebase = 16;
+	platebase = 12;
 }
 
 quadtile::~quadtile()
@@ -565,8 +565,9 @@ void quadtile::buildplates()
 	if (quadkey.size() < 1)
 		return;
 
-	int platenum = platebase -quadkey.size() > 4 ? platebase - quadkey.size() : 4;
-	
+	 unsigned int platenum = int(platebase - quadkey.size()) > 2 ? platebase - quadkey.size() : 2;
+
+
 	double circumference = 2 * glm::pi<double>() * 6378137.0f;
 	double mapsize = pow(2, quadkey.size()) * 256;
 
@@ -618,7 +619,6 @@ void quadtile::buildplates()
 
 	int px = -1;
 	int py = -1;
-
 
 	for (size_t x = 0; x < platenum; x++)
 	{
