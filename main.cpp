@@ -9,10 +9,9 @@ extern engine eng;
 
 int main()
 {
-	bool  status = eng.init(1024, 768);
-	eng.maxfps = 525;
+	bool status = eng.init(1024, 768);
+	eng.maxfps = 30;
 
-	eng.sc->generate_shaders();
 	eng.run();
 
 	glfwTerminate();

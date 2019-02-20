@@ -25,12 +25,7 @@ void tilerequest::perform()
 
 	unique_lock<std::mutex> lk(eng.sc->earth->mxpreparedtiles);
 	eng.sc->earth->preparedtiles.push_back(tile);
-
-
-
 }
-
-
 
 
 threadpool::threadpool() : maxallowed(5), running(true)

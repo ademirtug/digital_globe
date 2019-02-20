@@ -73,6 +73,8 @@ bool engine::init(int width, int height)
 
 void engine::run()
 {
+	sc->generate_shaders();
+
 	double timer = 0;
 	double timer2 = glfwGetTime();
 	int fps = 0;
