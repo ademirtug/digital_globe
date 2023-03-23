@@ -690,13 +690,11 @@ void quadtile::buildplates()
 
 
 	////haritalarý yükle
-	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=tGyflWkBSo8sNTv0PsRPD1F0OAxX11Yh&format=png&center=" +
+	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=ohT06mfFYTRpy9dV4SNdaFh8jsXUEnhc&format=png&center=" +
 		to_string(lat_center) + "," + to_string(lon_center) +
 		"&size=256,256&zoom=" + to_string(quadkey.size());
 
-	//string req = "https://www.mapquestapi.com/staticmap/v5/map?key=y5i8o8QO8e8AsZ2k2I4VKPifkxkd1lJd&format=png&center=" +
-	//	to_string(lat_center) + "," + to_string(lon_center) +
-	//	"&size=256,256&zoom=" + to_string(quadkey.size());
+
 
 	
 
