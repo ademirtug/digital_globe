@@ -692,7 +692,7 @@ void quadtile::buildplates()
 	////haritalarý yükle
 	string req = "https://www.mapquestapi.com/staticmap/v5/map?key=ohT06mfFYTRpy9dV4SNdaFh8jsXUEnhc&format=png&center=" +
 		to_string(lat_center) + "," + to_string(lon_center) +
-		"&size=256,256&zoom=" + to_string(quadkey.size());
+		"&size=256,256&zoom=" + to_string(quadkey.size())+ "&type=sat";
 
 
 
