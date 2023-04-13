@@ -77,20 +77,20 @@ double N(double phi)
 
 std::array<double, 3> ecef_to_geo(std::array<double,3> ecef) {
 
-	double  a = 6378137.0;              //WGS-84 semi-major axis
-	double e2 = 6.6943799901377997e-3;  //WGS-84 first eccentricity squared
-	double a1 = 4.2697672707157535e+4;  //a1 = a*e2
-	double a2 = 1.8230912546075455e+9;  //a2 = a1*a1
-	double a3 = 1.4291722289812413e+2;  //a3 = a1*e2/2
-	double a4 = 4.5577281365188637e+9;  //a4 = 2.5*a2
-	double a5 = 4.2840589930055659e+4;  //a5 = a1+a3
-	double a6 = 9.9330562000986220e-1;  //a6 = 1-e2
+	double  a = 6378137.0;              
+	double e2 = 6.6943799901377997e-3; 
+	double a1 = 4.2697672707157535e+4;  
+	double a2 = 1.8230912546075455e+9;  
+	double a3 = 1.4291722289812413e+2; 
+	double a4 = 4.5577281365188637e+9;  
+	double a5 = 4.2840589930055659e+4;  
+	double a6 = 9.9330562000986220e-1;  
 	double zp, w2, w, r2, r, s2, c2, s, c, ss;
 	double g, rg, rf, u, v, m, f, p, x, y, z;
 	double n, lat, lon, alt;
 	
 
-	std::array<double,3> geo;   //Results go here (Lat, Lon, Altitude)
+	std::array<double,3> geo;
 	x = ecef[0];
 	y = ecef[1];
 	z = ecef[2];
@@ -99,20 +99,20 @@ std::array<double, 3> ecef_to_geo(std::array<double,3> ecef) {
 	w = sqrt(w2);
 	r2 = w2 + z * z;
 	r = sqrt(r2);
-	geo[1] = atan2(y, x);       //Lon (final)
+	geo[1] = atan2(y, x);       
 	s2 = z * z / r2;
 	c2 = w2 / r2;
 	u = a2 / r;
 	v = a3 - a4 / r;
 	if (c2 > 0.3) {
 		s = (zp / r)*(1.0 + c2 * (a1 + u + s2 * v) / r);
-		geo[0] = asin(s);      //Lat
+		geo[0] = asin(s);      
 		ss = s * s;
 		c = sqrt(1.0 - ss);
 	}
 	else {
 		c = (w / r)*(1.0 - s2 * (a5 - u - c2 * v) / r);
-		geo[0] = acos(c);      //Lat
+		geo[0] = acos(c);     
 		ss = 1.0 - c * c;
 		s = sqrt(ss);
 	}
@@ -124,16 +124,16 @@ std::array<double, 3> ecef_to_geo(std::array<double,3> ecef) {
 	f = c * u + s * v;
 	m = c * v - s * u;
 	p = m / (rf / g + f);
-	geo[0] = geo[0] + p;      //Lat
-	geo[2] = f + m * p / 2.0;     //Altitude
+	geo[0] = geo[0] + p;      
+	geo[2] = f + m * p / 2.0;     
 	if (z < 0.0) {
-		geo[0] *= -1.0;     //Lat
+		geo[0] *= -1.0;     
 	}
 
 	geo[0] = geo[0] * 180 / glm::pi<double>();
 	geo[1] = geo[1] * 180 / glm::pi<double>();
 
-	return(geo);    //Return Lat, Lon, Altitude in that order
+	return(geo);
 }
 
 double lon2mercx(double lon, double mapsize = 1024)
