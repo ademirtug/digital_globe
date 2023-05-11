@@ -159,7 +159,7 @@ double merc_y_to_lat(double merc_y, double map_size)
 
 	while ((abs(dphi) > 0.000000001) && (i < 25)) {
 		double con = e * sin(phi);
-		dphi = glm::pi<double>() / 2 - 2 * atan(ts * powf((1.0 - con) / (1.0 + con), e / 2)) - phi;
+		dphi = glm::pi<double>() / 2.0 - 2.0 * atan(ts * powf((1.0 - con) / (1.0 + con), e / 2.0)) - phi;
 		phi += dphi;
 		i++;
 	}

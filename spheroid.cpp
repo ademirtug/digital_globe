@@ -127,3 +127,8 @@ earth_plate::earth_plate(std::string plate_path, size_t resolution) {
 earth_plate::~earth_plate() {
 	glDeleteVertexArrays(1, &vao);
 }
+
+map_quest<null_store>& earth_plate::get_provider() {
+	static map_quest<null_store> provider;
+	return provider;
+}

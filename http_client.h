@@ -10,7 +10,7 @@
 class http_client {
 	/*HINTERNET h_internet_, h_connect_, h_request_, h_url_;*/
 public:
-	static std::string get_page(const std::string& url)
+	static std::shared_ptr<std::string> get_page(const std::string& url)
 	{
 		HINTERNET h_internet_, h_connect_;
 		std::string result;
@@ -33,9 +33,9 @@ public:
 			InternetCloseHandle(h_internet_);
 		}
 		result.append(vb.begin(), vb.end());
-		return result;
+		return std::make_shared<std::string>(result);
 	}
-	static std::vector<unsigned char> get_binary_page(std::string url)
+	static std::shared_ptr<std::vector<unsigned char>> get_binary_page(std::string url)
 	{
 		HINTERNET h_internet_, h_connect_;
 		char buffer[4096];
@@ -55,6 +55,6 @@ public:
 			}
 			InternetCloseHandle(h_internet_);
 		}
-		return vb;
+		return std::make_shared<std::vector<unsigned char>>(vb);
 	}
 };

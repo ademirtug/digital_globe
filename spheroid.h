@@ -29,10 +29,7 @@ public:
 	earth_plate(std::string plate_path, size_t resolution = 16);
 	~earth_plate();
 
-	static map_quest<disk_store> get_provider() {
-		static map_quest<disk_store> provider;
-		return provider;
-	}
+	static map_quest<null_store>& get_provider();
 };
 
 
