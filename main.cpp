@@ -57,27 +57,27 @@ int main()
 		renderer.process(world, ns);
 		});
 
-	//util test
-	double lat = 0;
-	double lon = 0;
-	double mercx = 0;
-	double mercy = 0;
+	////util test
+	//double lat = 0;
+	//double lon = 0;
+	//double mercx = 0;
+	//double mercy = 0;
 
-	std::vector<glm::vec3> mx;
-	std::vector<glm::vec3> lx;
-	std::vector<glm::vec3> m_y_lat;
-	std::vector<float> m_x_lon;
-	float step = 128;
-	for (size_t i = 0; i <= 8; i++) {
-		std::cout << "merc_x: (" << i * step << ") ->" << merc_x_to_lon(i * step, 1024) << std::endl;
-	}
-	std::cout << std::endl;
+	//std::vector<glm::vec3> mx;
+	//std::vector<glm::vec3> lx;
+	//std::vector<glm::vec3> m_y_lat;
+	//std::vector<float> m_x_lon;
+	//float step = 128;
+	//for (size_t i = 0; i <= 8; i++) {
+	//	std::cout << "merc_x: (" << i * step << ") ->" << merc_x_to_lon(i * step, 1024) << std::endl;
+	//}
+	//std::cout << std::endl;
 
-	for (size_t i = 0; i <= 8; i++) {
-		std::cout << "merc_y: (" << i * step << ") ->" << merc_y_to_lat(i * step, 1024) << std::endl;
-	}
+	//for (size_t i = 0; i <= 8; i++) {
+	//	std::cout << "merc_y: (" << i * step << ") ->" << merc_y_to_lat(i * step, 1024) << std::endl;
+	//}
 
-	glm::vec3 ecef = merc_to_ecef({ 512, 512, 0 }, 1024);
+	//glm::vec3 ecef = merc_to_ecef({ 512, 512, 0 }, 1024);
 
 	//for (size_t i = 0; i <= 8; i++) {
 	//	std::cout << "merc_x: (" << i * step << ") ->" << merc_y_to_lat(i * step, 1024) << std::endl;

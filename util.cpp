@@ -10,7 +10,7 @@ double N(double phi)
 	return a * a / sqrt(a * a * cos(phi) * cos(phi) + b * b * sin(phi) * sin(phi));
 }
 
-//note: don't reinvent the wheel
+//note: don'tex reinvent the wheel
 //https://danceswithcode.net/engineeringnotes/geodetic_to_ecef/geodetic_to_ecef.html
 std::array<double, 3> ecef_to_geo(const std::array<double, 3>& ecef) {
 	double a = 6378137.0f;

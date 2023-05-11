@@ -55,7 +55,7 @@ void spheroid::process(ecs_s::registry& world, size_t& level) {
 
 plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path), resolution_(resolution) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
-	box_ = { 0, 0, map_size };
+    box_ = { 0, 0, map_size };
 	//  -map_size-
 	// |---------|
 	// |  c | d  |
@@ -84,12 +84,13 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	for (size_t y = 0; y <= resolution_; y++) {
 		for (size_t x = 0; x <= resolution_; x++) {
 			double step = box_.a / resolution_;
-			vx.push_back({
-				merc_to_ecef({ box_.x + x * step, box_.y + y * step, 0 }, map_size),/*position*/
-				//{ box_.x + x * step, box_.y + y * step, 0 },/*position*/
+			 
+			vertices.push_back({
+				merc_to_ecef({ box_.x + x * step, box_.y + y * step, 0 }, map_size),/*3D position*/
+				//{ box_.x + x * step, box_.y + y * step, 0 },/*2D position*/
 				{ 0.0, 0.0, 0.0 },/*normal*/
-				{ 1.0 * (box_.x + x * step) / map_size,  (1.0 * (box_.y + y * step) / map_size)}/*uv*/
-			});
+				{ 1 - (x * step / box_.a),  1 - (y * step / box_.a)}/*uv*/
+				});
 		}
 	}
 
@@ -110,54 +111,55 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 			//upper rigth triangle - anti-clockwise
 			indices.insert(indices.end(), { v1, v3 ,v2 });
 
-			//TODO: these normals are wrong, winding rotation changes after 3D transform
+			//TODO: these normals might be wrong, winding rotation changes after 3D transform
 			//which messes the lighting
-			auto n1 = calc_normal(vx[v0].position, vx[v1].position, vx[v2].position);
-			auto n2 = calc_normal(vx[v1].position, vx[v3].position, vx[v0].position);
-			auto n3 = calc_normal(vx[v2].position, vx[v0].position, vx[v3].position);
-			auto n4 = calc_normal(vx[v3].position, vx[v2].position, vx[v1].position);
+			auto n1 = calc_normal(vertices[v0].position, vertices[v1].position, vertices[v2].position);
+			auto n2 = calc_normal(vertices[v1].position, vertices[v3].position, vertices[v0].position);
+			auto n3 = calc_normal(vertices[v2].position, vertices[v0].position, vertices[v3].position);
+			auto n4 = calc_normal(vertices[v3].position, vertices[v2].position, vertices[v1].position);
 
-			vx[v0].normal = n1;
-			vx[v1].normal = n2;
-			vx[v2].normal = n3;
-			vx[v3].normal = n4;
+			vertices[v0].normal = n1;
+			vertices[v1].normal = n2;
+			vertices[v2].normal = n3;
+			vertices[v3].normal = n4;
 		}
 	}
-	indices_size = indices.size();
+	size_of_indices = indices.size();
 }
 
 //EARTH PLATE
-earth_plate::earth_plate(std::string path, size_t resolution) : path_(path) {
+earth_plate::earth_plate(std::string path, size_t resolution) {
 	m = std::make_shared<plate>(path, resolution);
-	t = std::make_shared<texture>(std::string("textures/earth.bmp"));
+	tex = std::make_shared<texture>(std::string("textures/"+path+".bmp"));
+	path_ = path;
+	
 }
 earth_plate::~earth_plate() {
 	glDeleteVertexArrays(1, &vao);
 }
-void earth_plate::draw()
-{
-	glm::mat4 model = glm::mat4(1.0f);
-	//model = glm::rotate(model, 2 * glm::pi<float>() / 4, glm::vec3(1.0, 0, 0));
-	prg_->use();
-	prg_->setuniform("model", model);
-	prg_->setuniform("material.specular", m->specular);
-	prg_->setuniform("material.shininess", m->shininess);
-
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, m->indices_size, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-}
-bool earth_plate::upload() {
-	try {
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		m->upload();
-		t->upload();
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-	}
-	catch (...) {
-		return false;
-	}
-	return true;
-}
+//void earth_plate::draw()
+//{
+//	prg->use();
+//	prg->setuniform("model", glm::mat4(1.0f));
+//	prg->setuniform("material.specular", m->specular);
+//	prg->setuniform("material.shininess", m->shininess);
+//
+//	glBindVertexArray(vao);
+//	glDrawElements(GL_TRIANGLES, m->size_of_indices, GL_UNSIGNED_INT, 0);
+//	glBindVertexArray(0);
+//}
+//bool earth_plate::upload() {
+//	try {
+//		glGenVertexArrays(1, &vao);
+//		glBindVertexArray(vao);
+//
+//		m->upload();
+//		tex->upload();
+//
+//		glBindVertexArray(0);
+//	}
+//	catch (...) {
+//		return false;
+//	}
+//	return true;
+//}

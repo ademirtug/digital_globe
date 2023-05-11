@@ -28,14 +28,10 @@ public:
 };
 
 
-class earth_plate : public model {
-	std::string path_;
-	std::shared_ptr<texture> t;
+class earth_plate : public texture_model {
 public:
 	earth_plate(std::string path, size_t resolution);
 	~earth_plate();
-	bool upload();
-	void draw();
 };
 
 
@@ -49,6 +45,6 @@ private:
 	using rtype = decltype(std::declval<de2>().load_model_async<model>());
 	double a{ .0f }, c{ .0f };
 	std::map<std::string, rtype> requests_made_;
-	std::vector<rtype> vx;
+	std::vector<rtype> vertices;
 };
 
