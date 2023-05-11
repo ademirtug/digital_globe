@@ -33,6 +33,7 @@ void scene::draw()
 	if (cam == nullptr)
 	{
 		cam.reset(new qball_camera());
+		//cam.reset(new euler_angle_orbit());
 		earth.reset(new spheroid(6378137.0f, 6356752.3f));
 	}
 	GLenum err = 0;

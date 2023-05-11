@@ -1,1 +1,1 @@
-C:\Users\akn\source\repos\ademirtug\digital_globe\Debug\digital_globe.exe
+C:\Users\akn\source\repos\digital_globe\Debug\digital_globe.exe
