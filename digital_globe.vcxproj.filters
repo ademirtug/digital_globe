@@ -29,6 +29,12 @@
     <ClInclude Include="spheroid.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="map_provider.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="http_client.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\c_t_direct.frag">

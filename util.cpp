@@ -1,5 +1,31 @@
 #include "util.h"
 #include <algorithm>
+#include <string>
+#include "spheroid.h"
+
+
+box path_to_box(const std::string& plate_path) {
+	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
+	box b = { 0, 0, map_size };
+	//  -map_size-
+	// |---------|
+	// |  c | d  |
+	// |---------|
+	// |  a | b  |
+	// |---------|
+	for (size_t i = 0; i < plate_path.size(); i++) {
+		char c = plate_path[i] - 97;
+		b = {
+			b.x + (c & 1) * b.a / 2,
+			b.y + (c & 2) * b.a / 4,
+			b.a / 2
+		};
+	}
+	return b;
+}
+
+
+
 
 double a = 6.3781370f;
 double b = 6.3567523f;

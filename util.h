@@ -4,7 +4,14 @@
 #include <math.h>
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include <string>
 
+struct box {
+	size_t x{ 0 }, y{ 0 }, a{ 0 };
+};
+box path_to_box(const std::string& plate_path);
+
+//GIS functions
 double N(double phi);
 glm::vec3 lla_to_ecef(double lat_indegrees, double lon_indegrees);
 std::array<double, 3> ecef_to_geo(const std::array<double, 3>& ecef);

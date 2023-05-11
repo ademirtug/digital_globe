@@ -105,7 +105,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>../de2/de2/;../de2/de2/include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -162,6 +162,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="http_client.h" />
+    <ClInclude Include="map_provider.h" />
     <ClInclude Include="spheroid.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>

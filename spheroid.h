@@ -4,6 +4,8 @@
 #include <iostream>
 #include <set>
 #include "glm/glm.hpp"
+#include "util.h"
+#include "map_provider.h"
 
 struct earth {
 
@@ -12,12 +14,6 @@ struct earth {
 struct plate_name {
 	std::string name;
 };
-
-struct box {
-	size_t x{ 0 }, y{ 0 }, a{ 0 };
-};
-
-
 
 class plate : public mesh {
 	size_t resolution_{ 0 };
@@ -30,8 +26,13 @@ public:
 
 class earth_plate : public texture_model {
 public:
-	earth_plate(std::string path, size_t resolution);
+	earth_plate(std::string plate_path, size_t resolution = 16);
 	~earth_plate();
+
+	static map_quest<disk_store> get_provider() {
+		static map_quest<disk_store> provider;
+		return provider;
+	}
 };
 
 
