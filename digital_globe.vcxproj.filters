@@ -18,6 +18,9 @@
     <Filter Include="source">
       <UniqueIdentifier>{d054febe-2918-463e-8dcf-8d435586d2c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{3e374703-39a1-4c99-81b9-f169c521b3bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="util.h">
@@ -26,5 +29,19 @@
     <ClInclude Include="spheroid.h">
       <Filter>headers</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\c_t_direct.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\c_t_direct.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\c_t_point.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\c_t_point.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 #include "util.h"
+#include <algorithm>
 
 double a = 6.3781370f;
 double b = 6.3567523f;
@@ -69,42 +70,49 @@ std::array<double, 3> ecef_to_geo(const std::array<double, 3>& ecef) {
 
 	return(geo);
 }
+glm::vec3 geo_to_ecef(glm::vec3 geo) {
+	glm::vec3 ecef;
+	double e2 = 6.6943799901377997e-3;
 
-
-double lon_to_mercator_x(double lon, double mapsize)
-{
-	//lon range is -180 to 180
-	return mapsize * ((lon + 180) / 360);
+	double lat = geo.x;
+	double lon = geo.y;
+	double alt = geo.z;
+	double n = a / sqrt(1 - e2 * sin(lat) * sin(lat));
+	ecef.x = (n + alt) * cos(lat) * cos(lon);    //ECEF x
+	ecef.y = (n + alt) * cos(lat) * sin(lon);    //ECEF y
+	ecef.z = (n * (1 - e2) + alt) * sin(lat);    //ECEF z
+	return ecef;
 }
 
 
-double lat_to_mercator_y(double lat, double mapsize)
+double lon_to_mercator_x(double lon, double map_size)
 {
-	if (lat < -85.08)
-		lat = -85.08;
+	//lon range is -180 to 180
+	return map_size * ((lon + 180) / 360);
+}
+
+
+double lat_to_mercator_y(double lat, double map_size)
+{
+	//merc projection range
+	lat = std::clamp(lat, -85.08, 85.08);
 
 	double e2 = 1 - ((b / a) * (b / a));
 	double e = sqrt(e2);
-
 	double phi = lat * glm::pi<double>() / 180;
 	double sinphi = sin(phi);
 	double con = e * sinphi;
-
 	con = pow((1.0 - con) / (1.0 + con), e / 2);
-
 	double ts = tan(0.5 * (glm::pi<double>() * 0.5 - phi)) / con;
-
 	double distance = 0 - a * log(ts);
 	//0 to circumference
 	distance += circumference / 2;
 	//now take the complement.
 	distance = circumference - distance;
-
-	distance = (distance / circumference) * mapsize;
-
+	distance = (distance / circumference) * map_size;
 	//sanity check
 	distance = distance < 0 ? 0 : distance;
-	distance = distance > mapsize ? mapsize : distance;
+	distance = distance > map_size ? map_size : distance;
 
 	return distance;
 }
@@ -118,14 +126,12 @@ double merc_y_to_lat(double merc_y, double map_size)
 	auto y = circumference / map_size * (map_size / 2 - merc_y);
 	double e2 = 1 - ((b / a) * (b / a));
 	double e = sqrt(e2);
-
 	double ts = exp(-y / a);
 	double phi = (glm::pi<double>() / 2) - 2 * atan(ts);
 	double dphi = 1.0;
 	int i = 0;
 
-	while ((abs(dphi) > 0.000000001) && (i < 25))
-	{
+	while ((abs(dphi) > 0.000000001) && (i < 25)) {
 		double con = e * sin(phi);
 		dphi = glm::pi<double>() / 2 - 2 * atan(ts * powf((1.0 - con) / (1.0 + con), e / 2)) - phi;
 		phi += dphi;

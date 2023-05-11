@@ -110,6 +110,8 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 			//upper rigth triangle - anti-clockwise
 			indices.insert(indices.end(), { v1, v3 ,v2 });
 
+			//TODO: these normals are wrong, winding rotation changes after 3D transform
+			//which messes the lighting
 			auto n1 = calc_normal(vx[v0].position, vx[v1].position, vx[v2].position);
 			auto n2 = calc_normal(vx[v1].position, vx[v3].position, vx[v0].position);
 			auto n3 = calc_normal(vx[v2].position, vx[v0].position, vx[v3].position);

@@ -165,6 +165,12 @@
     <ClInclude Include="spheroid.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\c_t_direct.frag" />
+    <None Include="shaders\c_t_direct.vert" />
+    <None Include="shaders\c_t_point.frag" />
+    <None Include="shaders\c_t_point.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
