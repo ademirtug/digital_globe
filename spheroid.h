@@ -35,13 +35,16 @@ public:
 
 class spheroid : public sub_system<size_t> {
 public:
-	spheroid(double semi_axis_a, double semi_axis_c) : a(semi_axis_a), c(semi_axis_c) {
+	spheroid(double semi_axis_a, double semi_axis_c) : earth_a(semi_axis_a), c(semi_axis_c) {
 	}
 
 	void process(ecs_s::registry& world, size_t& level);
+
+
+
 private:
 	using rtype = decltype(std::declval<de2>().load_model_async<model>());
-	double a{ .0f }, c{ .0f };
+	double earth_a{ .0f }, c{ .0f };
 	std::map<std::string, rtype> requests_made_;
 	std::vector<rtype> vertices;
 };

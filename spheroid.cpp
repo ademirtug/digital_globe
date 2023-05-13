@@ -29,6 +29,9 @@ void spheroid::process(ecs_s::registry& world, size_t& level) {
 		plates_to_draw.push_back("d");
 	}
 
+
+	
+	
 	for (size_t i = 0; i < plates_to_draw.size(); i++){
 		if (!de2::get_instance().has_model(plates_to_draw[i]) && requests_made_.find(plates_to_draw[i]) == requests_made_.end()) {
 			requests_made_[plates_to_draw[i]] = de2::get_instance().load_model_async<earth_plate>(plates_to_draw[i], plates_to_draw[i]);
@@ -60,10 +63,10 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	// |---------|
 	// |  c | d  |
 	// |---------|
-	// |  a | b  |
+	// |  earth_a | earth_b  |
 	// |---------|
 	
-	// vertices for resolution_ = 2, plate_path=b
+	// vertices for resolution_ = 2, plate_path=earth_b
 	// |-----------------------|
 	// |           |     |     |
 	// |     c     |   box_.y  |
@@ -75,13 +78,13 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	// |-----------0-----1-----2
 	for (size_t y = 0; y <= resolution_; y++) {
 		for (size_t x = 0; x <= resolution_; x++) {
-			double step = box_.a / resolution_;
+			double step = box_.earth_a / resolution_;
 			 
 			vertices.push_back({
 				merc_to_ecef({ box_.x + x * step, box_.y + y * step, 0 }, map_size),/*3D position*/
 				//{ box_.x + x * step, box_.y + y * step, 0 },/*2D position*/
 				{ 0.0, 0.0, 0.0 },/*normal*/
-				{ 1 - (x * step / box_.a),  1 - (y * step / box_.a)}/*uv*/
+				{ 1 - (x * step / box_.earth_a),  1 - (y * step / box_.earth_a)}/*uv*/
 				});
 		}
 	}
@@ -92,7 +95,7 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 			// v2----v3
 			// |     |
 			// v0----v1
-			//term: 2d array in a 1d pack
+			//term: 2d array in earth_a 1d pack
 			int v0 = x + (point_per_row * y);
 			int v1 = x + 1 + (point_per_row * y);
 			int v2 = x + (point_per_row * (y+1));

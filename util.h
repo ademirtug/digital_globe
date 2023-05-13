@@ -7,7 +7,7 @@
 #include <string>
 
 struct box {
-	size_t x{ 0 }, y{ 0 }, a{ 0 };
+	size_t x{ 0 }, y{ 0 }, earth_a{ 0 };
 };
 box path_to_box(const std::string& plate_path);
 
@@ -26,3 +26,7 @@ glm::vec3 lla_to_ecef(double lat_indegrees, double lon_indegrees);
 glm::vec3 merc_to_ecef(glm::vec3 input, double map_size);
 
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3);
+
+
+bool solve_quadratic(float a, float b, float c, float& t0, float& t1);
+void sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction);

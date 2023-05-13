@@ -30,6 +30,12 @@ int main()
 	size_t level = 3;
 	renderer_system renderer;
 
+	//+x=anti meridian
+	//-x=meridian
+	//+y=india
+	//-y=panama
+	//+z=south pole
+	//-z=north pole
 	//approximate sun position
 	time_t rawtime;
 	time(&rawtime);
@@ -43,6 +49,7 @@ int main()
 	de2::get_instance().on<pre_render>([&](std::chrono::nanoseconds ns) {
 		end = std::chrono::high_resolution_clock::now();
 
+		//term: fps counter;
 		fps++;
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() > 10000000) {
 			eng.set_title("Frame Time(msec): " + std::to_string(1000 / fps));
@@ -53,41 +60,10 @@ int main()
 		});
 
 	de2::get_instance().on<render>([&world, &renderer](std::chrono::nanoseconds ns) {
-		//renderer.l = std::make_shared<directional_light>(renderer.cam_->getpos());
+
 		renderer.process(world, ns);
 		});
 
-	map_quest<disk_store> mq;
-	mq.get("a");
-
-	////util test
-	//double lat = 0;
-	//double lon = 0;
-	//double mercx = 0;
-	//double mercy = 0;
-
-	//std::vector<glm::vec3> mx;
-	//std::vector<glm::vec3> lx;
-	//std::vector<glm::vec3> m_y_lat;
-	//std::vector<float> m_x_lon;
-	//float step = 128;
-	//for (size_t i = 0; i <= 8; i++) {
-	//	std::cout << "merc_x: (" << i * step << ") ->" << merc_x_to_lon(i * step, 1024) << std::endl;
-	//}
-	//std::cout << std::endl;
-
-	//for (size_t i = 0; i <= 8; i++) {
-	//	std::cout << "merc_y: (" << i * step << ") ->" << merc_y_to_lat(i * step, 1024) << std::endl;
-	//}
-
-	//glm::vec3 ecef = merc_to_ecef({ 512, 512, 0 }, 1024);
-
-	//for (size_t i = 0; i <= 8; i++) {
-	//	std::cout << "merc_x: (" << i * step << ") ->" << merc_y_to_lat(i * step, 1024) << std::endl;
-
-	//}
-	//eng.enable_wireframe_mode();
-	//eng.enable_point_mode();
 	eng.run();
 
 	return 0;
