@@ -28,9 +28,6 @@ void spheroid::process(ecs_s::registry& world, size_t& level) {
 		plates_to_draw.push_back("c");
 		plates_to_draw.push_back("d");
 	}
-
-
-	
 	
 	for (size_t i = 0; i < plates_to_draw.size(); i++){
 		if (!de2::get_instance().has_model(plates_to_draw[i]) && requests_made_.find(plates_to_draw[i]) == requests_made_.end()) {
