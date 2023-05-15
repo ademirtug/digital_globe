@@ -215,12 +215,13 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 	auto r1 = ecef_to_geo({ hit1.x, hit1.y, hit1.z });
 	auto r2 = ecef_to_geo({ hit2.x, hit2.y, hit2.z });
 
-	std::string s_mgeo = std::format("lat1:{:02.2f} lon1:{:02.2f}", r1[0], r1[1]);
-	std::string s_mgeo2 = std::format(" - lat2:{:02.2f} lon2:{:02.2f}", r2[0], r2[1]);
-	de2::get_instance().set_title(s_mgeo + s_mgeo2);
+	std::string s_mgeo = std::format("lat1:{:02.2f} lon1:{:02.2f}", -r1[0], r1[1] > 0 ? 180 - r1[1] : -(180 + r1[1]));
+	//std::string s_mgeo2 = std::format(" - lat2:{:02.2f} lon2:{:02.2f}", r2[0], r2[1]);
+	de2::get_instance().set_title(s_mgeo /*+ s_mgeo2*/);
 
-	auto rx = r2;//t0 < 0 ? r2 : r1;
-	return glm::vec3(rx[0], rx[1], rx[2]);
+	auto rx = t0 < 0 ? r2 : r1;
+	//TODO: why do i need this little dirty hack?
+	return glm::vec3(-rx[0], rx[1] > 0 ? 180 - rx[1] : -(180 + rx[1]), rx[2]);
 }
 
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir) {
