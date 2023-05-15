@@ -13,22 +13,22 @@ double constexpr circumference = 2 * glm::pi<double>() * earth_a;
 
 box path_to_box(const std::string& plate_path) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
-	box earth_b = { 0, 0, map_size };
+	box b = { 0, 0, map_size };
 	//  -map_size-
 	// |---------|
 	// |  c | d  |
 	// |---------|
-	// |  earth_a | earth_b  |
+	// |  a | b  |
 	// |---------|
 	for (size_t i = 0; i < plate_path.size(); i++) {
 		char c = plate_path[i] - 97;
-		earth_b = {
-			earth_b.x + (c & 1) * earth_b.earth_a / 2,
-			earth_b.y + (c & 2) * earth_b.earth_a / 4,
-			earth_b.earth_a / 2
+		b = {
+			b.x + (c & 1) * b.a / 2,
+			b.y + (c & 2) * b.a / 4,
+			b.a / 2
 		};
 	}
-	return earth_b;
+	return b;
 }
 
 double N(double phi){
