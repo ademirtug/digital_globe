@@ -42,8 +42,8 @@ int main()
 	time_t rawtime;
 	time(&rawtime);
 	float e2 = 2 * glm::pi<float>() * ((gmtime(&rawtime)->tm_hour) / 24.0);
-	renderer.l = std::make_shared<directional_light>(glm::vec3({ cos(e2), sin(e2), 0 }));
-	//renderer.l = std::make_shared<directional_light>(glm::vec3({ 0, 1, 0 }));
+	renderer.l = std::make_shared<directional_light>(glm::vec3({ -cos(e2), sin(e2), 0 }));
+
 
 	float fps = 0;
 	auto begin = std::chrono::high_resolution_clock::now();
@@ -64,7 +64,7 @@ int main()
 	de2::get_instance().on<render>([&world, &renderer](std::chrono::nanoseconds ns) {
 
 		renderer.process(world, ns);
-		sphere_intersection(renderer.cam_->getpos(), renderer.cam_->getpos());
+		
 		});
 
 	eng.run();

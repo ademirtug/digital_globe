@@ -128,7 +128,7 @@ earth_plate::~earth_plate() {
 	glDeleteVertexArrays(1, &vao);
 }
 
-map_quest<null_store>& earth_plate::get_provider() {
-	static map_quest<null_store> provider;
+map_quest<disk_store>& earth_plate::get_provider() {
+	static map_quest<disk_store> provider;
 	return provider;
 }

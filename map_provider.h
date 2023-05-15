@@ -20,7 +20,6 @@ class disk_store {
 public:
 	std::shared_ptr<texture> get(const std::string& plate_path) {
 		if (!std::filesystem::exists("C:\\mapdata\\" + plate_path + ".png")) {
-			std::cout << "disk_store " << plate_path << " does not exist" << std::endl;
 			return nullptr;
 		}
 		return std::make_shared<texture>("C:\\mapdata\\" + plate_path + ".png");
@@ -41,7 +40,6 @@ public:
 		if (tex != nullptr)
 			return tex;
 
-		
 		box earth_b = path_to_box(plate_path);
 		size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
 		std::string http_request = std::format("https://www.mapquestapi.com/staticmap/v5/map?key={}&format=png&center={},{}&size=256,256&zoom={}&type=sat", 

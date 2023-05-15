@@ -180,7 +180,6 @@ glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3){
 	return glm::cross(pt2 - pt1, pt3 - pt1);
 }
 
-
 bool solve_quadratic(float a, float b, float c, float& t0, float& t1) {
 
 	float discriminant = (b * b) - (4 * a * c);
@@ -195,24 +194,18 @@ bool solve_quadratic(float a, float b, float c, float& t0, float& t1) {
 		t0 = (- b - droot) / (2.0f * a);
 		t1 = (- b + droot) / (2.0f * a);
 	}
-
 	return true;
 }
 
+//TODO: WGS84 is a spheroid not a sphere!
 glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
-	double r = earth_a;
-
 	//a = dot of ray origin -> dot(camera pos) or a mouse ray
-	//b = ray direction -> 
+	//b = ray direction -> where you want to go
 	//r = radius -> earth_a
 	//t = hit distance -> solutions
-	glm::mat4 rot_mat = glm::rotate(glm::mat4(1.0f), glm::pi<float>() / 2.0f, glm::vec3(1, 0, 0));
-	ray_origin = glm::vec3(glm::vec4(ray_origin, 1.0f) * rot_mat);
-	ray_direction = glm::vec3(glm::vec4(ray_direction, 1.0f) * rot_mat);
-
 	float a = glm::dot(ray_direction, ray_direction);
 	float b = glm::dot(ray_origin, ray_direction) * 2.0f;
-	float c = glm::dot(ray_origin, ray_origin) - (r * r);
+	float c = glm::dot(ray_origin, ray_origin) - (earth_a * earth_a);
 
 	float t0{ 0 }, t1{ 0 };
 	if (!solve_quadratic(a, b, c, t0, t1))
@@ -223,12 +216,16 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 	auto r1 = ecef_to_geo({ hit1.x, hit1.y, hit1.z });
 	auto r2 = ecef_to_geo({ hit2.x, hit2.y, hit2.z });
 
-	auto rx = r1;//t0 > 0 ? r1 : r2;
+	auto rx = t0 > 0 ? r2 : r1;
+	return glm::vec3(rx[0], -rx[1], rx[2]);
+}
 
-	//de2::get_instance().set_title("lat: " + std::to_string(rx[0]) + ", lon:  " + std::to_string(rx[1]) + "---" + "lat: " + std::to_string(c_res.b) + ", lon:  " + std::to_string(c_res.l) );
-	de2::get_instance().set_title("lat: " + std::to_string(rx[0]) + ", lon:  " + std::to_string(-rx[1]));
-	int stop = 1;
 
-	return glm::vec3(0,0,0);
-
+glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir) {
+	glm::vec2 ndc_mouse{ ((mouse.x * 2) - viewport.x) / viewport.x, -((mouse.y * 2) - viewport.y) / viewport.y };
+	glm::vec4 ray_clip{ ndc_mouse, dir, 1.0f };
+	glm::vec4 ray_eye = glm::inverse(projection) * ray_clip;
+	ray_eye = glm::vec4(ray_eye.x, ray_eye.y, dir, 0.0f);
+	glm::vec3 ray_world = glm::normalize((glm::inverse(view) * ray_eye));
+	return ray_world;
 }

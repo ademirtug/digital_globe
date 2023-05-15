@@ -29,5 +29,6 @@ glm::vec3 merc_to_ecef(glm::vec3 input, double map_size);
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3);
 
 
+glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir = -1.0f);
 bool solve_quadratic(float a, float b, float c, float& t0, float& t1);
 glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction);
