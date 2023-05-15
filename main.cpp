@@ -57,12 +57,8 @@ int main()
 		renderer.process(world, ns);
 		
 		//Coordinates, based on sphere not WGS84 spheroid!!!!
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 projection = glm::mat4(1.0f);
-		view = glm::rotate(renderer.cam_->getview(), glm::pi<float>() / 2, glm::vec3(1.0, 0, 0));
-		projection = glm::perspective(glm::radians(45.0f), (float)de2::get_instance().viewport.x / (float)de2::get_instance().viewport.y, 0.1f, 100.0f);
-		auto from = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, projection, view, -1.0f);
-		auto to = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, projection, view, 1.0f);
+		auto from = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
+		auto to = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
 
 		auto m_geo = sphere_intersection(from, to - from);
 		std::string s_mgeo = std::format("lat:{:02.2f} lon:{:02.2f}", m_geo[0], m_geo[1]);

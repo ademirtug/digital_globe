@@ -9,12 +9,6 @@ void spheroid::process(ecs_s::registry& world, size_t& level) {
 	std::vector<std::string> plates_to_draw;
 	std::vector<std::string> plates;
 
-
-
-
-
-
-
 	world.view<plate_name>([&node_count](ecs_s::entity& e, plate_name& pn) {
 		std::string plate_root = pn.name.substr(0, pn.name.size() - 1);
 		if (node_count.find(plate_root) == node_count.end())
@@ -29,6 +23,10 @@ void spheroid::process(ecs_s::registry& world, size_t& level) {
 			plates_to_draw.push_back(kv.first);
 		}
 	}
+
+	//here we goooooo!
+	//auto top_ray = ray_cast();
+
 	if (plates_to_draw.size() == 0) {
 		plates_to_draw.push_back("a");
 		plates_to_draw.push_back("b");
