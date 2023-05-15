@@ -47,7 +47,7 @@ int main()
 	renderer.l = std::make_shared<directional_light>(glm::vec3({ cos(e2), sin(e2), 0 }));
 
 	de2::get_instance().on<pre_render>([&](std::chrono::nanoseconds ns) {
-		s.process(world, level);
+		s.process(world, renderer.cam_->zoom_);
 		});
 	
 	float fps = 0;
@@ -57,7 +57,7 @@ int main()
 
 		renderer.process(world, ns);
 		
-		//Coordinates, based on sphere not wgs84 spheroid!!!!
+		//Coordinates, based on sphere not WGS84 spheroid!!!!
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
 		view = glm::rotate(renderer.cam_->getview(), glm::pi<float>() / 2, glm::vec3(1.0, 0, 0));
