@@ -44,26 +44,27 @@ int main()
 	float e2 = 2 * glm::pi<float>() * ((gmtime(&rawtime)->tm_hour) / 24.0);
 	renderer.l = std::make_shared<directional_light>(glm::vec3({ cos(e2), sin(e2), 0 }));
 
-
-	float fps = 0;
-	auto begin = std::chrono::high_resolution_clock::now();
-	auto end = begin;
 	de2::get_instance().on<pre_render>([&](std::chrono::nanoseconds ns) {
-		end = std::chrono::high_resolution_clock::now();
-
-		//term: fps counter;
-		fps++;
-		if (std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() > 10000000) {
-			//eng.set_title("Frame Time(msec): " + std::to_string(1000 / fps));
-			begin = end;
-			fps = 0;
-		}
 		s.process(world, level);
 		});
 	
-	de2::get_instance().on<render>([&world, &renderer](std::chrono::nanoseconds ns) {
+	float fps = 0;
+	auto begin = std::chrono::high_resolution_clock::now();
+	auto end = begin;
+	std::string perf = "";
+	de2::get_instance().on<render>([&](std::chrono::nanoseconds ns) {
 
 		renderer.process(world, ns);
+		
+		end = std::chrono::high_resolution_clock::now();
+
+		////term: fps counter;
+		//fps++;
+		//if (std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() > 10000000) {
+		//	perf = "Frame Time(msec): " + std::to_string(1000 / fps) + " - ";
+		//	begin = end;
+		//	fps = 0;
+		//}
 
 		//Coordinates, based on sphere not wgs84 spheroid!!!!
 		glm::mat4 view = glm::mat4(1.0f);
@@ -75,7 +76,7 @@ int main()
 
 		auto m_geo = sphere_intersection(from, to - from);
 		std::string s_mgeo = std::format("lat:{:02.2f} lon:{:02.2f}", m_geo[0], m_geo[1]);
-		de2::get_instance().set_title(s_mgeo);
+		de2::get_instance().set_title(perf + s_mgeo);
 		
 		});
 
