@@ -15,6 +15,8 @@
 #include "spheroid.h"
 #include "util.h"
 #include "map_provider.h"
+
+
 using namespace std;
 using namespace ecs_s;
 
@@ -51,21 +53,10 @@ int main()
 	float fps = 0;
 	auto begin = std::chrono::high_resolution_clock::now();
 	auto end = begin;
-	std::string perf = "";
 	de2::get_instance().on<render>([&](std::chrono::nanoseconds ns) {
 
 		renderer.process(world, ns);
 		
-		end = std::chrono::high_resolution_clock::now();
-
-		////term: fps counter;
-		//fps++;
-		//if (std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() > 10000000) {
-		//	perf = "Frame Time(msec): " + std::to_string(1000 / fps) + " - ";
-		//	begin = end;
-		//	fps = 0;
-		//}
-
 		//Coordinates, based on sphere not wgs84 spheroid!!!!
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
@@ -76,7 +67,7 @@ int main()
 
 		auto m_geo = sphere_intersection(from, to - from);
 		std::string s_mgeo = std::format("lat:{:02.2f} lon:{:02.2f}", m_geo[0], m_geo[1]);
-		de2::get_instance().set_title(perf + s_mgeo);
+		de2::get_instance().set_title(s_mgeo);
 		
 		});
 
