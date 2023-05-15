@@ -9,6 +9,12 @@ void spheroid::process(ecs_s::registry& world, size_t& level) {
 	std::vector<std::string> plates_to_draw;
 	std::vector<std::string> plates;
 
+
+
+
+
+
+
 	world.view<plate_name>([&node_count](ecs_s::entity& e, plate_name& pn) {
 		std::string plate_root = pn.name.substr(0, pn.name.size() - 1);
 		if (node_count.find(plate_root) == node_count.end())
@@ -64,7 +70,7 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	// |  a | b  |
 	// |---------|
 	
-	// vertices for resolution_ = 2, plate_path=earth_b
+	// vertices for resolution_ = 2, plate_path=b
 	// |-----------------------|
 	// |           |     |     |
 	// |     c     |   box_.y  |
@@ -76,13 +82,13 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	// |-----------0-----1-----2
 	for (size_t y = 0; y <= resolution_; y++) {
 		for (size_t x = 0; x <= resolution_; x++) {
-			double step = box_.earth_a / resolution_;
+			double step = box_.a / resolution_;
 			 
 			vertices.push_back({
 				merc_to_ecef({ box_.x + x * step, box_.y + y * step, 0 }, map_size),/*3D position*/
 				//{ box_.x + x * step, box_.y + y * step, 0 },/*2D position*/
 				{ 0.0, 0.0, 0.0 },/*normal*/
-				{ 1 - (x * step / box_.earth_a),  1 - (y * step / box_.earth_a)}/*uv*/
+				{ 1 - (x * step / box_.a),  1 - (y * step / box_.a)}/*uv*/
 				});
 		}
 	}
@@ -93,7 +99,7 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 			// v2----v3
 			// |     |
 			// v0----v1
-			//term: 2d array in earth_a 1d pack
+			//term: 2d array in a 1d pack
 			int v0 = x + (point_per_row * y);
 			int v1 = x + 1 + (point_per_row * y);
 			int v2 = x + (point_per_row * (y+1));

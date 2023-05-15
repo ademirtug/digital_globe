@@ -7,7 +7,7 @@
 #include <string>
 
 struct box {
-	size_t x{ 0 }, y{ 0 }, earth_a{ 0 };
+	size_t x{ 0 }, y{ 0 }, a{ 0 };
 };
 box path_to_box(const std::string& plate_path);
 
