@@ -112,6 +112,15 @@
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>lib</AdditionalLibraryDirectories>
     </Link>
+    <CustomBuildStep>
+      <Command>xcopy "$(SolutionDir)models"  "$(OutDir)models" /I /E /Y &amp;
+xcopy "$(SolutionDir)shaders"  "$(OutDir)shaders" /I /E /Y &amp;
+xcopy "$(SolutionDir)textures"  "$(OutDir)textures" /I /E /Y &amp;
+xcopy "$(SolutionDir)lib\glfw3.dll"  "$(OutDir)" /Y</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>non_existent_file.txt</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
