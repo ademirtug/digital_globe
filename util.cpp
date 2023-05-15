@@ -199,7 +199,7 @@ bool solve_quadratic(float a, float b, float c, float& t0, float& t1) {
 //TODO: WGS84 is a spheroid not a sphere!
 glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 	//a = dot of ray origin -> dot(camera pos) or a mouse ray
-	//b = ray direction -> where you want to go
+	//b = ray direction -> 
 	//r = radius -> earth_a
 	//t = hit distance -> solutions
 	float a = glm::dot(ray_direction, ray_direction);
@@ -212,16 +212,12 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 
 	glm::vec3 hit1 = ray_origin + ray_direction * t0;
 	glm::vec3 hit2 = ray_origin + ray_direction * t1;
-	auto r1 = ecef_to_geo({ hit1.x, hit1.y, hit1.z });
-	auto r2 = ecef_to_geo({ hit2.x, hit2.y, hit2.z });
-
-	std::string s_mgeo = std::format("lat1:{:02.2f} lon1:{:02.2f}", -r1[0], r1[1] > 0 ? 180 - r1[1] : -(180 + r1[1]));
-	//std::string s_mgeo2 = std::format(" - lat2:{:02.2f} lon2:{:02.2f}", r2[0], r2[1]);
-	de2::get_instance().set_title(s_mgeo /*+ s_mgeo2*/);
+	//TODO: find the cause of this left hand - right hand difference, probably in inverse transformations.
+	auto r1 = ecef_to_geo({ -hit1.x, hit1.y, -hit1.z });
+	auto r2 = ecef_to_geo({ -hit2.x, hit2.y, -hit2.z });
 
 	auto rx = t0 < 0 ? r2 : r1;
-	//TODO: why do i need this little dirty hack?
-	return glm::vec3(-rx[0], rx[1] > 0 ? 180 - rx[1] : -(180 + rx[1]), rx[2]);
+	return glm::vec3(rx[0], rx[1], rx[2]);
 }
 
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir) {
