@@ -32,7 +32,6 @@ int main()
 	size_t level = 3;
 	renderer_system renderer;
 
-	//wgs84
 	//-x=meridian
 	//+x=anti meridian
 	//-y=india
