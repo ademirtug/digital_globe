@@ -42,7 +42,7 @@ int main()
 	time_t rawtime;
 	time(&rawtime);
 	float e2 = 2 * glm::pi<float>() * ((gmtime(&rawtime)->tm_hour) / 24.0);
-	renderer.l = std::make_shared<directional_light>(glm::vec3({ -cos(e2), sin(e2), 0 }));
+	renderer.l = std::make_shared<directional_light>(glm::vec3({ cos(e2), sin(e2), 0 }));
 
 
 	float fps = 0;
@@ -54,7 +54,7 @@ int main()
 		//term: fps counter;
 		fps++;
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() > 10000000) {
-			eng.set_title("Frame Time(msec): " + std::to_string(1000 / fps));
+			//eng.set_title("Frame Time(msec): " + std::to_string(1000 / fps));
 			begin = end;
 			fps = 0;
 		}

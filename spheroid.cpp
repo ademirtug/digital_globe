@@ -60,7 +60,7 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	// |---------|
 	// |  c | d  |
 	// |---------|
-	// |  earth_a | earth_b  |
+	// |  a | b  |
 	// |---------|
 	
 	// vertices for resolution_ = 2, plate_path=earth_b

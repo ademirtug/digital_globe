@@ -2,7 +2,14 @@
 #include <algorithm>
 #include <string>
 #include "spheroid.h"
-#include <math.h> 
+#include <math.h>
+#include <format>
+
+
+double constexpr earth_a = 6.3781370f;
+double constexpr earth_b = 6.3567523f;
+double constexpr circumference = 2 * glm::pi<double>() * earth_a;
+
 
 box path_to_box(const std::string& plate_path) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
@@ -23,13 +30,6 @@ box path_to_box(const std::string& plate_path) {
 	}
 	return earth_b;
 }
-
-
-
-
-double earth_a = 6.3781370f;
-double earth_b = 6.3567523f;
-double circumference = 2 * glm::pi<double>() * earth_a;
 
 double N(double phi){
 	return earth_a * earth_a / sqrt(earth_a * earth_a * cos(phi) * cos(phi) + earth_b * earth_b * sin(phi) * sin(phi));
@@ -55,7 +55,7 @@ std::array<double, 3> ecef_to_geo(std::array<double, 3> ecef) {
 	  double g, rg, rf, u, v, m, f, p, x, y, z;
 	  double n, lat, lon, alt;
 
-	x = ecef[0] * 1000000;
+	x = ecef[0] * 1000000 ;
 	y = ecef[1] * 1000000;
 	z = ecef[2] * 1000000;
 	zp = std::abs(z);
@@ -93,6 +93,7 @@ std::array<double, 3> ecef_to_geo(std::array<double, 3> ecef) {
 	if (z < 0.0) {
 		geo[0] *= -1.0;     //Lat
 	}
+	//convert to angles
 	geo[0] = geo[0] * 180 / glm::pi<double>();
 	geo[1] = geo[1] * 180 / glm::pi<double>();
 	return(geo);    //Return Lat, Lon, Altitude in that order
@@ -113,7 +114,7 @@ glm::vec3 geo_to_ecef(glm::vec3 geo) {
 
 
 double lon_to_mercator_x(double lon, double map_size){
-	//lon range is -180 to 180
+	//lon range is -180 to 180 -> 0 to 360
 	return map_size * ((lon + 180) / 360);
 }
 double lat_to_mercator_y(double lat, double map_size){
@@ -144,7 +145,7 @@ double merc_x_to_lon(double merc_x, double map_size) {
 	return lon;
 }
 double merc_y_to_lat(double merc_y, double map_size){
-	auto y = circumference / map_size * (map_size / 2 - merc_y);
+	double y = circumference / map_size * (map_size / 2 - merc_y);
 	double e2 = 1 - ((earth_b / earth_a) * (earth_b / earth_a));
 	double e = sqrt(e2);
 	double ts = exp(-y / earth_a);
@@ -163,7 +164,6 @@ double merc_y_to_lat(double merc_y, double map_size){
 glm::vec3 merc_to_ecef(glm::vec3 input, double map_size){
 	double lat = merc_y_to_lat(input.y, map_size);
 	double lon = merc_x_to_lon(input.x, map_size);
-
 	return lla_to_ecef(lat, lon);
 }
 glm::vec3 lla_to_ecef(double lat_indegrees, double lon_indegrees){
@@ -181,7 +181,6 @@ glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3){
 }
 
 bool solve_quadratic(float a, float b, float c, float& t0, float& t1) {
-
 	float discriminant = (b * b) - (4 * a * c);
 	if (discriminant < 0) //no solution
 		return false; 
@@ -216,16 +215,19 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 	auto r1 = ecef_to_geo({ hit1.x, hit1.y, hit1.z });
 	auto r2 = ecef_to_geo({ hit2.x, hit2.y, hit2.z });
 
-	auto rx = t0 > 0 ? r2 : r1;
-	return glm::vec3(rx[0], -rx[1], rx[2]);
+	std::string s_mgeo = std::format("lat1:{:02.2f} lon1:{:02.2f}", r1[0], r1[1]);
+	std::string s_mgeo2 = std::format(" - lat2:{:02.2f} lon2:{:02.2f}", r2[0], r2[1]);
+	de2::get_instance().set_title(s_mgeo + s_mgeo2);
+
+	auto rx = r2;//t0 < 0 ? r2 : r1;
+	return glm::vec3(rx[0], rx[1], rx[2]);
 }
 
-
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir) {
-	glm::vec2 ndc_mouse{ ((mouse.x * 2) - viewport.x) / viewport.x, -((mouse.y * 2) - viewport.y) / viewport.y };
+	glm::vec2 ndc_mouse{ ((mouse.x * 2) - viewport.x) / viewport.x, -((mouse.y * 2) - viewport.y) / viewport.y};
 	glm::vec4 ray_clip{ ndc_mouse, dir, 1.0f };
 	glm::vec4 ray_eye = glm::inverse(projection) * ray_clip;
-	ray_eye = glm::vec4(ray_eye.x, ray_eye.y, dir, 0.0f);
-	glm::vec3 ray_world = glm::normalize((glm::inverse(view) * ray_eye));
+	glm::vec4 ray_world = glm::inverse(view) * ray_eye;
+	ray_world /= ray_world.w;
 	return ray_world;
 }
