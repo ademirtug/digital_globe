@@ -3,6 +3,7 @@
 #include "../../ecs_s/ecs_s.hpp"
 #include "util.h"
 #include "map_provider.h"
+#include <glm/gtx/vector_angle.hpp>
 
 void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	std::map<std::string, size_t> node_count;
@@ -12,39 +13,62 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	std::set<std::string> visible_roots;
 	std::set<std::string> in, out;
 
-	//We need to confirm two things...
+	//task: find visible plates
+	//there are 2 ideas to do this
+	//IDEA 1 -> We need to confirm two things...
 	//1-is dot(normal, camera.pos()) < 90? 
 	//2-is that point within NDC cube?
-	//std::array<std::string, 4> pn{ "a", "b", "c", "d" };
-	//in.emplace("a");
-	//in.emplace("b");
-	//in.emplace("c");
-	//in.emplace("d");
+	// IMPLEMENT!!!
+	
 
-	//std::string root = "";
-	//for (size_t i = 0; i < renderer.cam_->zoom_; i++) {
-	//	for (std::string plate : in){
-	//		//now check is it facing to us or not?
-	//		bool is_facing = false;
-	//		corner_normals cn = get_corner_normals(plate);
+	//IDEA 2 -> cast triple ray from edges of screen
+	//to see either they hit the sphere or not.
+	//any dot(plate_corner_normal, camera_pos) greater than 
+	//dot(hit_normal, camera_pos) is invisible to user.
+	//|---------------------------------|
+	//|									|
+	//|									|
+	//|	  l3    				   l6	|
+	//|l1,l2					   l4,l5|
+	//|									|
+	//|									|
+	//|---------------------------------|
+	
+	//this should be around 70, only infinite distance 
+	//can get 90, like in the directional lighting.
+	float max_visible_angle = 90;
+	auto vp = de2::get_instance().viewport;
+	//we need triple point to calculate surface normal;
+	glm::vec2 l1{ 0, vp.y / 2 }, l2{ 1, vp.y / 2 }, l3{ 1, (vp.y / 2) + 1 };
+	glm::vec2 l4{ vp.x - 1, vp.y / 2 }, l5{ vp.x, vp.y / 2 }, l6{ vp.x - 1, (vp.y / 2) + 1 };
 
-	//		for (size_t z = 0; z < 4; z++){
-	//			if (glm::dot(glm::normalize(renderer.cam_->getpos()), cn[z]) < 90) {
-	//				is_facing = true;
-	//				break;
-	//			}
-	//		}
-	//		
-	//	}
-	//	//for (size_t x = 0; x < in.size(); x++) {
-	//	//	std::string plate = in.;
-	//	//	//now check is it facing to us or not?
-	//	//	bool is_facing = false;
+	//we will actually calculate only 1 because 
+	//we are still using sphere not spheroid
+	//normal = glm::normalize(ecef)
 
-	//	//	corner_normals cn = get_corner_normals(plate);
-	//	//}	
-	//}
+	
+	auto from = cast_ray(l1, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
+	auto to = cast_ray(l1, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
+	auto edge_hit = sphere_intersection(from, to - from);
+	glm::vec3 cam = glm::vec4(renderer.cam_->get_world_pos(), 0.0) * renderer.get_view();
+	cam.y *= -1;
+	float angle = glm::dot(glm::normalize(edge_hit), glm::normalize(cam));
+	float gangle = glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
+	auto hit_geo = ecef_to_geo({ edge_hit.x, edge_hit.y, edge_hit.z });
 
+
+	//Coordinates, based on sphere not WGS84 spheroid!!!!
+	auto mfrom = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
+	auto mto = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
+
+	auto mouse_hit = sphere_intersection(mfrom, mto - mfrom);
+	//TODO: find the cause of this left hand - right hand difference, probably in the inverse transformations.
+	auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
+	
+
+	std::string s_mgeo = std::format("edge_hit -> ({:02.2f},{:02.2f},{:02.2f}) | camera -> ({:02.2f},{:02.2f},{:02.2f}) | angle -> {:02.2f} | (sphere coords) -> ({:02.2f},{:02.2f},{:02.2f})",
+		edge_hit.x, edge_hit.y, edge_hit.z, cam.x, cam.y, cam.z,  gangle * 180/glm::pi<float>(), mouse_hit.x, mouse_hit.y, mouse_hit.z);
+	de2::get_instance().set_title(s_mgeo);
 
 	//iterate over all the plates and get a full quad tree
 	world.view<plate_name>([&node_count](ecs_s::entity& e, plate_name& pn) {

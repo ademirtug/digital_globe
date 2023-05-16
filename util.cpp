@@ -34,13 +34,13 @@ corner_normals calculate_corner_normals(std::string plate_path_, size_t resoluti
 	// resolution_ = 3, plate_path = generic 
 	//   |<-----------b.a----------->|
 	//	 v7-------v8--------v10------v11  -
-	//	 |	 n2   |		    |  n3	 |    |
+	//	 |	 cn2  |		    |  cn3	 |    |
 	//	 |        |		    |        |    |
 	//	 v6-------|---------|--------v9   |
 	//	 |<-step->|		    |		 |   b.a
 	//	 |		  |		    |		 |    |
 	//	 v2-------|---------|--------v5   |
-	//	 |   n0   |		    |  n1    |    |
+	//	 |   cn0  |		    |  cn1   |    |
 	//	 |        |		    |        |    |
 	//	 v0-------v1--------v3-------v4   -
 	//(b.x, b.y) 
@@ -252,12 +252,11 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 
 	glm::vec3 hit1 = ray_origin + ray_direction * t0;
 	glm::vec3 hit2 = ray_origin + ray_direction * t1;
-	//TODO: find the cause of this left hand - right hand difference, probably in the inverse transformations.
-	auto r1 = ecef_to_geo({ -hit1.x, hit1.y, -hit1.z });
-	auto r2 = ecef_to_geo({ -hit2.x, hit2.y, -hit2.z });
+	//reverse hand
+	hit1 = { -hit1.x, hit1.y, -hit1.z };
+	hit2 = { -hit2.x, hit2.y, -hit2.z };
 
-	auto rx = t0 < 0 ? r2 : r1;
-	return glm::vec3(rx[0], rx[1], rx[2]);
+	return t0 < 0 ? hit2 : hit1;
 }
 
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir) {
