@@ -6,11 +6,6 @@
 #include <format>
 
 
-double constexpr earth_a = 6.3781370f;
-double constexpr earth_b = 6.3567523f;
-double constexpr circumference = 2 * glm::pi<double>() * earth_a;
-
-
 box path_to_box(const std::string& plate_path) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
 	box b = { 0, 0, map_size };

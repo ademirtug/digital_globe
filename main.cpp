@@ -8,12 +8,13 @@
 #pragma comment (lib, "de2.lib")
 
 
+#include <set>
+#include <iostream>
+
 //https://github.com/ademirtug/de2/
 #include "de2.h"
-#include <iostream>
-#include <set>
-#include "spheroid.h"
 #include "util.h"
+#include "spheroid.h"
 #include "map_provider.h"
 
 
@@ -29,7 +30,6 @@ int main()
 
 	spheroid s(6378137.0f, 6356752.3f);
 	registry world;
-	size_t level = 3;
 	renderer_system renderer;
 
 	//-x=meridian
@@ -45,8 +45,11 @@ int main()
 	float e2 = 2 * glm::pi<float>() * ((gmtime(&rawtime)->tm_hour) / 24.0);
 	renderer.l = std::make_shared<directional_light>(glm::vec3({ cos(e2), sin(e2), 0 }));
 
+	
+	//de2::get_instance().enable_wireframe_mode();
+
 	de2::get_instance().on<pre_render>([&](std::chrono::nanoseconds ns) {
-		s.process(world, renderer.cam_->zoom_);
+		s.process(world, renderer);
 		});
 	
 	float fps = 0;

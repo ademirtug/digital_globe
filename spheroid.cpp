@@ -4,11 +4,32 @@
 #include "util.h"
 #include "map_provider.h"
 
-void spheroid::process(ecs_s::registry& world, size_t& level) {
+void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	std::map<std::string, size_t> node_count;
 	std::vector<std::string> plates_to_draw;
 	std::vector<std::string> plates;
+	std::set<std::string> visible_plates;
 
+
+	//here we goooooo!
+	//we need to confirm two things
+	//1-is dot(normal, camera.pos()) < 90? means that is it facing to us? 
+	//2-is that point within NDC cube?
+	//if answer for both questions are yes then we are going to draw it.
+	std::array<std::string, 4> pn{ "a", "b", "c", "d" };
+	std::string root = "";
+	for (size_t i = 0; i < renderer.cam_->zoom_; i++) {
+		for (size_t x = 0; x < 4; x++) {
+			std::string plate = root + pn[x];
+			//now check is it facing to us or not?
+		}
+
+	}
+
+
+
+
+	//iterate over all the plates and get a full quad tree
 	world.view<plate_name>([&node_count](ecs_s::entity& e, plate_name& pn) {
 		std::string plate_root = pn.name.substr(0, pn.name.size() - 1);
 		if (node_count.find(plate_root) == node_count.end())
@@ -24,8 +45,7 @@ void spheroid::process(ecs_s::registry& world, size_t& level) {
 		}
 	}
 
-	//here we goooooo!
-	//auto top_ray = ray_cast();
+
 
 	if (plates_to_draw.size() == 0) {
 		plates_to_draw.push_back("a");
@@ -34,17 +54,19 @@ void spheroid::process(ecs_s::registry& world, size_t& level) {
 		plates_to_draw.push_back("d");
 	}
 	
+	//make requests for required plates
 	for (size_t i = 0; i < plates_to_draw.size(); i++){
 		if (!de2::get_instance().has_model(plates_to_draw[i]) && requests_made_.find(plates_to_draw[i]) == requests_made_.end()) {
 			requests_made_[plates_to_draw[i]] = de2::get_instance().load_model_async<earth_plate>(plates_to_draw[i], plates_to_draw[i]);
 		}
 	}
 
+	//evaluate any plate request that has been completed
 	for (size_t i = 0; i < plates_to_draw.size(); i++) {
 		if (requests_made_.find(plates_to_draw[i]) != requests_made_.end()) {
 			if (requests_made_[plates_to_draw[i]].wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 				requests_made_.erase(plates_to_draw[i]);
-				//TODO: object may never appear in the list after all, that means this function will block thread
+				//TODO: object may never appear in the list after all, that means this function will block main thread!!!
 				ecs_s::entity e = world.new_entity();
 
 				auto m = de2::get_instance().load_model<earth_plate>(plates_to_draw[i], plates_to_draw[i]);
@@ -59,7 +81,7 @@ void spheroid::process(ecs_s::registry& world, size_t& level) {
 
 plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path), resolution_(resolution) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
-	box_ = path_to_box(plate_path);
+	b = path_to_box(plate_path);
 
 	//  -map_size-
 	// |---------|
@@ -70,23 +92,23 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	
 	// vertices for resolution_ = 2, plate_path=b
 	// |-----------------------|
-	// |           |     |     |
-	// |     c     |   box_.y  |
-	// |           |     |     |
+	// | c         |d          |
+	// |           |           |
+	// |<---b.x--->|           |
 	// |-----------6-----7-----8
-	// |           |  bc |  bd |
-	// |---box_.x--3-----4-----5
-	// |           |  ba |  bb |
+	// |a    |     |  bc |  bd |
+	// |	b.y    3-----4-----5
+	// |     |     |  ba |  bb |
 	// |-----------0-----1-----2
 	for (size_t y = 0; y <= resolution_; y++) {
 		for (size_t x = 0; x <= resolution_; x++) {
-			double step = box_.a / resolution_;
+			double step = b.a / resolution_;
 			 
 			vertices.push_back({
-				merc_to_ecef({ box_.x + x * step, box_.y + y * step, 0 }, map_size),/*3D position*/
-				//{ box_.x + x * step, box_.y + y * step, 0 },/*2D position*/
+				merc_to_ecef({ b.x + x * step, b.y + y * step, 0 }, map_size),/*3D position*/
+				//{ b.x + x * step, b.y + y * step, 0 },/*2D position*/
 				{ 0.0, 0.0, 0.0 },/*normal*/
-				{ 1 - (x * step / box_.a),  1 - (y * step / box_.a)}/*uv*/
+				{ 1 - (x * step / b.a),  1 - (y * step / b.a)}/*uv*/
 				});
 		}
 	}
@@ -122,6 +144,58 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	}
 	size_of_indices = indices.size();
 }
+
+std::array<glm::vec3, 4> plate::get_corner_normals() {
+	std::array<glm::vec3, 4> normals{ glm::vec3{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+	size_t map_size = (size_t)std::pow(2, plate_path_.size()) * 256;
+	double step = b.a / resolution_;
+	
+	// resolution_ = 3, plate_path = generic 
+	//   |<-----------b.a----------->|
+	//	 v7-------v8--------v10------v11  -
+	//	 |	      |		    |		 |    |
+	//	 |        |		    |        |    |
+	//	 v6-------|---------|--------v9   |
+	//	 |		  |		    |		 |   b.a
+	//	 |		  |		    |		 |    |
+	//	 v2-------|---------|--------v5   |
+	//	 |<-step->|		    |        |    |
+	//	 |        |		    |        |    |
+	//	 v0-------v1--------v3-------v4   -
+	//(b.x, b.y) 
+	
+	//for lower left corner
+	glm::vec3 v0 = merc_to_ecef({ b.x, b.y, 0 }, map_size);
+	glm::vec3 v1 = merc_to_ecef({ b.x + step, b.y, 0 }, map_size);
+	glm::vec3 v2 = merc_to_ecef({ b.x, b.y + step, 0 }, map_size);
+
+	//for lower right corner
+	glm::vec3 v3 = merc_to_ecef({ b.x + b.a - step, b.y, 0 }, map_size);
+	glm::vec3 v4 = merc_to_ecef({ b.x + b.a, b.y, 0 }, map_size);
+	glm::vec3 v5 = merc_to_ecef({ b.x + b.a, b.y + step, 0 }, map_size);
+
+
+	//for upper left corner
+	glm::vec3 v6 = merc_to_ecef({ b.x, b.y + b.a - step, 0 }, map_size);
+	glm::vec3 v7 = merc_to_ecef({ b.x, b.y + b.a, 0 }, map_size);
+	glm::vec3 v8 = merc_to_ecef({ b.x + step, b.y + step, 0 }, map_size);
+
+
+	//for upper right corner
+	glm::vec3 v9 = merc_to_ecef({ b.x, b.y, 0 }, map_size);
+	glm::vec3 v10 = merc_to_ecef({ b.x + step, b.y, 0 }, map_size);
+	glm::vec3 v11 = merc_to_ecef({ b.x, b.y + step, 0 }, map_size);
+
+
+	//for (size_t y = 0; y <= resolution_; y++) {
+	//	for (size_t x = 0; x <= resolution_; x++) {
+	//		double step = b.a / resolution_;
+	//		merc_to_ecef({ b.x + x * step, b.y + y * step, 0 }, map_size);/*3D position*/
+	//	}
+	//}
+	return normals;
+}
+
 
 //EARTH PLATE
 earth_plate::earth_plate(std::string plate_path, size_t resolution) {

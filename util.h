@@ -6,6 +6,10 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <string>
 
+double constexpr earth_a = 6.3781370f;
+double constexpr earth_b = 6.3567523f;
+double constexpr circumference = 2 * glm::pi<double>() * earth_a;
+
 struct box {
 	size_t x{ 0 }, y{ 0 }, a{ 0 };
 };

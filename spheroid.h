@@ -19,7 +19,8 @@ class plate : public mesh {
 	size_t resolution_{ 0 };
 public:
 	plate(std::string plate_path, size_t resolution);
-	box box_;
+	std::array<glm::vec3, 4> get_corner_normals();
+	box b;
 	std::string plate_path_;
 };
 
@@ -33,12 +34,12 @@ public:
 };
 
 
-class spheroid : public sub_system<size_t> {
+class spheroid : public sub_system<renderer_system> {
 public:
 	spheroid(double semi_axis_a, double semi_axis_c) : earth_a(semi_axis_a), c(semi_axis_c) {
 	}
 
-	void process(ecs_s::registry& world, size_t& level);
+	void process(ecs_s::registry& world, renderer_system& renderer);
 
 
 
