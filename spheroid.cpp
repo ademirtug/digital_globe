@@ -34,7 +34,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	//|									|
 	//|---------------------------------|
 	
-	//this should be around 70, only infinite distance 
+	//default value should be around 70, only infinite distance 
 	//can get 90, like in the directional lighting.
 	float max_visible_angle = 90;
 	auto vp = de2::get_instance().viewport;
@@ -45,30 +45,25 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	//we will actually calculate only 1 because 
 	//we are still using sphere not spheroid
 	//normal = glm::normalize(ecef)
-
-	
 	auto from = cast_ray(l1, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
 	auto to = cast_ray(l1, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
 	auto edge_hit = sphere_intersection(from, to - from);
 	glm::vec3 cam = glm::vec4(renderer.cam_->get_world_pos(), 0.0) * renderer.get_view();
 	cam.y *= -1;
-	float angle = glm::dot(glm::normalize(edge_hit), glm::normalize(cam));
-	float gangle = glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
+	float angle = glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
 	auto hit_geo = ecef_to_geo({ edge_hit.x, edge_hit.y, edge_hit.z });
 
-
-	//Coordinates, based on sphere not WGS84 spheroid!!!!
 	auto mfrom = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
 	auto mto = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
-
 	auto mouse_hit = sphere_intersection(mfrom, mto - mfrom);
-	//TODO: find the cause of this left hand - right hand difference, probably in the inverse transformations.
 	auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
 	
-
+	//set title
 	std::string s_mgeo = std::format("edge_hit -> ({:02.2f},{:02.2f},{:02.2f}) | camera -> ({:02.2f},{:02.2f},{:02.2f}) | angle -> {:02.2f} | (sphere coords) -> ({:02.2f},{:02.2f},{:02.2f})",
-		edge_hit.x, edge_hit.y, edge_hit.z, cam.x, cam.y, cam.z,  gangle * 180/glm::pi<float>(), mouse_hit.x, mouse_hit.y, mouse_hit.z);
+		edge_hit.x, edge_hit.y, edge_hit.z, cam.x, cam.y, cam.z,  angle * 180/glm::pi<float>(), mouse_hit.x, mouse_hit.y, mouse_hit.z);
 	de2::get_instance().set_title(s_mgeo);
+
+
 
 	//iterate over all the plates and get a full quad tree
 	world.view<plate_name>([&node_count](ecs_s::entity& e, plate_name& pn) {
@@ -142,7 +137,7 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	// |           |           |
 	// |<---b.x--->|           |
 	// |-----------6-----7-----8
-	// |a    |     |  bc |  bd |
+	// | a   |     |  bc |  bd |
 	// |	b.y    3-----4-----5
 	// |     |     |  ba |  bb |
 	// |-----------0-----1-----2
