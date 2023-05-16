@@ -19,9 +19,11 @@ class plate : public mesh {
 	size_t resolution_{ 0 };
 public:
 	plate(std::string plate_path, size_t resolution);
-	std::array<glm::vec3, 4> get_corner_normals();
+	void calculate_corner_normals();
+	
 	box b;
 	std::string plate_path_;
+	std::array<glm::vec3, 4> corner_normals{ glm::vec3{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 };
 
 
@@ -40,9 +42,6 @@ public:
 	}
 
 	void process(ecs_s::registry& world, renderer_system& renderer);
-
-
-
 private:
 	using rtype = decltype(std::declval<de2>().load_model_async<model>());
 	double earth_a{ .0f }, c{ .0f };

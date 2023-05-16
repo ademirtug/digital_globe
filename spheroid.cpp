@@ -143,57 +143,54 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 		}
 	}
 	size_of_indices = indices.size();
+
+	//pre calculate corner normals;
+	calculate_corner_normals();
 }
 
-std::array<glm::vec3, 4> plate::get_corner_normals() {
-	std::array<glm::vec3, 4> normals{ glm::vec3{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+void plate::calculate_corner_normals() {
 	size_t map_size = (size_t)std::pow(2, plate_path_.size()) * 256;
-	double step = b.a / resolution_;
-	
+	double step = ((float)b.a) / resolution_;
+
 	// resolution_ = 3, plate_path = generic 
 	//   |<-----------b.a----------->|
 	//	 v7-------v8--------v10------v11  -
-	//	 |	      |		    |		 |    |
+	//	 |	 n2   |		    |  n3	 |    |
 	//	 |        |		    |        |    |
 	//	 v6-------|---------|--------v9   |
-	//	 |		  |		    |		 |   b.a
+	//	 |<-step->|		    |		 |   b.a
 	//	 |		  |		    |		 |    |
 	//	 v2-------|---------|--------v5   |
-	//	 |<-step->|		    |        |    |
+	//	 |   n0   |		    |  n1    |    |
 	//	 |        |		    |        |    |
 	//	 v0-------v1--------v3-------v4   -
 	//(b.x, b.y) 
-	
+
 	//for lower left corner
-	glm::vec3 v0 = merc_to_ecef({ b.x, b.y, 0 }, map_size);
-	glm::vec3 v1 = merc_to_ecef({ b.x + step, b.y, 0 }, map_size);
-	glm::vec3 v2 = merc_to_ecef({ b.x, b.y + step, 0 }, map_size);
+	glm::vec3 v0 = merc_to_ecef({ b.x,			b.y,		0 }, map_size);
+	glm::vec3 v1 = merc_to_ecef({ b.x + step,	b.y,		0 }, map_size);
+	glm::vec3 v2 = merc_to_ecef({ b.x,			b.y + step,	0 }, map_size);
 
 	//for lower right corner
-	glm::vec3 v3 = merc_to_ecef({ b.x + b.a - step, b.y, 0 }, map_size);
-	glm::vec3 v4 = merc_to_ecef({ b.x + b.a, b.y, 0 }, map_size);
-	glm::vec3 v5 = merc_to_ecef({ b.x + b.a, b.y + step, 0 }, map_size);
-
+	glm::vec3 v3 = merc_to_ecef({ b.x + b.a - step,	b.y,		0 }, map_size);
+	glm::vec3 v4 = merc_to_ecef({ b.x + b.a,		b.y,		0 }, map_size);
+	glm::vec3 v5 = merc_to_ecef({ b.x + b.a,		b.y + step, 0 }, map_size);
 
 	//for upper left corner
-	glm::vec3 v6 = merc_to_ecef({ b.x, b.y + b.a - step, 0 }, map_size);
-	glm::vec3 v7 = merc_to_ecef({ b.x, b.y + b.a, 0 }, map_size);
-	glm::vec3 v8 = merc_to_ecef({ b.x + step, b.y + step, 0 }, map_size);
-
+	glm::vec3 v6 = merc_to_ecef({ b.x,			b.y + b.a - step,	0 }, map_size);
+	glm::vec3 v7 = merc_to_ecef({ b.x,			b.y + b.a,			0 }, map_size);
+	glm::vec3 v8 = merc_to_ecef({ b.x + step,	b.y + b.a,			0 }, map_size);
 
 	//for upper right corner
-	glm::vec3 v9 = merc_to_ecef({ b.x, b.y, 0 }, map_size);
-	glm::vec3 v10 = merc_to_ecef({ b.x + step, b.y, 0 }, map_size);
-	glm::vec3 v11 = merc_to_ecef({ b.x, b.y + step, 0 }, map_size);
+	glm::vec3 v9 = merc_to_ecef({ b.x + b.a,			b.y + b.a - step,	0 }, map_size);
+	glm::vec3 v10 = merc_to_ecef({ b.x + b.a - step,	b.y,				0 }, map_size);
+	glm::vec3 v11 = merc_to_ecef({ b.x + b.a,			b.y + step,			0 }, map_size);
 
-
-	//for (size_t y = 0; y <= resolution_; y++) {
-	//	for (size_t x = 0; x <= resolution_; x++) {
-	//		double step = b.a / resolution_;
-	//		merc_to_ecef({ b.x + x * step, b.y + y * step, 0 }, map_size);/*3D position*/
-	//	}
-	//}
-	return normals;
+	//anti clock wise
+	corner_normals[0] = calc_normal(v0, v1, v2);
+	corner_normals[1] = calc_normal(v4, v5, v3);
+	corner_normals[2] = calc_normal(v7, v6, v8);
+	corner_normals[3] = calc_normal(v11, v10, v9);
 }
 
 
