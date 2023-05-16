@@ -59,8 +59,8 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
 	
 	//set title
-	std::string s_mgeo = std::format("edge_hit -> ({:02.2f},{:02.2f},{:02.2f}) | camera -> ({:02.2f},{:02.2f},{:02.2f}) | angle -> {:02.2f} | (sphere coords) -> ({:02.2f},{:02.2f},{:02.2f})",
-		edge_hit.x, edge_hit.y, edge_hit.z, cam.x, cam.y, cam.z,  angle * 180/glm::pi<float>(), mouse_hit.x, mouse_hit.y, mouse_hit.z);
+	std::string s_mgeo = std::format("edge_hit -> ({:02.2f},{:02.2f},{:02.2f}) | camera -> ({:02.2f},{:02.2f},{:02.2f}) | angle -> {:02.2f} | (sphere coords) -> ({:02.2f},{:02.2f})",
+		edge_hit.x, edge_hit.y, edge_hit.z, cam.x, cam.y, cam.z,  angle * 180/glm::pi<float>(), mouse_geo[0], mouse_geo[1]);
 	de2::get_instance().set_title(s_mgeo);
 
 
