@@ -26,15 +26,60 @@ box path_to_box(const std::string& plate_path) {
 	return b;
 }
 
+corner_normals calculate_corner_normals(std::string plate_path_, size_t resolution_, box b) {
+	size_t map_size = (size_t)std::pow(2, plate_path_.size()) * 256;
+	double step = ((float)b.a) / resolution_;
+	corner_normals cn;
+
+	// resolution_ = 3, plate_path = generic 
+	//   |<-----------b.a----------->|
+	//	 v7-------v8--------v10------v11  -
+	//	 |	 n2   |		    |  n3	 |    |
+	//	 |        |		    |        |    |
+	//	 v6-------|---------|--------v9   |
+	//	 |<-step->|		    |		 |   b.a
+	//	 |		  |		    |		 |    |
+	//	 v2-------|---------|--------v5   |
+	//	 |   n0   |		    |  n1    |    |
+	//	 |        |		    |        |    |
+	//	 v0-------v1--------v3-------v4   -
+	//(b.x, b.y) 
+
+	//for lower left corner
+	glm::vec3 v0 = merc_to_ecef({ b.x,			b.y,		0 }, map_size);
+	glm::vec3 v1 = merc_to_ecef({ b.x + step,	b.y,		0 }, map_size);
+	glm::vec3 v2 = merc_to_ecef({ b.x,			b.y + step,	0 }, map_size);
+
+	//for lower right corner
+	glm::vec3 v3 = merc_to_ecef({ b.x + b.a - step,	b.y,		0 }, map_size);
+	glm::vec3 v4 = merc_to_ecef({ b.x + b.a,		b.y,		0 }, map_size);
+	glm::vec3 v5 = merc_to_ecef({ b.x + b.a,		b.y + step, 0 }, map_size);
+
+	//for upper left corner
+	glm::vec3 v6 = merc_to_ecef({ b.x,			b.y + b.a - step,	0 }, map_size);
+	glm::vec3 v7 = merc_to_ecef({ b.x,			b.y + b.a,			0 }, map_size);
+	glm::vec3 v8 = merc_to_ecef({ b.x + step,	b.y + b.a,			0 }, map_size);
+
+	//for upper right corner
+	glm::vec3 v9 = merc_to_ecef({ b.x + b.a,			b.y + b.a - step,	0 }, map_size);
+	glm::vec3 v10 = merc_to_ecef({ b.x + b.a - step,	b.y,				0 }, map_size);
+	glm::vec3 v11 = merc_to_ecef({ b.x + b.a,			b.y + step,			0 }, map_size);
+
+	//anti clock wise
+	cn[0] = glm::normalize(calc_normal(v0, v1, v2));
+	cn[1] = glm::normalize(calc_normal(v4, v5, v3));
+	cn[2] = glm::normalize(calc_normal(v7, v6, v8));
+	cn[3] = glm::normalize(calc_normal(v11, v10, v9));
+
+	return cn;
+}
+
 double N(double phi){
 	return earth_a * earth_a / sqrt(earth_a * earth_a * cos(phi) * cos(phi) + earth_b * earth_b * sin(phi) * sin(phi));
 }
 
 //note: don't reinvent the wheel
 //https://danceswithcode.net/engineeringnotes/geodetic_to_ecef/geodetic_to_ecef.html
-//Convert Earth-Centered-Earth-Fixed (ECEF) to lat, Lon, Altitude
-//Input is a three element array containing x, y, z in meters
-//Returned array contains lat and lon in radians, and altitude in meters
 std::array<double, 3> ecef_to_geo(std::array<double, 3> ecef) {
 
 	std::array<double, 3> geo{ 0, 0, 0 };   //Results go here (Lat, Lon, Altitude)
@@ -207,7 +252,7 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 
 	glm::vec3 hit1 = ray_origin + ray_direction * t0;
 	glm::vec3 hit2 = ray_origin + ray_direction * t1;
-	//TODO: find the cause of this left hand - right hand difference, probably in inverse transformations.
+	//TODO: find the cause of this left hand - right hand difference, probably in the inverse transformations.
 	auto r1 = ecef_to_geo({ -hit1.x, hit1.y, -hit1.z });
 	auto r2 = ecef_to_geo({ -hit2.x, hit2.y, -hit2.z });
 

@@ -45,8 +45,6 @@ int main()
 	float e2 = 2 * glm::pi<float>() * ((gmtime(&rawtime)->tm_hour) / 24.0);
 	renderer.l = std::make_shared<directional_light>(glm::vec3({ cos(e2), sin(e2), 0 }));
 
-	
-	//de2::get_instance().enable_wireframe_mode();
 
 	de2::get_instance().on<pre_render>([&](std::chrono::nanoseconds ns) {
 		s.process(world, renderer);
@@ -56,7 +54,6 @@ int main()
 	auto begin = std::chrono::high_resolution_clock::now();
 	auto end = begin;
 	de2::get_instance().on<render>([&](std::chrono::nanoseconds ns) {
-
 		renderer.process(world, ns);
 		
 		//Coordinates, based on sphere not WGS84 spheroid!!!!
@@ -64,7 +61,7 @@ int main()
 		auto to = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
 
 		auto m_geo = sphere_intersection(from, to - from);
-		std::string s_mgeo = std::format("lat:{:02.2f} lon:{:02.2f}", m_geo[0], m_geo[1]);
+		std::string s_mgeo = std::format("(sphere coords) -> ({:02.2f},{:02.2f})", m_geo[0], m_geo[1]);
 		de2::get_instance().set_title(s_mgeo);
 		
 		});

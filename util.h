@@ -13,7 +13,18 @@ double constexpr circumference = 2 * glm::pi<double>() * earth_a;
 struct box {
 	size_t x{ 0 }, y{ 0 }, a{ 0 };
 };
+struct corner_normals {
+	std::array<glm::vec3, 4> data{ glm::vec3{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+
+	glm::vec3& operator[](size_t idx) {
+		return data[idx];
+	}
+};
+
+
 box path_to_box(const std::string& plate_path);
+corner_normals calculate_corner_normals(std::string plate_path_, size_t resolution_, box b);
+
 
 //GIS functions
 double N(double phi);
@@ -36,3 +47,5 @@ glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3);
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir = -1.0f);
 bool solve_quadratic(float a, float b, float c, float& t0, float& t1);
 glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction);
+
+
