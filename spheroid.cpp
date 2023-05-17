@@ -6,63 +6,110 @@
 #include <glm/gtx/vector_angle.hpp>
 
 void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
-	std::map<std::string, size_t> node_count;
-	std::vector<std::string> plates_to_draw;
-	std::vector<std::string> plates;
-	std::set<std::string> visible_plates;
-	std::set<std::string> visible_roots;
-	std::set<std::string> in, out;
-
 	//task: find visible plates
-	//there are 2 ideas to do this
-	//IDEA 1 -> We need to confirm two things...
-	//1-is dot(normal, camera.pos()) < 90? 
-	//2-is that point within NDC cube?
-	// IMPLEMENT!!!
+	//perfect solution to this question is probably 
+	//sphere - sphere intersection
 	
+	//
+	//|---------------------------------|
+	//|l16            l17            l20|
+	//|l14,l15                   l18,l19|
+	//|                                 |
+	//|   l10                    l13    |
+	//|l8,l9                     l11,l12|
+	//|                                 |
+	//|   l3                       l7   |
+	//|l1,l2          l4           l5,l6|
+	//|---------------------------------|
 
-	//IDEA 2 -> cast triple ray from edges of screen
-	//to see either they hit the sphere or not.
-	//any dot(plate_corner_normal, camera_pos) greater than 
-	//dot(hit_normal, camera_pos) is invisible to user.
-	//|---------------------------------|
-	//|                                 |
-	//|                                 |
-	//|   l3                       l6   |
-	//|l1,l2                       l4,l5|
-	//|                                 |
-	//|                                 |
-	//|---------------------------------|
-	
+
 	//default value should be around 70, only infinite distance 
 	//can get 90, like in the directional lighting.
 	float max_visible_angle = 90;
 	auto vp = de2::get_instance().viewport;
-	//we need triple point to calculate surface normal;
-	glm::vec2 l1{ 0, vp.y / 2 }, l2{ 1, vp.y / 2 }, l3{ 1, (vp.y / 2) + 1 };
-	glm::vec2 l4{ vp.x - 1, vp.y / 2 }, l5{ vp.x, vp.y / 2 }, l6{ vp.x - 1, (vp.y / 2) + 1 };
+	glm::vec2 l1{ 0, 0 }, l4{ vp.x / 2, 0 }, l6{ vp.x, 0 }, l8{ 0, vp.y / 2 }, l12{ vp.x, vp.y / 2 };
+	glm::vec2 l16{ 0, vp.y }, l17{ vp.x / 2, vp.y }, l20{ vp.x, vp.y };
 
-	//we will actually calculate only 1 because 
+	std::vector<glm::vec2> points;
+	points.insert(points.end(), { l1, l4, l6, l8, l12, l16, l17, l20 });
+
 	//we are still using sphere not spheroid
-	//normal = glm::normalize(ecef)
-	auto from = cast_ray(l1, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
-	auto to = cast_ray(l1, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
+	//so -> hit_normal = glm::normalize(ecef)
+	auto from = cast_ray(l8, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
+	auto to = cast_ray(l8, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
 	auto edge_hit = sphere_intersection(from, to - from);
 	glm::vec3 cam = glm::vec4(renderer.cam_->get_world_pos(), 0.0) * renderer.get_view();
 	cam.y *= -1;
-	float angle = glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
+	float hit_angle = glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
 	auto hit_geo = ecef_to_geo({ edge_hit.x, edge_hit.y, edge_hit.z });
 
-	auto mfrom = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
-	auto mto = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
+	//coords under mouse cursor
+	auto mfrom = cast_ray(renderer.mouse_pos, de2::get_instance().viewport, renderer.get_projection(), renderer.get_view(), -1.0f);
+	auto mto = cast_ray(renderer.mouse_pos, de2::get_instance().viewport, renderer.get_projection(), renderer.get_view(), 1.0f);
 	auto mouse_hit = sphere_intersection(mfrom, mto - mfrom);
 	auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
 	
-	//set title
-	std::string s_mgeo = std::format("edge_hit -> ({:02.2f},{:02.2f},{:02.2f}) | camera -> ({:02.2f},{:02.2f},{:02.2f}) | angle -> {:02.2f} | (sphere coords) -> ({:02.2f},{:02.2f})",
-		edge_hit.x, edge_hit.y, edge_hit.z, cam.x, cam.y, cam.z,  angle * 180/glm::pi<float>(), mouse_geo[0], mouse_geo[1]);
-	de2::get_instance().set_title(s_mgeo);
 
+
+
+	//////////////////////////////////////////////////
+	std::map<std::string, size_t> node_count;
+	std::vector<std::string> plates_to_draw;
+	std::vector<std::string> plates;
+	std::set<std::string> visible_roots;
+	std::set<std::string> in, out;
+
+	std::set<std::string> visible_plates;
+
+	std::queue<std::string> plates_to_check;
+	plates_to_check.push("a");
+	plates_to_check.push("b");
+	plates_to_check.push("c");
+	plates_to_check.push("d");
+
+	std::string visible = "(visible) -> (";
+	while (!plates_to_check.empty()) {
+		std::string plate_path = plates_to_check.front();
+		plates_to_check.pop();
+
+		auto cn = get_corner_normals(plate_path);
+		bool is_visible = false;
+		for (size_t i = 0; i < 4; i++){
+			auto ca = glm::angle(cn[i], glm::normalize(glm::vec3{cam.x, -cam.y, cam.z }));
+			if (ca < ( hit_angle * 1.50)) {
+				//visible plate has been found!
+				is_visible = true;
+				visible += plate_path +" ";
+				break;
+			}
+		}
+
+		if (!is_visible) {
+			//check in a reverse manner.
+			for (size_t i = 0; i < points.size(); i++) {
+
+
+			}
+		}
+
+
+		////visible plate has been found! just add its siblings to queue
+		////so we can see if they are visible or not
+		//if (plate_path.size() < renderer.cam_->zoom_) {
+		//	visible_plates.emplace(plate_path);
+
+		//	plates_to_check.push(plate_path + "a");
+		//	plates_to_check.push(plate_path + "b");
+		//	plates_to_check.push(plate_path + "c");
+		//	plates_to_check.push(plate_path + "d");
+		//}
+	}
+	visible += ")";
+
+	//set title
+	std::string s_mgeo = std::format("edge_hit -> ({:02.2f},{:02.2f},{:02.2f}) | hit_angle -> {:02.2f} | camera -> ({:02.2f},{:02.2f},{:02.2f}) |  (sphere coords) -> ({:02.2f},{:02.2f}) {}",
+		edge_hit.x, edge_hit.y, edge_hit.z, hit_angle * 180 / glm::pi<float>(), cam.x, cam.y, cam.z, /*renderer.mouse_pos.x, renderer.mouse_pos.y*/mouse_geo[0], mouse_geo[1], visible);
+	de2::get_instance().set_title(s_mgeo);
 
 
 	//iterate over all the plates and get a full quad tree
@@ -91,7 +138,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	//make async requests for required plates
 	for (size_t i = 0; i < plates_to_draw.size(); i++){
 		if (!de2::get_instance().has_model(plates_to_draw[i]) && requests_made_.find(plates_to_draw[i]) == requests_made_.end()) {
-			requests_made_[plates_to_draw[i]] = de2::get_instance().load_model_async<earth_plate>(plates_to_draw[i], plates_to_draw[i]);
+			requests_made_[plates_to_draw[i]] = de2::get_instance().load_model_async<earth_plate>(plates_to_draw[i], plates_to_draw[i], resolution);
 		}
 	}
 
@@ -117,8 +164,10 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	}
 };
 corner_normals& spheroid::get_corner_normals(std::string plate_path) {
-	corner_normals cc;
-	return cc;
+	if (!cn_cache.exists(plate_path)) {
+		cn_cache.put(plate_path, calculate_corner_normals(plate_path, resolution)); 
+	}
+	return cn_cache.get(plate_path);
 }
 plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path), resolution_(resolution) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
@@ -186,7 +235,7 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	size_of_indices = indices.size();
 
 	//pre calculate corner normals;
-	cn = calculate_corner_normals(plate_path_, resolution_, b);
+	cn = calculate_corner_normals(plate_path_, resolution_);
 }
 
 
@@ -199,7 +248,6 @@ earth_plate::earth_plate(std::string plate_path, size_t resolution) {
 earth_plate::~earth_plate() {
 	glDeleteVertexArrays(1, &vao);
 }
-
 map_quest<disk_store>& earth_plate::get_provider() {
 	static map_quest<disk_store> provider;
 	return provider;

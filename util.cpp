@@ -26,9 +26,10 @@ box path_to_box(const std::string& plate_path) {
 	return b;
 }
 
-corner_normals calculate_corner_normals(std::string plate_path_, size_t resolution_, box b) {
-	size_t map_size = (size_t)std::pow(2, plate_path_.size()) * 256;
-	double step = ((float)b.a) / resolution_;
+corner_normals calculate_corner_normals(std::string plate_path, size_t resolution) {
+	box b = path_to_box(plate_path);
+	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
+	double step = ((float)b.a) / resolution;
 	corner_normals cn;
 
 	// resolution_ = 3, plate_path = generic 
@@ -62,8 +63,8 @@ corner_normals calculate_corner_normals(std::string plate_path_, size_t resoluti
 
 	//for upper right corner
 	glm::vec3 v9 = merc_to_ecef({ b.x + b.a,			b.y + b.a - step,	0 }, map_size);
-	glm::vec3 v10 = merc_to_ecef({ b.x + b.a - step,	b.y,				0 }, map_size);
-	glm::vec3 v11 = merc_to_ecef({ b.x + b.a,			b.y + step,			0 }, map_size);
+	glm::vec3 v10 = merc_to_ecef({ b.x + b.a - step,	b.y + b.a,			0 }, map_size);
+	glm::vec3 v11 = merc_to_ecef({ b.x + b.a,			b.y + b.a,			0 }, map_size);
 
 	//anti clock wise
 	cn[0] = glm::normalize(calc_normal(v0, v1, v2));

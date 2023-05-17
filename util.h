@@ -23,7 +23,7 @@ struct corner_normals {
 
 
 box path_to_box(const std::string& plate_path);
-corner_normals calculate_corner_normals(std::string plate_path_, size_t resolution_, box b);
+corner_normals calculate_corner_normals(std::string plate_path, size_t resolution);
 
 
 //GIS functions

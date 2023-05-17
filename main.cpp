@@ -25,19 +25,11 @@ int main()
 {
 	auto& eng = de2::get_instance();
 	eng.init();
-	eng.programs["c_t_point"] = std::make_shared<program>("c_t_point", "shaders/c_t_point.vert", "shaders/c_t_point.frag");
 	eng.programs["c_t_direct"] = std::make_shared<program>("c_t_direct", "shaders/c_t_direct.vert", "shaders/c_t_direct.frag");
 
 	spheroid s(6378137.0f, 6356752.3f);
 	registry world;
 	renderer_system renderer;
-
-	//-x=meridian
-	//+x=anti meridian
-	//-y=india
-	//+y=panama
-	//-z=north pole
-	//+z=south pole
 
 	//approximate sun position
 	time_t rawtime;
@@ -50,22 +42,8 @@ int main()
 		s.process(world, renderer);
 		});
 	
-	float fps = 0;
-	auto begin = std::chrono::high_resolution_clock::now();
-	auto end = begin;
 	de2::get_instance().on<render>([&](std::chrono::nanoseconds ns) {
-		renderer.process(world, ns);
-		
-		////Coordinates, based on sphere not WGS84 spheroid!!!!
-		//auto from = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
-		//auto to = cast_ray(renderer.mouse_pos, { de2::get_instance().viewport.x , de2::get_instance().viewport.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
-
-		//auto mouse_hit = sphere_intersection(from, to - from);
-		////TODO: find the cause of this left hand - right hand difference, probably in the inverse transformations.
-		//auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
-		//std::string s_mgeo = std::format("(sphere coords) -> ({:02.2f},{:02.2f})", mouse_geo[0], mouse_geo[1]);
-		//de2::get_instance().set_title(s_mgeo);
-		
+		renderer.process(world, ns);	
 		});
 
 	eng.run();

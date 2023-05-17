@@ -43,6 +43,7 @@ public:
 
 
 	corner_normals& get_corner_normals(std::string plate_path);
+	size_t resolution{ 32 };
 private:
 	using rtype = decltype(std::declval<de2>().load_model_async<model>());
 	double earth_a{ .0f }, c{ .0f };
