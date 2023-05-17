@@ -26,12 +26,12 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	//any dot(plate_corner_normal, camera_pos) greater than 
 	//dot(hit_normal, camera_pos) is invisible to user.
 	//|---------------------------------|
-	//|									|
-	//|									|
-	//|	  l3    				   l6	|
-	//|l1,l2					   l4,l5|
-	//|									|
-	//|									|
+	//|                                 |
+	//|                                 |
+	//|   l3                       l6   |
+	//|l1,l2                       l4,l5|
+	//|                                 |
+	//|                                 |
 	//|---------------------------------|
 	
 	//default value should be around 70, only infinite distance 
