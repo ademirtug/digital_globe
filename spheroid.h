@@ -7,14 +7,11 @@
 #include "util.h"
 #include "map_provider.h"
 
-struct earth {
-
-};
+struct earth {};
 
 struct plate_name {
 	std::string name;
 };
-
 
 class plate : public mesh {
 	size_t resolution_{ 0 };
@@ -43,8 +40,9 @@ public:
 
 
 	corner_normals& get_corner_normals(std::string plate_path);
-	size_t resolution{ 32 };
+	size_t resolution{ 16 };
 private:
+	void evaluate_completed_requests(ecs_s::registry& world);
 	using rtype = decltype(std::declval<de2>().load_model_async<model>());
 	double earth_a{ .0f }, c{ .0f };
 	std::map<std::string, rtype> requests_made_;

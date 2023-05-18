@@ -27,7 +27,7 @@ int main()
 	eng.init();
 	eng.programs["c_t_direct"] = std::make_shared<program>("c_t_direct", "shaders/c_t_direct.vert", "shaders/c_t_direct.frag");
 
-	spheroid s(6378137.0f, 6356752.3f);
+	spheroid s(earth_a, earth_b);
 	registry world;
 	renderer_system renderer;
 
