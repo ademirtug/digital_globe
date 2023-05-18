@@ -4,7 +4,6 @@
 #include "util.h"
 #include "map_provider.h"
 #include <glm/gtx/vector_angle.hpp>
-#include <stdlib.h>
 
 void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	//task: find visible plates
@@ -45,15 +44,20 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	hit_angle = std::isnan(hit_angle) ? max_visible_angle : hit_angle;
 	auto hit_geo = ecef_to_geo({ edge_hit.x, edge_hit.y, edge_hit.z });
 
+
 	//coords under mouse cursor
 	auto mfrom = cast_ray(renderer.mouse_pos, de2::get_instance().viewport, renderer.get_projection(), renderer.get_view(), -1.0f);
 	auto mto = cast_ray(renderer.mouse_pos, de2::get_instance().viewport, renderer.get_projection(), renderer.get_view(), 1.0f);
 	auto mouse_hit = sphere_intersection(mfrom, mto - mfrom);
 	auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
-	
+	//set title
+	std::string s_mgeo = std::format("camera -> ({:02.2f},{:02.2f},{:02.2f}) |  (sphere coords) -> ({:02.2f},{:02.2f})",
+		hit_angle * 180 / glm::pi<float>(), cam.x, cam.y, cam.z, mouse_geo[0], mouse_geo[1]);
+	de2::get_instance().set_title(s_mgeo);
+
 
 	//////////////////////////////////////////////////
-	std::set<std::string> visible_plates;
+	std::set<std::string> visible_hierarchy;
 	std::queue<std::string> plates_to_check;
 	plates_to_check.push("a");
 	plates_to_check.push("b");
@@ -74,14 +78,9 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 				break;
 			}
 		}
-		//if (!is_visible) {
-		//	//reverse check to completely rule out.
-		//	for (size_t i = 0; i < corner_points.size(); i++) {
-		//	}
-		//}
 
 		if (is_visible) {
-			visible_plates.emplace(plate_path);
+			visible_hierarchy.emplace(plate_path);
 			if (plate_path.size() < renderer.cam_->zoom_) {
 				plates_to_check.push(plate_path + "a");
 				plates_to_check.push(plate_path + "b");
@@ -92,51 +91,68 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	}
 
 
-	//make async requests for visible plates
-	for (auto plate_path : visible_plates) {
-		if (!de2::get_instance().has_model(plate_path) && requests_made_.find(plate_path) == requests_made_.end()) {
+	std::set<std::string> plates_to_request = visible_hierarchy;
+	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
+		if (visible_hierarchy.find(pn.name) != visible_hierarchy.end()) {
+			plates_to_request.erase(pn.name);
+		}
+	});
+
+	//make async requests for missing plates in visible_hierarchy
+	for (auto plate_path : plates_to_request) {
+		if (requests_made_.find(plate_path) == requests_made_.end()) {
+			//std::cout << "plate requested-> " << plate_path << std::endl;
 			requests_made_[plate_path] = de2::get_instance().load_model_async<earth_plate>(plate_path, plate_path, resolution);
 		}
 	}
 
-	//world.truncate_component<visible>();
 	evaluate_completed_requests(world);
 
-	std::vector<std::string> plates_to_draw;
-
-	//world.view<plate_name, model>([&](ecs_s::entity& e, plate_name& pn, model& m) {
-	//	if (visible_plates.find(pn.name) != visible_plates.end()) {
-	//		world.add_component(e, visible{});
-	//	}
-	//});
+	//remove all entities that is not in visible_hierarchy
+	std::vector<ecs_s::entity> entities_to_remove;
+	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
+		if (visible_hierarchy.find(pn.name) == visible_hierarchy.end()) {
+			entities_to_remove.push_back(e);
+		}
+	});
+	for (auto e : entities_to_remove) {
+		world.remove_entity(e);
+	}
 
 	//iterate over all the plates and get a full quad tree
+	std::set<std::string> plates_to_draw;
 	std::map<std::string, size_t> node_count;
-	world.view<plate_name>([&node_count](ecs_s::entity& e, plate_name& pn) {
-		std::string plate_root = pn.name.substr(0, pn.name.size() - 1);
+	for (auto plate_path : visible_hierarchy) {
+		std::string plate_root = plate_path.substr(0, plate_path.size() - 1);
 		if (node_count.find(plate_root) == node_count.end())
 			node_count[plate_root] = 0;
 
-		node_count[pn.name] = 1; 
+		node_count[plate_path] = 1;
 		node_count[plate_root]++;
-		});
+	}
 
 	for (auto kv : node_count) {
 		if (kv.second < 4 && node_count[kv.first.substr(0, kv.first.size() - 1)] > 3) {
-			plates_to_draw.push_back(kv.first);
+			plates_to_draw.emplace(kv.first);
 		}
 	}
-	//system("cls");
-	//set title
-	std::string s_mgeo = std::format("edge_hit -> ({:02.2f},{:02.2f},{:02.2f}) | hit_angle -> {:02.2f} | camera -> ({:02.2f},{:02.2f},{:02.2f}) |  (sphere coords) -> ({:02.2f},{:02.2f})",
-		edge_hit.x, edge_hit.y, edge_hit.z, hit_angle * 180 / glm::pi<float>(), cam.x, cam.y, cam.z, /*renderer.mouse_pos.x, renderer.mouse_pos.y*/mouse_geo[0], mouse_geo[1]);
-	de2::get_instance().set_title(s_mgeo);
+	if (plates_to_draw.size() == 0)
+		plates_to_draw = visible_hierarchy;
+
+	world.truncate_component<visible>();
+	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
+		if (std::find(plates_to_draw.begin(), plates_to_draw.end(), pn.name) != plates_to_draw.end()) {
+			world.add_component(e, visible{});
+		}
+	});
+
 };
 void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 	std::vector<std::string> completed_requests;
 	for (auto it = requests_made_.begin(); it != requests_made_.end(); ++it) {
 		if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 			//TODO: object may never appear in the list after all, that means this function will block main thread!!!
+			//std::cout << "evaluate_completed_requests() -> " << it->first << std::endl;
 			auto m = de2::get_instance().load_model<earth_plate>(it->first, it->first);
 			m->upload();
 			m->attach_program(de2::get_instance().programs["c_t_direct"]);
@@ -145,7 +161,6 @@ void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 			ecs_s::entity e = world.new_entity();
 			world.add_component(e, plate_name{ it->first });
 			world.add_component(e, m);
-			world.add_component(e, visible{});
 			cn_cache.put(it->first, std::static_pointer_cast<plate>(ep->m)->cn);
 			completed_requests.push_back(it->first);
 		}
@@ -163,7 +178,7 @@ corner_normals& spheroid::get_corner_normals(std::string plate_path) {
 plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path), resolution_(resolution) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
 	b = path_to_box(plate_path);
-
+	int s = 0;
 	//  -map_size-
 	// |---------|
 	// |  c | d  |
@@ -232,9 +247,11 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 
 //EARTH PLATE
 earth_plate::earth_plate(std::string plate_path, size_t resolution) {
+	//std::cout << "earth_plate() -> " << plate_path << std::endl;
 	m = std::make_shared<plate>(plate_path, resolution);
 	tex = earth_plate::get_provider().get(plate_path);
 	path_ = plate_path;
+	m->name = plate_path;
 }
 earth_plate::~earth_plate() {
 	glDeleteVertexArrays(1, &vao);
