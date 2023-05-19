@@ -39,7 +39,6 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	auto to = cast_ray(l8, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
 	auto edge_hit = sphere_intersection(from, to - from);
 	glm::vec3 cam = glm::vec4(renderer.cam_->get_world_pos(), 0.0) * renderer.get_view();
-	cam.y *= -1;
 	float hit_angle = glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
 	hit_angle = std::isnan(hit_angle) ? max_visible_angle : hit_angle;
 	auto hit_geo = ecef_to_geo({ edge_hit.x, edge_hit.y, edge_hit.z });
@@ -52,7 +51,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
 	//set title
 	std::string s_mgeo = std::format("camera -> ({:02.2f},{:02.2f},{:02.2f}) |  (sphere coords) -> ({:02.2f},{:02.2f})",
-		hit_angle * 180 / glm::pi<float>(), cam.x, cam.y, cam.z, mouse_geo[0], mouse_geo[1]);
+		cam.x, cam.y, cam.z, mouse_geo[0], mouse_geo[1]);
 	de2::get_instance().set_title(s_mgeo);
 
 
@@ -90,7 +89,11 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 		}
 	}
 
-
+	visible_hierarchy.clear();
+	visible_hierarchy.emplace("a");
+	visible_hierarchy.emplace("b");
+	visible_hierarchy.emplace("c");
+	visible_hierarchy.emplace("d");
 	std::set<std::string> plates_to_request = visible_hierarchy;
 	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
 		if (visible_hierarchy.find(pn.name) != visible_hierarchy.end()) {
@@ -204,7 +207,7 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 				merc_to_ecef({ b.x + x * step, b.y + y * step, 0 }, map_size),/*3D position*/
 				//{ b.x + x * step, b.y + y * step, 0 },/*2D position*/
 				{ 0.0, 0.0, 0.0 },/*normal*/
-				{ 1 - (x * step / b.a),  1 - (y * step / b.a)}/*uv*/
+				{ (x * step / b.a),  1 - (y * step / b.a)}/*uv*/
 				});
 		}
 	}

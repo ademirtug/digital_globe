@@ -215,7 +215,7 @@ glm::vec3 lla_to_ecef(double lat_indegrees, double lon_indegrees){
 	double y = N(lat) * cos(lat) * sin(lon);
 	double z = (((earth_b * earth_b) / (earth_a * earth_a)) * N(lat)) * sin(lat);
 
-	return { x, y, z };
+	return { -x, y, z };
 }
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3){
 	return glm::cross(pt2 - pt1, pt3 - pt1);
