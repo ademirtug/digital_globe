@@ -49,9 +49,10 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	auto mto = cast_ray(renderer.mouse_pos, de2::get_instance().viewport, renderer.get_projection(), renderer.get_view(), 1.0f);
 	auto mouse_hit = sphere_intersection(mfrom, mto - mfrom);
 	auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
+
 	//set title
-	std::string s_mgeo = std::format("camera -> ({:02.2f},{:02.2f},{:02.2f}) |  (sphere coords) -> ({:02.2f},{:02.2f})",
-		cam.x, cam.y, cam.z, mouse_geo[0], mouse_geo[1]);
+	std::string s_mgeo = std::format("camera -> ({:02.2f},{:02.2f},{:02.2f}) | m_hit -> ({:02.2f},{:02.2f},{:02.2f}) | (sphere coords) -> ({:02.2f},{:02.2f})",
+		cam.x, cam.y, cam.z, mouse_hit.x, mouse_hit.y, mouse_hit.z, mouse_geo[0], mouse_geo[1]);
 	de2::get_instance().set_title(s_mgeo);
 
 
@@ -71,7 +72,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 		auto cn = get_corner_normals(plate_path);
 		bool is_visible = false;
 		for (size_t i = 0; i < 4; i++){
-			auto ca = glm::angle(cn[i], glm::normalize(glm::vec3{cam.x, -cam.y, cam.z }));
+			auto ca = glm::angle(cn[i], glm::normalize(glm::vec3{cam.x, cam.y, cam.z }));
 			if (ca < ( hit_angle * 1.50)) {
 				is_visible = true;
 				break;
@@ -90,10 +91,26 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	}
 
 	visible_hierarchy.clear();
-	visible_hierarchy.emplace("a");
-	visible_hierarchy.emplace("b");
-	visible_hierarchy.emplace("c");
-	visible_hierarchy.emplace("d");
+	//visible_hierarchy.emplace("a");
+	//visible_hierarchy.emplace("b");
+	//visible_hierarchy.emplace("c");
+	visible_hierarchy.emplace("aa");
+	visible_hierarchy.emplace("ab");
+	visible_hierarchy.emplace("ac");
+	visible_hierarchy.emplace("ad");
+	visible_hierarchy.emplace("ba");
+	visible_hierarchy.emplace("bb");
+	visible_hierarchy.emplace("bc");
+	visible_hierarchy.emplace("bd");
+	visible_hierarchy.emplace("ca");
+	visible_hierarchy.emplace("cb");
+	visible_hierarchy.emplace("cc");
+	visible_hierarchy.emplace("cd");
+	visible_hierarchy.emplace("da");
+	visible_hierarchy.emplace("db");
+	visible_hierarchy.emplace("dc");
+	visible_hierarchy.emplace("dd");
+
 	std::set<std::string> plates_to_request = visible_hierarchy;
 	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
 		if (visible_hierarchy.find(pn.name) != visible_hierarchy.end()) {

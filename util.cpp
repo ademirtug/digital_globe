@@ -215,7 +215,7 @@ glm::vec3 lla_to_ecef(double lat_indegrees, double lon_indegrees){
 	double y = N(lat) * cos(lat) * sin(lon);
 	double z = (((earth_b * earth_b) / (earth_a * earth_a)) * N(lat)) * sin(lat);
 
-	return { -x, y, z };
+	return { -x, -y, -z };
 }
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3){
 	return glm::cross(pt2 - pt1, pt3 - pt1);
@@ -254,10 +254,18 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 	glm::vec3 hit1 = ray_origin + ray_direction * t0;
 	glm::vec3 hit2 = ray_origin + ray_direction * t1;
 	//reverse hand
-	hit1 = { -hit1.x, hit1.y, -hit1.z };
-	hit2 = { -hit2.x, hit2.y, -hit2.z };
+	hit1 = { -hit1.x, -hit1.y, hit1.z };
+	hit2 = { hit2.x, hit2.y, hit2.z };
+	//auto mouse_geo = ecef_to_geo({ hit1.x, hit1.y, hit1.z });
+	//auto mouse_geo2 = ecef_to_geo({ hit2.x, hit2.y, hit2.z });
 
-	return t0 < 0 ? hit2 : hit1;
+	//std::string s_mgeo = std::format("hit1 -> ({:02.2f},{:02.2f},{:02.2f}) | hit2 -> ({:02.2f},{:02.2f},{:02.2f}) | mgeo1 -> ({:02.2f},{:02.2f}) | mgeo2 -> ({:02.2f},{:02.2f})",
+	//	hit1.x, hit1.y, hit1.z, hit2.x, hit2.y, hit2.z, mouse_geo[0], mouse_geo[1], mouse_geo2[0], mouse_geo2[1]);
+	//de2::get_instance().set_title(s_mgeo);
+
+
+	return t0 > 0 ? hit1 : hit2;
+	//return hit2;
 }
 
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir) {

@@ -30,12 +30,15 @@ int main()
 	spheroid s(earth_a, earth_b);
 	registry world;
 	renderer_system renderer;
-
+	//+x meridian
+	//+y panama
+	//+z north pole
 	//approximate sun position
 	time_t rawtime;
 	time(&rawtime);
 	float e2 = 2 * glm::pi<float>() * ((gmtime(&rawtime)->tm_hour) / 24.0);
-	renderer.l = std::make_shared<directional_light>(glm::vec3({ cos(e2), sin(e2), 0 }));
+	//renderer.l = std::make_shared<directional_light>(glm::vec3({ cos(e2), sin(e2), 0 }));
+	renderer.l = std::make_shared<directional_light>(glm::vec3({ 0, 1, 0 }));
 
 
 	de2::get_instance().on<pre_render>([&](std::chrono::nanoseconds ns) {
