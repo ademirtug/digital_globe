@@ -302,7 +302,7 @@ glm::vec2 ray_hit_to_merc(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection
 
 //MISC UTIL
 double get_visible_angle_by_zoom(double zoom) {
-	std::array<double, 19> angles = { 0.0, 1.70, 1.65, 1.50, 0.80, 0.70, 0.60, 0.50, 0.40, 0.30, 0.20, 0.10 };
+	std::array<double, 19> angles = { 1.70, 1.65, 1.60, 0.60, 0.33, 0.15,  /*6*/0.07, 0.04, 0.02};
 	return angles[zoom];
 }
 

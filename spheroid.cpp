@@ -182,7 +182,7 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 
 		if (is_visible) {
 			visible_hierarchy.emplace(plate_path);
-			if (plate_path.size() < renderer.cam_->zoom_) {
+			if (plate_path.size() < renderer.cam_->zoom_+1) {
 				plates_to_check.push(plate_path + "a");
 				plates_to_check.push(plate_path + "b");
 				plates_to_check.push(plate_path + "c");
