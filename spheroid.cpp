@@ -25,7 +25,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 
 	//default value is 60 degrees, only infinite distance 
 	//can get 90, like in the directional lighting.
-	constexpr float max_visible_angle = glm::pi<float>() / 3;
+	constexpr float max_visible_angle = glm::pi<float>() / 2.7;
 	auto vp = de2::get_instance().viewport;
 	glm::vec2 l1{ 0, 0 }, l4{ vp.x / 2, 0 }, l6{ vp.x, 0 }, l8{ 0, vp.y / 2 }, l12{ vp.x, vp.y / 2 };
 	glm::vec2 l16{ 0, vp.y }, l17{ vp.x / 2, vp.y }, l20{ vp.x, vp.y };
@@ -50,20 +50,18 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	auto mouse_hit = sphere_intersection(mfrom, mto - mfrom);
 	auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
 
-	//set title
-	std::string s_mgeo = std::format("camera -> ({:02.2f},{:02.2f},{:02.2f}) | m_hit -> ({:02.2f},{:02.2f},{:02.2f}) | (sphere coords) -> ({:02.2f},{:02.2f})",
-		cam.x, cam.y, cam.z, mouse_hit.x, mouse_hit.y, mouse_hit.z, mouse_geo[0], mouse_geo[1]);
-	de2::get_instance().set_title(s_mgeo);
 
 
 	//////////////////////////////////////////////////
 	std::set<std::string> visible_hierarchy;
 	std::queue<std::string> plates_to_check;
+	//seed
 	plates_to_check.push("a");
 	plates_to_check.push("b");
 	plates_to_check.push("c");
 	plates_to_check.push("d");
 
+	std::string sv = "(";
 
 	while (!plates_to_check.empty()) {
 		std::string plate_path = plates_to_check.front();
@@ -72,9 +70,13 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 		auto cn = get_corner_normals(plate_path);
 		bool is_visible = false;
 		for (size_t i = 0; i < 4; i++){
-			auto ca = glm::angle(cn[i], glm::normalize(glm::vec3{cam.x, cam.y, cam.z }));
+			auto ca = glm::angle(cn[i], glm::normalize(glm::vec3{-cam.x, -cam.y, -cam.z }));
+			if (plate_path == "da") {
+				int b = 1;
+			}
 			if (ca < ( hit_angle * 1.50)) {
 				is_visible = true;
+				sv += plate_path + ":" + std::format("{:02.2f} ", ca);
 				break;
 			}
 		}
@@ -89,27 +91,13 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 			}
 		}
 	}
+	sv += ")";
 
-	visible_hierarchy.clear();
-	//visible_hierarchy.emplace("a");
-	//visible_hierarchy.emplace("b");
-	//visible_hierarchy.emplace("c");
-	visible_hierarchy.emplace("aa");
-	visible_hierarchy.emplace("ab");
-	visible_hierarchy.emplace("ac");
-	visible_hierarchy.emplace("ad");
-	visible_hierarchy.emplace("ba");
-	visible_hierarchy.emplace("bb");
-	visible_hierarchy.emplace("bc");
-	visible_hierarchy.emplace("bd");
-	visible_hierarchy.emplace("ca");
-	visible_hierarchy.emplace("cb");
-	visible_hierarchy.emplace("cc");
-	visible_hierarchy.emplace("cd");
-	visible_hierarchy.emplace("da");
-	visible_hierarchy.emplace("db");
-	visible_hierarchy.emplace("dc");
-	visible_hierarchy.emplace("dd");
+	//| m_hit -> ({:02.2f},{:02.2f},{:02.2f}) mouse_hit.x, mouse_hit.y, mouse_hit.z,
+	//set title
+	std::string s_mgeo = std::format("camera -> ({:02.2f},{:02.2f},{:02.2f}) | hit_angle -> ({:02.2f}) | sv -> ({}) | (sphere coords) -> ({:02.2f},{:02.2f})",
+		cam.x, cam.y, cam.z, hit_angle,sv, -mouse_geo[0], mouse_geo[1]);
+	de2::get_instance().set_title(s_mgeo);
 
 	std::set<std::string> plates_to_request = visible_hierarchy;
 	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
@@ -172,7 +160,6 @@ void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 	for (auto it = requests_made_.begin(); it != requests_made_.end(); ++it) {
 		if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 			//TODO: object may never appear in the list after all, that means this function will block main thread!!!
-			//std::cout << "evaluate_completed_requests() -> " << it->first << std::endl;
 			auto m = de2::get_instance().load_model<earth_plate>(it->first, it->first);
 			m->upload();
 			m->attach_program(de2::get_instance().programs["c_t_direct"]);
@@ -263,7 +250,6 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	//pre calculate corner normals;
 	cn = calculate_corner_normals(plate_path_, resolution_);
 }
-
 
 //EARTH PLATE
 earth_plate::earth_plate(std::string plate_path, size_t resolution) {

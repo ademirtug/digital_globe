@@ -254,7 +254,7 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 	glm::vec3 hit1 = ray_origin + ray_direction * t0;
 	glm::vec3 hit2 = ray_origin + ray_direction * t1;
 	//reverse hand
-	hit1 = { -hit1.x, -hit1.y, hit1.z };
+	hit1 = { -hit1.x, -hit1.y, -hit1.z };
 	hit2 = { hit2.x, hit2.y, hit2.z };
 	//auto mouse_geo = ecef_to_geo({ hit1.x, hit1.y, hit1.z });
 	//auto mouse_geo2 = ecef_to_geo({ hit2.x, hit2.y, hit2.z });
