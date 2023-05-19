@@ -37,8 +37,8 @@ int main()
 	time_t rawtime;
 	time(&rawtime);
 	float e2 = 2 * glm::pi<float>() * ((gmtime(&rawtime)->tm_hour) / 24.0);
-	//renderer.l = std::make_shared<directional_light>(glm::vec3({ cos(e2), sin(e2), 0 }));
-	renderer.l = std::make_shared<directional_light>(glm::vec3({ 0, 0, -1 }));
+	renderer.l = std::make_shared<directional_light>(glm::vec3({ -cos(e2), sin(e2), 0 }));
+	//renderer.l = std::make_shared<directional_light>(glm::vec3({ 0, 0, -1 }));
 
 
 	de2::get_instance().on<pre_render>([&](std::chrono::nanoseconds ns) {

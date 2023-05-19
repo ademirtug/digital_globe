@@ -25,7 +25,6 @@ box path_to_box(const std::string& plate_path) {
 	}
 	return b;
 }
-
 corner_normals calculate_corner_normals(std::string plate_path, size_t resolution) {
 	box b = path_to_box(plate_path);
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
@@ -47,24 +46,24 @@ corner_normals calculate_corner_normals(std::string plate_path, size_t resolutio
 	//(b.x, b.y) 
 
 	//for lower left corner
-	glm::vec3 v0 = merc_to_ecef({ b.x,			b.y,		0 }, map_size);
-	glm::vec3 v1 = merc_to_ecef({ b.x + step,	b.y,		0 }, map_size);
-	glm::vec3 v2 = merc_to_ecef({ b.x,			b.y + step,	0 }, map_size);
+	glm::vec3 v0 = merc_to_ecef({ b.x,			b.y }, map_size);
+	glm::vec3 v1 = merc_to_ecef({ b.x + step,	b.y }, map_size);
+	glm::vec3 v2 = merc_to_ecef({ b.x,			b.y + step,}, map_size);
 
 	//for lower right corner
-	glm::vec3 v3 = merc_to_ecef({ b.x + b.a - step,	b.y,		0 }, map_size);
-	glm::vec3 v4 = merc_to_ecef({ b.x + b.a,		b.y,		0 }, map_size);
-	glm::vec3 v5 = merc_to_ecef({ b.x + b.a,		b.y + step, 0 }, map_size);
+	glm::vec3 v3 = merc_to_ecef({ b.x + b.a - step,	b.y, }, map_size);
+	glm::vec3 v4 = merc_to_ecef({ b.x + b.a,		b.y, }, map_size);
+	glm::vec3 v5 = merc_to_ecef({ b.x + b.a,		b.y + step, }, map_size);
 
 	//for upper left corner
-	glm::vec3 v6 = merc_to_ecef({ b.x,			b.y + b.a - step,	0 }, map_size);
-	glm::vec3 v7 = merc_to_ecef({ b.x,			b.y + b.a,			0 }, map_size);
-	glm::vec3 v8 = merc_to_ecef({ b.x + step,	b.y + b.a,			0 }, map_size);
+	glm::vec3 v6 = merc_to_ecef({ b.x,			b.y + b.a - step, }, map_size);
+	glm::vec3 v7 = merc_to_ecef({ b.x,			b.y + b.a, }, map_size);
+	glm::vec3 v8 = merc_to_ecef({ b.x + step,	b.y + b.a, }, map_size);
 
 	//for upper right corner
-	glm::vec3 v9 = merc_to_ecef({ b.x + b.a,			b.y + b.a - step,	0 }, map_size);
-	glm::vec3 v10 = merc_to_ecef({ b.x + b.a - step,	b.y + b.a,			0 }, map_size);
-	glm::vec3 v11 = merc_to_ecef({ b.x + b.a,			b.y + b.a,			0 }, map_size);
+	glm::vec3 v9 = merc_to_ecef({ b.x + b.a,			b.y + b.a - step, }, map_size);
+	glm::vec3 v10 = merc_to_ecef({ b.x + b.a - step,	b.y + b.a, }, map_size);
+	glm::vec3 v11 = merc_to_ecef({ b.x + b.a,			b.y + b.a, }, map_size);
 
 	//anti clock wise
 	cn[0] = glm::normalize(calc_normal(v0, v1, v2));
@@ -74,6 +73,10 @@ corner_normals calculate_corner_normals(std::string plate_path, size_t resolutio
 
 	return cn;
 }
+glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3) {
+	return glm::cross(pt2 - pt1, pt3 - pt1);
+}
+
 
 double N(double phi){
 	return earth_a * earth_a / sqrt(earth_a * earth_a * cos(phi) * cos(phi) + earth_b * earth_b * sin(phi) * sin(phi));
@@ -81,43 +84,43 @@ double N(double phi){
 
 //note: don't reinvent the wheel
 //https://danceswithcode.net/engineeringnotes/geodetic_to_ecef/geodetic_to_ecef.html
-std::array<double, 3> ecef_to_geo(std::array<double, 3> ecef) {
+glm::vec3 ecef_to_lla(glm::vec3 ecef) {
 
-	std::array<double, 3> geo{ 0, 0, 0 };   //Results go here (Lat, Lon, Altitude)
-	  double  a = 6378137.0;              //WGS-84 semi-major axis
-	  double e2 = 6.6943799901377997e-3;  //WGS-84 first eccentricity squared
-	  double a1 = 4.2697672707157535e+4;  //a1 = a*e2
-	  double a2 = 1.8230912546075455e+9;  //a2 = a1*a1
-	  double a3 = 1.4291722289812413e+2;  //a3 = a1*e2/2
-	  double a4 = 4.5577281365188637e+9;  //a4 = 2.5*a2
-	  double a5 = 4.2840589930055659e+4;  //a5 = a1+a3
-	  double a6 = 9.9330562000986220e-1;  //a6 = 1-e2
-	  double zp, w2, w, r2, r, s2, c2, s, c, ss;
-	  double g, rg, rf, u, v, m, f, p, x, y, z;
-	  double n, lat, lon, alt;
+	glm::vec3 geo{ 0, 0, 0 };   //Results go here (Lat, Lon, Altitude)
+	double  a = 6378137.0;              //WGS-84 semi-major axis
+	double e2 = 6.6943799901377997e-3;  //WGS-84 first eccentricity squared
+	double a1 = 4.2697672707157535e+4;  //a1 = a*e2
+	double a2 = 1.8230912546075455e+9;  //a2 = a1*a1
+	double a3 = 1.4291722289812413e+2;  //a3 = a1*e2/2
+	double a4 = 4.5577281365188637e+9;  //a4 = 2.5*a2
+	double a5 = 4.2840589930055659e+4;  //a5 = a1+a3
+	double a6 = 9.9330562000986220e-1;  //a6 = 1-e2
+	double zp, w2, w, r2, r, s2, c2, s, c, ss;
+	double g, rg, rf, u, v, m, f, p, x, y, z;
+	double n, lat, lon, alt;
 
-	x = ecef[0] * 1000000 ;
-	y = ecef[1] * 1000000;
-	z = ecef[2] * 1000000;
+	x = ecef.x * 1000000 ;
+	y = ecef.y * 1000000;
+	z = ecef.z * 1000000;
 	zp = std::abs(z);
 	w2 = x * x + y * y;
 	w = std::sqrt(w2);
 	r2 = w2 + z * z;
 	r = std::sqrt(r2);
-	geo[1] = std::atan2(y, x);       //Lon (final)
+	geo.y = std::atan2(y, x);       //Lon (final)
 	s2 = z * z / r2;
 	c2 = w2 / r2;
 	u = a2 / r;
 	v = a3 - a4 / r;
 	if (c2 > 0.3) {
 		s = (zp / r) * (1.0 + c2 * (a1 + u + s2 * v) / r);
-		geo[0] = std::asin(s);      //Lat
+		geo.x = std::asin(s);      //Lat
 		ss = s * s;
 		c = std::sqrt(1.0 - ss);
 	}
 	else {
 		c = (w / r) * (1.0 - s2 * (a5 - u - c2 * v) / r);
-		geo[0] = std::acos(c);      //Lat
+		geo.x = std::acos(c);      //Lat
 		ss = 1.0 - c * c;
 		s = std::sqrt(ss);
 	}
@@ -129,15 +132,24 @@ std::array<double, 3> ecef_to_geo(std::array<double, 3> ecef) {
 	f = c * u + s * v;
 	m = c * v - s * u;
 	p = m / (rf / g + f);
-	geo[0] = geo[0] + p;      //Lat
-	geo[2] = f + m * p / 2.0;     //Altitude
+	geo.x = geo.x + p;      //Lat
+	geo.z = f + m * p / 2.0;     //Altitude
 	if (z < 0.0) {
-		geo[0] *= -1.0;     //Lat
+		geo.x *= -1.0;     //Lat
 	}
 	//convert to angles
-	geo[0] = geo[0] * 180 / glm::pi<double>();
-	geo[1] = geo[1] * 180 / glm::pi<double>();
+	geo *= 180 / glm::pi<double>();
 	return(geo);    //Return Lat, Lon, Altitude in that order
+}
+glm::vec3 lla_to_ecef(double lat_indegrees, double lon_indegrees) {
+	double lat = lat_indegrees * glm::pi<double>() / 180;
+	double lon = lon_indegrees * glm::pi<double>() / 180;
+
+	double x = N(lat) * cos(lat) * cos(lon);
+	double y = N(lat) * cos(lat) * sin(lon);
+	double z = (((earth_b * earth_b) / (earth_a * earth_a)) * N(lat)) * sin(lat);
+
+	return { -x, -y, -z };
 }
 glm::vec3 geo_to_ecef(glm::vec3 geo) {
 	glm::vec3 ecef;
@@ -173,7 +185,7 @@ double lat_to_mercator_y(double lat, double map_size){
 	//0 to circumference
 	distance += circumference / 2;
 	//now take the complement.
-	distance = circumference - distance;
+	//distance = circumference - distance;
 	distance = (distance / circumference) * map_size;
 	//sanity check
 	distance = distance < 0 ? 0 : distance;
@@ -181,6 +193,10 @@ double lat_to_mercator_y(double lat, double map_size){
 
 	return distance;
 }
+glm::vec2 lla_to_merc(glm::vec3 lla, double map_size) {
+	return { lon_to_mercator_x(lla.y, map_size), lat_to_mercator_y(lla.x, map_size) };
+}
+
 double merc_x_to_lon(double merc_x, double map_size) {
 	double lon = (360.0 / map_size * merc_x) - 180;
 	return lon;
@@ -202,41 +218,35 @@ double merc_y_to_lat(double merc_y, double map_size){
 	}
 	return (phi * 180.0 / glm::pi<double>());
 }
-glm::vec3 merc_to_ecef(glm::vec3 input, double map_size){
-	double lat = merc_y_to_lat(input.y, map_size);
-	double lon = merc_x_to_lon(input.x, map_size);
+glm::vec3 merc_to_ecef(glm::vec2 merc, double map_size){
+	double lat = merc_y_to_lat(merc.y, map_size);
+	double lon = merc_x_to_lon(merc.x, map_size);
 	return lla_to_ecef(lat, lon);
 }
-glm::vec3 lla_to_ecef(double lat_indegrees, double lon_indegrees){
-	double lat = lat_indegrees * glm::pi<double>() / 180;
-	double lon = lon_indegrees * glm::pi<double>() / 180;
-
-	double x = N(lat) * cos(lat) * cos(lon);
-	double y = N(lat) * cos(lat) * sin(lon);
-	double z = (((earth_b * earth_b) / (earth_a * earth_a)) * N(lat)) * sin(lat);
-
-	return { -x, -y, -z };
-}
-glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3){
-	return glm::cross(pt2 - pt1, pt3 - pt1);
+glm::vec2 ecef_to_merc(glm::vec3 ecef, double map_size) {
+	//auto lla = ecef_to_lla(ecef);
+	//return { lon_to_mercator_x(lla.y, map_size), lat_to_mercator_y(lla.x, map_size)};
+	return { 0, 0 };
 }
 
+
+
+//RAY CASTING
 bool solve_quadratic(float a, float b, float c, float& t0, float& t1) {
 	float discriminant = (b * b) - (4 * a * c);
 	if (discriminant < 0) //no solution
-		return false; 
+		return false;
 
 	if (discriminant == 0) { //1 solution
 		t0 = -b / 2.0f * a;
 	}
 	else if (discriminant > 0) {//2 solutions;
 		auto droot = std::sqrtf(discriminant);
-		t0 = (- b - droot) / (2.0f * a);
-		t1 = (- b + droot) / (2.0f * a);
+		t0 = (-b - droot) / (2.0f * a);
+		t1 = (-b + droot) / (2.0f * a);
 	}
 	return true;
 }
-
 //TODO: WGS84 is a spheroid not a sphere!
 glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 	//a = dot of ray origin -> dot(camera pos) or a mouse ray
@@ -253,19 +263,10 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 
 	glm::vec3 hit1 = ray_origin + ray_direction * t0;
 	glm::vec3 hit2 = ray_origin + ray_direction * t1;
-	//reverse hand
-	hit1 = { -hit1.x, -hit1.y, -hit1.z };
-	hit2 = { hit2.x, hit2.y, hit2.z };
-	//auto mouse_geo = ecef_to_geo({ hit1.x, hit1.y, hit1.z });
-	//auto mouse_geo2 = ecef_to_geo({ hit2.x, hit2.y, hit2.z });
-
-	//std::string s_mgeo = std::format("hit1 -> ({:02.2f},{:02.2f},{:02.2f}) | hit2 -> ({:02.2f},{:02.2f},{:02.2f}) | mgeo1 -> ({:02.2f},{:02.2f}) | mgeo2 -> ({:02.2f},{:02.2f})",
-	//	hit1.x, hit1.y, hit1.z, hit2.x, hit2.y, hit2.z, mouse_geo[0], mouse_geo[1], mouse_geo2[0], mouse_geo2[1]);
-	//de2::get_instance().set_title(s_mgeo);
-
+	//reverse
+	hit1 *= -1;
 
 	return t0 > 0 ? hit1 : hit2;
-	//return hit2;
 }
 
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir) {
@@ -275,4 +276,25 @@ glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, gl
 	glm::vec4 ray_world = glm::inverse(view) * ray_eye;
 	ray_world /= ray_world.w;
 	return ray_world;
+}
+
+glm::vec3 ray_hit(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
+	auto from = cast_ray(xy, viewport, projection, view, -1.0f);
+	auto to = cast_ray(xy, viewport, projection, view, 1.0f);
+	return sphere_intersection(from, to - from);
+}
+
+glm::vec3 ray_hit_to_geo(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
+	auto lla = ecef_to_lla(ray_hit(xy, viewport, projection, view));
+	lla.x *= -1;
+	return lla;
+}
+
+double ray_hit_to_angle(glm::vec2 xy, glm::vec2 viewport, glm::vec3 camera_pos, glm::mat4 projection, glm::mat4 view) {
+	auto edge_hit = ray_hit(xy, viewport, projection, view);
+	glm::vec3 cam = glm::vec4(camera_pos, 0.0) * view;
+	return glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
+}
+glm::vec2 ray_hit_to_merc(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
+	return { 0, 0 };
 }

@@ -40,7 +40,7 @@ public:
 
 
 	corner_normals& get_corner_normals(std::string plate_path);
-	size_t resolution{ 16 };
+	size_t resolution{ 32 };
 private:
 	void evaluate_completed_requests(ecs_s::registry& world);
 	using rtype = decltype(std::declval<de2>().load_model_async<model>());

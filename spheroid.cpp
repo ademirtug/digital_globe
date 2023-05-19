@@ -25,32 +25,23 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 
 	//default value is 60 degrees, only infinite distance 
 	//can get 90, like in the directional lighting.
-	constexpr float max_visible_angle = glm::pi<float>() / 2.7;
+	constexpr float max_visible_angle = glm::pi<float>() / 3;
 	auto vp = de2::get_instance().viewport;
 	glm::vec2 l1{ 0, 0 }, l4{ vp.x / 2, 0 }, l6{ vp.x, 0 }, l8{ 0, vp.y / 2 }, l12{ vp.x, vp.y / 2 };
 	glm::vec2 l16{ 0, vp.y }, l17{ vp.x / 2, vp.y }, l20{ vp.x, vp.y };
 
 	std::vector<glm::vec2> corner_points;
-	corner_points.insert(corner_points.end(), { l1, l6, l16, l20 });
+	corner_points.insert(corner_points.end(), { l1, l4, l6, l16, l17, l20 });
 
-	//we are still using sphere not spheroid
-	//so -> hit_normal = glm::normalize(ecef)
-	auto from = cast_ray(l8, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), -1.0f);
-	auto to = cast_ray(l8, { vp.x , vp.y }, renderer.get_projection(), renderer.get_view(), 1.0f);
-	auto edge_hit = sphere_intersection(from, to - from);
+	auto projection = renderer.get_projection();
+	auto view = renderer.get_view();
+
 	glm::vec3 cam = glm::vec4(renderer.cam_->get_world_pos(), 0.0) * renderer.get_view();
-	float hit_angle = glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
+	float hit_angle = ray_hit_to_angle(l8, vp, renderer.cam_->get_world_pos(), projection, view);
 	hit_angle = std::isnan(hit_angle) ? max_visible_angle : hit_angle;
-	auto hit_geo = ecef_to_geo({ edge_hit.x, edge_hit.y, edge_hit.z });
-
 
 	//coords under mouse cursor
-	auto mfrom = cast_ray(renderer.mouse_pos, de2::get_instance().viewport, renderer.get_projection(), renderer.get_view(), -1.0f);
-	auto mto = cast_ray(renderer.mouse_pos, de2::get_instance().viewport, renderer.get_projection(), renderer.get_view(), 1.0f);
-	auto mouse_hit = sphere_intersection(mfrom, mto - mfrom);
-	auto mouse_geo = ecef_to_geo({ mouse_hit.x, mouse_hit.y, mouse_hit.z });
-
-
+	auto mouse_geo = ray_hit_to_geo(renderer.mouse_pos, vp, projection, view);
 
 	//////////////////////////////////////////////////
 	std::set<std::string> visible_hierarchy;
@@ -61,8 +52,6 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	plates_to_check.push("c");
 	plates_to_check.push("d");
 
-	std::string sv = "(";
-
 	while (!plates_to_check.empty()) {
 		std::string plate_path = plates_to_check.front();
 		plates_to_check.pop();
@@ -70,16 +59,29 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 		auto cn = get_corner_normals(plate_path);
 		bool is_visible = false;
 		for (size_t i = 0; i < 4; i++){
-			auto ca = glm::angle(cn[i], glm::normalize(glm::vec3{-cam.x, -cam.y, -cam.z }));
+			auto ca = glm::angle(cn[i], glm::normalize(-cam));
 			if (plate_path == "da") {
 				int b = 1;
 			}
-			if (ca < ( hit_angle * 1.50)) {
+			if (ca < ( hit_angle * (1 + ((18 - renderer.cam_->zoom_) * 3)))) {
 				is_visible = true;
-				sv += plate_path + ":" + std::format("{:02.2f} ", ca);
 				break;
 			}
 		}
+
+		if (!is_visible) {
+			//now other way around
+			box pb = path_to_box(plate_path);
+			for (auto cp : corner_points) {
+				auto geo = ray_hit_to_geo(cp, vp, projection, view);
+				auto merc = lla_to_merc(geo, std::pow(2, plate_path.size()) * 256);
+				if (pb.hit_test(merc)) {
+					is_visible = true;
+					break;
+				}
+			}
+		}
+
 
 		if (is_visible) {
 			visible_hierarchy.emplace(plate_path);
@@ -91,12 +93,15 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 			}
 		}
 	}
-	sv += ")";
+
+
+	//auto mouse_merc = lla_to_merc(mouse_geo, std::pow(2, plate_path.size()) * 256);
 
 	//| m_hit -> ({:02.2f},{:02.2f},{:02.2f}) mouse_hit.x, mouse_hit.y, mouse_hit.z,
+	// | sv -> ({}) sv, 
 	//set title
-	std::string s_mgeo = std::format("camera -> ({:02.2f},{:02.2f},{:02.2f}) | hit_angle -> ({:02.2f}) | sv -> ({}) | (sphere coords) -> ({:02.2f},{:02.2f})",
-		cam.x, cam.y, cam.z, hit_angle,sv, -mouse_geo[0], mouse_geo[1]);
+	std::string s_mgeo = std::format("camera -> ({:02.2f},{:02.2f},{:02.2f}) | hit_angle -> ({:02.2f}) | (sphere coords) -> ({:02.2f},{:02.2f})",
+		cam.x, cam.y, cam.z, hit_angle, mouse_geo.x, mouse_geo.y);
 	de2::get_instance().set_title(s_mgeo);
 
 	std::set<std::string> plates_to_request = visible_hierarchy;
@@ -208,7 +213,7 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 			double step = b.a / resolution_;
 			 
 			vertices.push_back({
-				merc_to_ecef({ b.x + x * step, b.y + y * step, 0 }, map_size),/*3D position*/
+				merc_to_ecef({ b.x + x * step, b.y + y * step }, map_size),/*3D position*/
 				//{ b.x + x * step, b.y + y * step, 0 },/*2D position*/
 				{ 0.0, 0.0, 0.0 },/*normal*/
 				{ (x * step / b.a),  1 - (y * step / b.a)}/*uv*/
