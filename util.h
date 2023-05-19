@@ -61,6 +61,7 @@ glm::vec2 ecef_to_merc(glm::vec3 ecef, double map_size);
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3);
 
 
-
+//misc util
+double get_visible_angle_by_zoom(double zoom);
 
 
