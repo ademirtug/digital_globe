@@ -8,8 +8,8 @@
 #include <glm/gtx/vector_angle.hpp>
 
 
-double constexpr earth_a = 6.3781370f;
-double constexpr earth_b = 6.3567523f;
+double constexpr earth_a = 6378137.0f;
+double constexpr earth_b = 6356752.3f;
 double constexpr circumference = 2 * glm::pi<double>() * earth_a;
 
 struct box {

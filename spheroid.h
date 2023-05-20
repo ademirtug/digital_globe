@@ -26,7 +26,7 @@ public:
 
 class earth_plate : public texture_model {
 public:
-	earth_plate(std::string plate_path, size_t resolution = 8);
+	earth_plate(std::string plate_path, size_t resolution);
 	~earth_plate();
 
 	static map_quest<disk_store>& get_provider();
@@ -40,7 +40,7 @@ public:
 
 
 	corner_normals& get_corner_normals(std::string plate_path);
-	size_t resolution{ 32 };
+	size_t resolution{ 8 };
 private:
 	std::set<std::string> get_visible_hierarchy(renderer_system& renderer);
 	void evaluate_completed_requests(ecs_s::registry& world);

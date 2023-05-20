@@ -99,9 +99,9 @@ glm::vec3 ecef_to_lla(glm::vec3 ecef) {
 	double g, rg, rf, u, v, m, f, p, x, y, z;
 	double n, lat, lon, alt;
 
-	x = ecef.x * 1000000 ;
-	y = ecef.y * 1000000;
-	z = ecef.z * 1000000;
+	x = ecef.x;
+	y = ecef.y;
+	z = ecef.z;
 	zp = std::abs(z);
 	w2 = x * x + y * y;
 	w = std::sqrt(w2);
@@ -302,7 +302,8 @@ glm::vec2 ray_hit_to_merc(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection
 
 //MISC UTIL
 double get_visible_angle_by_zoom(double zoom) {
-	std::array<double, 19> angles = { 1.70, 1.65, 1.60, 1.00, 0.33, /*5*/0.15, 0.07, 0.04, /*8*/0.02, 0.01};
+	std::array<double, 19> angles = { 1.70, 1.65, 1.60, 1.00, 0.33, /*5*/0.15, 0.07, 0.0350, 0.019, 0.01,
+	/*10*/0.0045, 0.0030, 0.0014, 0.0007, 0.00035};
 	return angles[zoom];
 }
 

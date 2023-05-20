@@ -59,10 +59,20 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 		world.remove_entity(e);
 	}
 
+
+	//filter plates that has been uploaded and ready to draw
+	std::set<std::string> ready_plates;
+	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
+		if (std::find(visible_hierarchy.begin(), visible_hierarchy.end(), pn.name) != visible_hierarchy.end()) {
+			ready_plates.emplace(pn.name);
+		}
+	});
+
+
 	//iterate over all the plates and get a full quad tree
 	std::set<std::string> plates_to_draw;
 	std::map<std::string, size_t> node_count;
-	for (auto plate_path : visible_hierarchy) {
+	for (auto plate_path : ready_plates) {
 		std::string plate_root = plate_path.substr(0, plate_path.size() - 1);
 		if (node_count.find(plate_root) == node_count.end())
 			node_count[plate_root] = 0;
@@ -70,17 +80,11 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 		node_count[plate_path] = 1;
 		node_count[plate_root]++;
 	}
-
 	for (auto kv : node_count) {
-		if (kv.second < 4 ) {
+		if (kv.second < 4 && node_count[kv.first.substr(0, kv.first.size() - 1)] > 3) {
 			plates_to_draw.emplace(kv.first);
 		}
 	}
-	//for (auto kv : node_count) {
-	//	if (kv.second < 4 && node_count[kv.first.substr(0, kv.first.size() - 1)] > 3) {
-	//		plates_to_draw.emplace(kv.first);
-	//	}
-	//}
 	if (plates_to_draw.size() == 0)
 		plates_to_draw = visible_hierarchy;
 
@@ -98,8 +102,8 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	float hit_angle = ray_hit_to_angle(renderer.mouse_pos, vp, renderer.cam_->get_world_pos(), projection, view);
 
 	//set title
-	std::string s_mgeo = std::format("(sphere coords) -> ({:02.2f},{:02.2f}) | mhit_angle -> ({:02.2f}) |visible plates -> ({})",
-		mouse_geo.x, mouse_geo.y, hit_angle, iv);
+	std::string s_mgeo = std::format("(sphere coords) -> ({:02.2f},{:02.2f}) | zoom -> ({}) | mhit_angle -> ({:02.4f}) |visible plates -> ({})",
+		mouse_geo.x, mouse_geo.y, renderer.cam_->zoom_,  hit_angle, iv);
 	de2::get_instance().set_title(s_mgeo);
 
 };
@@ -108,7 +112,7 @@ void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 	for (auto it = requests_made_.begin(); it != requests_made_.end(); ++it) {
 		if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 			//TODO: object may never appear in the list after all, that means this function will block main thread!!!
-			auto m = de2::get_instance().load_model<earth_plate>(it->first, it->first);
+			auto m = de2::get_instance().load_model<earth_plate>(it->first, it->first, resolution);
 			m->upload();
 			m->attach_program(de2::get_instance().programs["c_t_direct"]);
 
@@ -187,12 +191,16 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 				plates_to_check.push(plate_path + "b");
 				plates_to_check.push(plate_path + "c");
 				plates_to_check.push(plate_path + "d");
+
+				visible_hierarchy.emplace(plate_path + "a");
+				visible_hierarchy.emplace(plate_path + "b");
+				visible_hierarchy.emplace(plate_path + "c");
+				visible_hierarchy.emplace(plate_path + "d");
 			}
 		}
 	}
 	return visible_hierarchy;
 }
-
 
 //PLATE
 plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path), resolution_(resolution) {
