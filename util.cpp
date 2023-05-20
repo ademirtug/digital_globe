@@ -28,7 +28,7 @@ box path_to_box(const std::string& plate_path) {
 corner_normals calculate_corner_normals(std::string plate_path, size_t resolution) {
 	box b = path_to_box(plate_path);
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
-	double step = ((float)b.a) / resolution;
+	double step = ((double)b.a) / resolution;
 	corner_normals cn;
 
 	// resolution_ = 3, plate_path = generic 
@@ -232,8 +232,8 @@ glm::vec2 ecef_to_merc(glm::vec3 ecef, double map_size) {
 
 
 //RAY CASTING
-bool solve_quadratic(float a, float b, float c, float& t0, float& t1) {
-	float discriminant = (b * b) - (4 * a * c);
+bool solve_quadratic(double a, double b, double c, float& t0, float& t1) {
+	double discriminant = (b * b) - (4 * a * c);
 	if (discriminant < 0) //no solution
 		return false;
 
@@ -253,9 +253,9 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 	//b = ray direction -> 
 	//r = radius -> earth_a
 	//t = hit distance -> solutions
-	float a = glm::dot(ray_direction, ray_direction);
-	float b = glm::dot(ray_origin, ray_direction) * 2.0f;
-	float c = glm::dot(ray_origin, ray_origin) - (earth_a * earth_a);
+	double a = glm::dot(ray_direction, ray_direction);
+	double b = glm::dot(ray_origin, ray_direction) * 2.0f;
+	double c = glm::dot(ray_origin, ray_origin) - (earth_a * earth_a);
 
 	float t0{ 0 }, t1{ 0 };
 	if (!solve_quadratic(a, b, c, t0, t1))

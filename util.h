@@ -28,7 +28,7 @@ struct corner_normals {
 };
 
 //ray casting
-bool solve_quadratic(float a, float b, float c, float& t0, float& t1);
+bool solve_quadratic(double a, double b, double c, float& t0, float& t1);
 glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction);
 glm::vec3 ray_hit(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
 glm::vec3 ray_hit_to_geo(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);

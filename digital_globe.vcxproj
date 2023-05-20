@@ -113,7 +113,9 @@
       <AdditionalLibraryDirectories>lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /f /y "$(SolutionDir)lib\glfw3.dll" "$(TargetDir)"</Command>
+      <Command>xcopy /f /y "$(SolutionDir)lib\glfw3.dll" "$(TargetDir)"
+xcopy /f /y "$(SolutionDir)shaders\c_t_direct.frag" "$(TargetDir)"
+xcopy /f /y "$(SolutionDir)shaders\c_t_direct.vert" "$(TargetDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,7 +157,7 @@
     </Link>
     <PostBuildEvent>
       <Command>
-</Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

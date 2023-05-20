@@ -25,7 +25,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 
 	//default value is 60 degrees, only infinite distance 
 	//can get 90, like in the directional lighting.
-	constexpr float max_visible_angle = glm::pi<float>() / 4;
+	constexpr double max_visible_angle = glm::pi<double>() / 4;
 	auto vp = de2::get_instance().viewport;
 	auto projection = renderer.get_projection();
 	auto view = renderer.get_view();
@@ -99,7 +99,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 
 	//coords under mouse cursor
 	auto mouse_geo = ray_hit_to_geo(renderer.mouse_pos, vp, projection, view);
-	float hit_angle = ray_hit_to_angle(renderer.mouse_pos, vp, renderer.cam_->get_world_pos(), projection, view);
+	double hit_angle = ray_hit_to_angle(renderer.mouse_pos, vp, renderer.cam_->get_world_pos(), projection, view);
 
 	//set title
 	std::string s_mgeo = std::format("(sphere coords) -> ({:02.2f},{:02.2f}) | zoom -> ({}) | mhit_angle -> ({:02.4f}) |visible plates -> ({})",
