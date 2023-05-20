@@ -141,9 +141,9 @@ glm::vec3 ecef_to_lla(glm::vec3 ecef) {
 	geo *= 180 / glm::pi<double>();
 	return(geo);    //Return Lat, Lon, Altitude in that order
 }
-glm::vec3 lla_to_ecef(double lat_indegrees, double lon_indegrees) {
-	double lat = lat_indegrees * glm::pi<double>() / 180;
-	double lon = lon_indegrees * glm::pi<double>() / 180;
+glm::vec3 lla_to_ecef(glm::vec3 lla) {
+	double lat = lla.x * glm::pi<double>() / 180;
+	double lon = lla.y * glm::pi<double>() / 180;
 
 	double x = N(lat) * cos(lat) * cos(lon);
 	double y = N(lat) * cos(lat) * sin(lon);
@@ -221,7 +221,7 @@ double merc_y_to_lat(double merc_y, double map_size){
 glm::vec3 merc_to_ecef(glm::vec2 merc, double map_size){
 	double lat = merc_y_to_lat(merc.y, map_size);
 	double lon = merc_x_to_lon(merc.x, map_size);
-	return lla_to_ecef(lat, lon);
+	return lla_to_ecef(glm::vec3{ lat, lon, 0 });
 }
 glm::vec2 ecef_to_merc(glm::vec3 ecef, double map_size) {
 	//auto lla = ecef_to_lla(ecef);
@@ -302,7 +302,7 @@ glm::vec2 ray_hit_to_merc(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection
 
 //MISC UTIL
 double get_visible_angle_by_zoom(double zoom) {
-	std::array<double, 19> angles = { 1.70, 1.65, 1.60, 0.60, 0.33, 0.15,  /*6*/0.07, 0.04, 0.02};
+	std::array<double, 19> angles = { 1.70, 1.65, 1.60, 1.00, 0.33, /*5*/0.15, 0.07, 0.04, /*8*/0.02, 0.01};
 	return angles[zoom];
 }
 
