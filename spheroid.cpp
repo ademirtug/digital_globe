@@ -101,9 +101,10 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	auto mouse_geo = ray_hit_to_geo(renderer.mouse_pos, vp, projection, view);
 	double hit_angle = ray_hit_to_angle(renderer.mouse_pos, vp, renderer.cam_->get_world_pos(), projection, view);
 
+	//|visible plates -> ({}) iv
 	//set title
-	std::string s_mgeo = std::format("(sphere coords) -> ({:02.2f},{:02.2f}) | zoom -> ({}) | mhit_angle -> ({:02.4f}) |visible plates -> ({})",
-		mouse_geo.x, mouse_geo.y, renderer.cam_->zoom_,  hit_angle, iv);
+	std::string s_mgeo = std::format("(sphere coords) -> ({:02.2f},{:02.2f}) | zoom -> ({}) | mhit_angle -> ({:02.4f}) ",
+		mouse_geo.x, mouse_geo.y, renderer.cam_->zoom_,  hit_angle );
 	de2::get_instance().set_title(s_mgeo);
 
 };

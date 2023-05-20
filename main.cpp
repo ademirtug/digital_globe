@@ -13,10 +13,7 @@
 
 //https://github.com/ademirtug/de2/
 #include "de2.h"
-#include "util.h"
 #include "spheroid.h"
-#include "map_provider.h"
-
 
 using namespace std;
 using namespace ecs_s;
@@ -38,7 +35,7 @@ int main()
 	time(&rawtime);
 	float e2 = 2 * glm::pi<float>() * ((gmtime(&rawtime)->tm_hour) / 24.0);
 	renderer.l = std::make_shared<directional_light>(glm::vec3({ -cos(e2), sin(e2), 0 }));
-	//renderer.l = std::make_shared<directional_light>(glm::vec3({ 0, 0, -1 }));
+	//renderer.l = std::make_shared<directional_light>(glm::vec3({ -1, 1, 0 }));
 
 
 	auto alt = renderer.cam_->get_altitude(9);
