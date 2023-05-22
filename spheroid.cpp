@@ -93,7 +93,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	dms n(wgs84_coords.x);
 	dms e(wgs84_coords.y);
 	//set title
-	std::string s_mgeo = std::format("{}E - {}N | zoom -> ({}) | mhit_angle -> ({:02.4f}) | mpath ->({}) | visible plates -> ({})",
+	std::string s_mgeo = std::format("(mouse coords) -> {}E - {}N | zoom -> ({}) | mhit_angle -> ({:02.4f}) | mpath ->({}) | visible plates -> ({})",
 		n.to_string(), e.to_string(), renderer.cam_->zoom_, hit_angle, mp, iv);
 	de2::get_instance().set_title(s_mgeo);
 
