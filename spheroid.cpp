@@ -10,22 +10,9 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	//perfect solution to this question is probably 
 	//sphere - sphere intersection
 	
-	//
-	//|---------------------------------|
-	//|l16            l17            l20|
-	//|l14,l15                   l18,l19|
-	//|                                 |
-	//|   l10                    l13    |
-	//|l8,l9                     l11,l12|
-	//|                                 |
-	//|   l3                       l7   |
-	//|l1,l2          l4           l5,l6|
-	//|---------------------------------|
-
-
 	//default value is 60 degrees, only infinite distance 
 	//can get 90, like in the directional lighting.
-	constexpr double max_visible_angle = glm::pi<double>() / 4;
+	constexpr double max_visible_angle = glm::pi<double>() / 3;
 	auto vp = de2::get_instance().viewport;
 	auto projection = renderer.get_projection();
 	auto view = renderer.get_view();
@@ -42,7 +29,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	for (auto plate_path : plates_to_request) {
 		if (requests_made_.find(plate_path) == requests_made_.end()) {
 			//std::cout << "plate requested-> " << plate_path << std::endl;
-			requests_made_[plate_path] = de2::get_instance().load_model_async<earth_plate>(plate_path, plate_path, resolution);
+			requests_made_[plate_path] = de2::get_instance().load_model_async<earth_plate>(plate_path, plate_path, resolution_);
 		}
 	}
 
@@ -98,13 +85,16 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	});
 
 	//coords under mouse cursor
-	auto mouse_geo = ray_hit_to_geo(renderer.mouse_pos, vp, projection, view);
+	//auto mouse_geo = ray_hit_to_lla(renderer.mouse_pos, vp, projection, view);
 	double hit_angle = ray_hit_to_angle(renderer.mouse_pos, vp, renderer.cam_->get_world_pos(), projection, view);
+	auto mp = ray_hit_to_path(renderer.mouse_pos, vp, projection, view, renderer.cam_->zoom_);
+	auto wgs84_coords = ray_hit_to_lla_ellipsoid(renderer.mouse_pos, vp, projection, view);
 
-	//|visible plates -> ({}) iv
+	dms n(wgs84_coords.x);
+	dms e(wgs84_coords.y);
 	//set title
-	std::string s_mgeo = std::format("(sphere coords) -> ({:02.2f},{:02.2f}) | zoom -> ({}) | mhit_angle -> ({:02.4f}) ",
-		mouse_geo.x, mouse_geo.y, renderer.cam_->zoom_,  hit_angle );
+	std::string s_mgeo = std::format("{}E - {}N | zoom -> ({}) | mhit_angle -> ({:02.4f}) | mpath ->({}) | visible plates -> ({})",
+		n.to_string(), e.to_string(), renderer.cam_->zoom_, hit_angle, mp, iv);
 	de2::get_instance().set_title(s_mgeo);
 
 };
@@ -113,7 +103,7 @@ void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 	for (auto it = requests_made_.begin(); it != requests_made_.end(); ++it) {
 		if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 			//TODO: object may never appear in the list after all, that means this function will block main thread!!!
-			auto m = de2::get_instance().load_model<earth_plate>(it->first, it->first, resolution);
+			auto m = de2::get_instance().load_model<earth_plate>(it->first, it->first, resolution_);
 			m->upload();
 			m->attach_program(de2::get_instance().programs["c_t_direct"]);
 
@@ -131,7 +121,7 @@ void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 }
 corner_normals& spheroid::get_corner_normals(std::string plate_path) {
 	if (!cn_cache.exists(plate_path)) {
-		cn_cache.put(plate_path, calculate_corner_normals(plate_path, resolution)); 
+		cn_cache.put(plate_path, calculate_corner_normals(plate_path, resolution_)); 
 	}
 	return cn_cache.get(plate_path);
 }
@@ -141,20 +131,30 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 	std::set<std::string> visible_hierarchy;
 	auto vp = de2::get_instance().viewport;
 	glm::vec3 cam = glm::vec4(renderer.cam_->get_world_pos(), 0.0) * renderer.get_view();
+	auto view = renderer.get_view();
+	auto projection = renderer.get_projection();
+	std::vector<glm::vec2> corner_points;
 
+	//|---------------------------------|
+	//|l16            l17            l20|
+	//|l14,l15                   l18,l19|
+	//|                                 |
+	//|   l10                    l13    |
+	//|l8,l9                     l11,l12|
+	//|                                 |
+	//|   l3                       l7   |
+	//|l1,l2          l4           l5,l6|
+	//|---------------------------------|
 	glm::vec2 l1{ 0, 0 }, l4{ vp.x / 2, 0 }, l6{ vp.x, 0 }, l8{ 0, vp.y / 2 }, l12{ vp.x, vp.y / 2 };
 	glm::vec2 l16{ 0, vp.y }, l17{ vp.x / 2, vp.y }, l20{ vp.x, vp.y };
 
-	std::vector<glm::vec2> corner_points;
+
 	corner_points.insert(corner_points.end(), { l1, l4, l6, l16, l17, l20 });
 	//seed
 	plates_to_check.push("a");
 	plates_to_check.push("b");
 	plates_to_check.push("c");
 	plates_to_check.push("d");
-
-	auto view = renderer.get_view();
-	auto projection = renderer.get_projection();
 
 	while (!plates_to_check.empty()) {
 		std::string plate_path = plates_to_check.front();
@@ -175,7 +175,7 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 			//now other way around
 			box pb = path_to_box(plate_path);
 			for (auto cp : corner_points) {
-				auto geo = ray_hit_to_geo(cp, vp, projection, view);
+				auto geo = ray_hit_to_lla(cp, vp, projection, view);
 				auto merc = lla_to_merc(geo, std::pow(2, plate_path.size()) * 256);
 				if (pb.hit_test(merc)) {
 					is_visible = true;
@@ -188,6 +188,7 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 		if (is_visible) {
 			visible_hierarchy.emplace(plate_path);
 			if (plate_path.size() < renderer.cam_->zoom_+1) {
+				//keep seeding
 				plates_to_check.push(plate_path + "a");
 				plates_to_check.push(plate_path + "b");
 				plates_to_check.push(plate_path + "c");

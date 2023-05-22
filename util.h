@@ -3,6 +3,7 @@
 #include <array>
 #include <math.h>
 #include <string>
+#include <format>
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include <glm/gtx/vector_angle.hpp>
@@ -27,15 +28,32 @@ struct corner_normals {
 	}
 };
 
+struct dms {
+	dms(double input) {
+		degrees = std::trunc(input);
+		double degrees_decimal = input - degrees;
+		minutes = std::trunc(degrees_decimal * 60);
+		double  minutes_decimal = degrees_decimal * 60 - minutes;
+		seconds = minutes_decimal * 60;
+	}
+	std::string to_string() {
+		return std::format("{:02} {:02}' {:02}\"", degrees, minutes, seconds);
+	}
+	int degrees{ 0 }, minutes{ 0 }, seconds{ 0 };
+};
+
 //ray casting
 bool solve_quadratic(double a, double b, double c, float& t0, float& t1);
 glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction);
 glm::vec3 ray_hit(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
-glm::vec3 ray_hit_to_geo(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
+glm::vec3 ray_hit_to_lla(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
 glm::vec2 ray_hit_to_merc(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
+glm::vec3 ellipsoid_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::vec3 radius);
+glm::vec3 ray_hit_ellipsoid(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
+glm::vec3 ray_hit_to_lla_ellipsoid(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir = -1.0f);
+std::string ray_hit_to_path(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, size_t zoom);
 double ray_hit_to_angle(glm::vec2 xy, glm::vec2 viewport, glm::vec3 camera_pos, glm::mat4 projection, glm::mat4 view);
-
 
 
 //GIS functions
@@ -55,6 +73,7 @@ double lat_to_mercator_y(double lat, double mapsize = 1024);
 //misc util
 double get_visible_angle_by_zoom(double zoom);
 box path_to_box(const std::string& plate_path);
+std::string merc_to_path(glm::vec2 merc, double zoom);
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3);
 corner_normals calculate_corner_normals(std::string plate_path, size_t resolution);
 

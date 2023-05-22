@@ -1,15 +1,8 @@
 ﻿
-//#pragma comment(lib,"ws2_32.lib")
-//#pragma comment(lib,"winhttp.lib")
-//#pragma comment(lib,"wininet.lib")
-//#pragma comment (lib, "gdiplus.lib")
 #pragma comment (lib, "glfw3dll.lib")
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "de2.lib")
 
-
-#include <set>
-#include <iostream>
 
 //https://github.com/ademirtug/de2/
 #include "de2.h"
@@ -24,7 +17,10 @@ int main()
 	eng.init();
 	eng.programs["c_t_direct"] = std::make_shared<program>("c_t_direct", "shaders/c_t_direct.vert", "shaders/c_t_direct.frag");
 
-	spheroid s(earth_a, earth_b);
+	double dx = 39.8633;
+	dms d(dx);
+
+	spheroid s(earth_a, earth_b, 8);
 	registry world;
 	renderer_system renderer;
 	//+x meridian
@@ -37,9 +33,8 @@ int main()
 	renderer.l = std::make_shared<directional_light>(glm::vec3({ -cos(e2), sin(e2), 0 }));
 	//renderer.l = std::make_shared<directional_light>(glm::vec3({ -1, 1, 0 }));
 
-
-	auto alt = renderer.cam_->get_altitude(9);
-
+	auto geo = geo_to_ecef({ 0, glm::pi<float>() / 2, 0 });
+	auto lla = lla_to_ecef({ 0, 90 , earth_a });
 
 	de2::get_instance().on<pre_render>([&](std::chrono::nanoseconds ns) {
 		s.process(world, renderer);

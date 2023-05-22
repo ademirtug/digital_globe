@@ -35,12 +35,12 @@ public:
 
 class spheroid : public sub_system<renderer_system> {
 public:
-	spheroid(double semi_axis_a, double semi_axis_c) : earth_a(semi_axis_a), c(semi_axis_c) {}
+	spheroid(double semi_axis_a, double semi_axis_c, size_t resolution) : earth_a(semi_axis_a), c(semi_axis_c), resolution_(resolution) {}
 	void process(ecs_s::registry& world, renderer_system& renderer);
 
 
 	corner_normals& get_corner_normals(std::string plate_path);
-	size_t resolution{ 8 };
+	size_t resolution_{ 16 };
 private:
 	std::set<std::string> get_visible_hierarchy(renderer_system& renderer);
 	void evaluate_completed_requests(ecs_s::registry& world);

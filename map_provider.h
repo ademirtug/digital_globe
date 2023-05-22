@@ -42,8 +42,8 @@ public:
 
 		box b = path_to_box(plate_path);
 		size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
-		std::string http_request = std::format("https://www.mapquestapi.com/staticmap/v5/map?key={}&format=png&center={},{}&size=256,256&zoom={}&type=sat", 
-			"ohT06mfFYTRpy9dV4SNdaFh8jsXUEnhc", -merc_y_to_lat(b.y + b.a / 2, map_size), merc_x_to_lon(b.x+b.a/2, map_size), plate_path.size());
+		std::string http_request = std::format("https://www.mapquestapi.com/staticmap/v5/map?key={}&format=png&center={},{}&size=256,256&zoom={}&type=sat",
+			"ohT06mfFYTRpy9dV4SNdaFh8jsXUEnhc", -merc_y_to_lat(b.y + b.a / 2, map_size), merc_x_to_lon(b.x + b.a / 2, map_size), plate_path.size());
 
 		auto data = http_client::get_binary_page(http_request);
 		permanent_store_.put(plate_path + ".png", data);
