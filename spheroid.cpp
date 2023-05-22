@@ -90,11 +90,11 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	auto mp = ray_hit_to_path(renderer.mouse_pos, vp, projection, view, renderer.cam_->zoom_);
 	auto wgs84_coords = ray_hit_to_lla_ellipsoid(renderer.mouse_pos, vp, projection, view);
 
-	dms n(wgs84_coords.x);
-	dms e(wgs84_coords.y);
+	dms e(wgs84_coords.x);
+	dms n(wgs84_coords.y);
 	//set title
-	std::string s_mgeo = std::format("(mouse coords) -> {}E - {}N | zoom -> ({}) | mhit_angle -> ({:02.4f}) | mpath ->({}) | visible plates -> ({})",
-		n.to_string(), e.to_string(), renderer.cam_->zoom_, hit_angle, mp, iv);
+	std::string s_mgeo = std::format("(mouse coords) -> {}N - {}E | zoom -> ({}) | mhit_angle -> ({:02.4f}) | mpath ->({}) | visible plates -> ({})",
+		e.to_string(), n.to_string(), renderer.cam_->zoom_, hit_angle, mp, iv);
 	de2::get_instance().set_title(s_mgeo);
 
 };
