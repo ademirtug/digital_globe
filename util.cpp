@@ -395,7 +395,7 @@ std::string ray_hit_to_path(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projecti
 
 //MISC UTIL
 double get_visible_angle_by_zoom(double zoom) {
-	std::array<double, 19> angles = { 1.70, 1.65, 1.60, 1.00, 0.70, /*5*/0.30, 0.15, 0.07, 0.0350, 0.019, 
+	std::array<double, 19> angles = { 1.70, 1.65, 1.60, 1.30, 0.90, /*5*/0.30, 0.15, 0.07, 0.0350, 0.019, 
 		/*10*/0.01, 0.045, 0.020, 0.014, 0.0007, 0.00035};
 	return angles[zoom];
 }
