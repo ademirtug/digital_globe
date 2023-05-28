@@ -13,12 +13,8 @@ using namespace ecs_s;
 
 int main()
 {
-	auto& eng = de2::get_instance();
-	eng.init();
-	eng.programs["c_t_direct"] = std::make_shared<program>("c_t_direct", "shaders/c_t_direct.vert", "shaders/c_t_direct.frag");
-
-	double dx = 39.8633;
-	dms d(dx);
+	de2::get_instance().init();
+	de2::get_instance().programs["c_t_direct"] = std::make_shared<program>("c_t_direct", "shaders/c_t_direct.vert", "shaders/c_t_direct.frag");
 
 	spheroid s(earth_a, earth_b, 8);
 	registry world;
@@ -30,11 +26,13 @@ int main()
 	time_t rawtime;
 	time(&rawtime);
 	float e2 = 2 * glm::pi<float>() * ((gmtime(&rawtime)->tm_hour) / 24.0);
-	renderer.l = std::make_shared<directional_light>(glm::vec3({ -cos(e2), sin(e2), 0 }));
+	auto l = std::make_shared<directional_light>(glm::vec3({ -cos(e2), sin(e2), 0 }));
+	l->ambient = { 0.7, 0.7, 0.7 };
+	renderer.l = l;
+	renderer.z_near = 100;
+	renderer.z_far = 30000000;
 	//renderer.l = std::make_shared<directional_light>(glm::vec3({ -1, 1, 0 }));
 
-	auto geo = geo_to_ecef({ 0, glm::pi<float>() / 2, 0 });
-	auto lla = lla_to_ecef({ 0, 90 , earth_a });
 
 	de2::get_instance().on<pre_render>([&](std::chrono::nanoseconds ns) {
 		s.process(world, renderer);
@@ -44,7 +42,7 @@ int main()
 		renderer.process(world, ns);	
 		});
 
-	eng.run();
+	de2::get_instance().run();
 
 	return 0;
 }

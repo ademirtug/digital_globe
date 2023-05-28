@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{9B8ADCB4-2235-4BCA-9407-FEE2A3CD9D82}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>My3d_engine</RootNamespace>
+    <RootNamespace>de2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>digital_globe</ProjectName>
   </PropertyGroup>

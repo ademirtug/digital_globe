@@ -6,9 +6,9 @@
 #include <format>
 #include <bitset>
 
-box path_to_box(const std::string& plate_path) {
+square path_to_square(const std::string& plate_path) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
-	box b = { 0, 0, map_size };
+	square b = { 0, 0, map_size };
 	//  -map_size-
 	// |---------|
 	// |  c | d  |
@@ -59,10 +59,22 @@ std::string merc_to_path(glm::vec2 merc, double zoom) {
 	return plate_path;
 }
 
-corner_normals calculate_corner_normals(std::string plate_path, size_t resolution) {
-	box b = path_to_box(plate_path);
+std::array<glm::vec3, 4> calculate_corners(std::string plate_path, size_t resolution) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
-	double step = ((double)b.a) / resolution;
+	square s = path_to_square(plate_path);
+
+	auto p0 = merc_to_ecef({s.x, s.y }, map_size);
+	auto p1 = merc_to_ecef({s.x + 256, s.y}, map_size);
+	auto p2 = merc_to_ecef({ s.x, s.y + 256 }, map_size);
+	auto p3 = merc_to_ecef({ s.x + 256, s.y + 256 }, map_size);
+	std::array<glm::vec3, 4> corners{ p0, p1, p2, p3 };
+	return corners;
+	
+}
+corner_normals calculate_corner_normals(std::string plate_path, size_t resolution) {
+	square b = path_to_square(plate_path);
+	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
+	float step = ((float)b.a) / resolution;
 	corner_normals cn;
 
 	// resolution_ = 3, plate_path = generic 
@@ -285,12 +297,7 @@ bool solve_quadratic(double a, double b, double c, float& t0, float& t1) {
 	return true;
 }
 
-//TODO: WGS84 is a spheroid not a sphere!
 glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
-	//a = dot of ray origin -> dot(camera pos) or a mouse ray
-	//b = ray direction -> 
-	//r = radius -> earth_a
-	//t = hit distance -> solutions
 	double a = glm::dot(ray_direction, ray_direction);
 	double b = glm::dot(ray_origin, ray_direction) * 2.0f;
 	double c = glm::dot(ray_origin, ray_origin) - (earth_a * earth_a);
@@ -307,7 +314,7 @@ glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction) {
 	return t0 > 0 ? hit1 : hit2;
 }
 
-glm::vec3 ellipsoid_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::vec3 radius) //(in vec3 ro, in vec3 rd, in vec3 r, inout float t0, inout float t1)
+glm::vec3 ellipsoid_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::vec3 radius)
 {
 	glm::vec3 ir2 = glm::vec3(1.0) / (radius * radius);
 	double a = dot(ray_direction * ray_direction, ir2);
@@ -325,27 +332,7 @@ glm::vec3 ellipsoid_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction, 
 
 	return t0 > 0 ? hit1 : hit2;
 }
-//bool iElliellipsoid_intersectionpsoid(glm::vec3 ray_origin, glm::vec3 ray_direction) //(in vec3 ro, in vec3 rd, in vec3 r, inout float t0, inout float t1)
-//{
-//	vec3 ir2 = vec3(1.0) / (r * r);
-//	float A = dot(rd * rd, ir2);
-//	float B = 2.0 * dot(rd * ro, ir2);
-//	float C = dot(ir2, ro * ro) - 1.0;
-//	float D = B * B - (4.0 * A * C);
-//	if (D < 0.0)
-//	{
-//		t0 = -M_MAX;
-//		t1 = -M_MAX;
-//		return false;
-//	}
-//
-//	float D_SQR = sqrt(D);
-//	A += A; // 2A
-//	t0 = (-B - D_SQR) / A;
-//	t1 = (-B + D_SQR) / A;
-//
-//	return true;
-//}
+
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir) {
 	glm::vec2 ndc_mouse{ ((mouse.x * 2) - viewport.x) / viewport.x, -((mouse.y * 2) - viewport.y) / viewport.y};
 	glm::vec4 ray_clip{ ndc_mouse, dir, 1.0f };
@@ -354,14 +341,17 @@ glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, gl
 	ray_world /= ray_world.w;
 	return ray_world;
 }
-
-glm::vec3 ray_hit(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
-	auto from = cast_ray(xy, viewport, projection, view, -1.0f);
-	auto to = cast_ray(xy, viewport, projection, view, 1.0f);
-	return sphere_intersection(from, to - from);
+glm::vec3 point_to_world(glm::vec4 pt, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
+	glm::vec2 ndc_mouse{ ((pt.x * 2) - viewport.x) / viewport.x, -((pt.y * 2) - viewport.y) / viewport.y };
+	glm::vec4 pt_clip{ ndc_mouse, pt.z, pt.w };
+	glm::vec4 pt_eye = glm::inverse(projection) * pt_clip;
+	glm::vec4 pt_world = glm::inverse(view) * pt_eye;
+	pt_world /= pt_world.w;
+	return pt_world;
 }
+
 glm::vec3 ray_hit_to_lla(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
-	auto lla = ecef_to_lla(ray_hit(xy, viewport, projection, view));
+	auto lla = ecef_to_lla(ray_hit_ellipsoid(xy, viewport, projection, view));
 	lla.x *= -1;
 	return lla;
 }
@@ -376,7 +366,7 @@ glm::vec3 ray_hit_to_lla_ellipsoid(glm::vec2 xy, glm::vec2 viewport, glm::mat4 p
 	return lla;
 }
 double ray_hit_to_angle(glm::vec2 xy, glm::vec2 viewport, glm::vec3 camera_pos, glm::mat4 projection, glm::mat4 view) {
-	auto edge_hit = ray_hit(xy, viewport, projection, view);
+	auto edge_hit = ray_hit_ellipsoid(xy, viewport, projection, view);
 	glm::vec3 cam = glm::vec4(camera_pos, 0.0) * view;
 	return glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
 }
@@ -396,7 +386,7 @@ std::string ray_hit_to_path(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projecti
 //MISC UTIL
 double get_visible_angle_by_zoom(double zoom) {
 	std::array<double, 19> angles = { 1.70, 1.65, 1.60, 1.30, 0.90, /*5*/0.30, 0.15, 0.07, 0.0350, 0.019, 
-		/*10*/0.01, 0.0045, 0.0020, 0.0014, 0.00007, 0.00035};
+		/*10*/0.0069, 0.0030, 0.0015, 0.0014, 0.00007, 0.00035};
 	return angles[zoom];
 }
 

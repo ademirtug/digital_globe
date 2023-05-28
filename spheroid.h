@@ -18,11 +18,11 @@ class plate : public mesh {
 public:
 	plate(std::string plate_path, size_t resolution);
 	
-	box b;
+	square b;
 	std::string plate_path_;
 	corner_normals cn;
+	std::array<glm::vec3, 4> corners;
 };
-
 
 class earth_plate : public texture_model {
 public:
@@ -40,8 +40,10 @@ public:
 
 
 	corner_normals& get_corner_normals(std::string plate_path);
+	std::array<glm::vec3, 4>& get_corners(std::string plate_path);
 	size_t resolution_{ 16 };
 private:
+
 	std::set<std::string> get_visible_hierarchy(renderer_system& renderer);
 	void evaluate_completed_requests(ecs_s::registry& world);
 	using rtype = decltype(std::declval<de2>().load_model_async<model>());
@@ -50,5 +52,6 @@ private:
 	std::vector<rtype> vertices;
 	//corner normals cache;
 	lru_cache<std::string, corner_normals> cn_cache;
+	lru_cache<std::string, std::array<glm::vec3, 4>> c_cache;
 };
 

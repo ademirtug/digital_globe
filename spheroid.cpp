@@ -7,23 +7,22 @@
 
 void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	//task: find visible plates
-	//perfect solution to this question is probably 
-	//sphere - sphere intersection
-	
-	//default value is 60 degrees, only infinite distance 
-	//can get 90, like in the directional lighting.
 	constexpr double max_visible_angle = glm::pi<double>() / 3;
 	auto vp = de2::get_instance().viewport;
 	auto projection = renderer.get_projection();
 	auto view = renderer.get_view();
-	
+	auto start = std::chrono::high_resolution_clock::now();
+
 	std::set<std::string> visible_hierarchy = get_visible_hierarchy(renderer);
+
 	std::set<std::string> plates_to_request = visible_hierarchy;
 	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
 		if (visible_hierarchy.find(pn.name) != visible_hierarchy.end()) {
 			plates_to_request.erase(pn.name);
 		}
 	});
+
+	auto tp1 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
 	//make async requests for missing plates in visible_hierarchy
 	for (auto plate_path : plates_to_request) {
@@ -46,6 +45,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 		world.remove_entity(e);
 	}
 
+	auto tp2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
 	//filter plates that has been uploaded and ready to draw
 	std::set<std::string> ready_plates;
@@ -54,7 +54,6 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 			ready_plates.emplace(pn.name);
 		}
 	});
-
 
 	//iterate over all the plates and get a full quad tree
 	std::set<std::string> plates_to_draw;
@@ -75,6 +74,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	if (plates_to_draw.size() == 0)
 		plates_to_draw = visible_hierarchy;
 
+	
 	int iv = 0;
 	world.truncate_component<visible>();
 	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
@@ -84,8 +84,9 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 		}
 	});
 
+	auto tp3 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+
 	//coords under mouse cursor
-	//auto mouse_geo = ray_hit_to_lla(renderer.mouse_pos, vp, projection, view);
 	double hit_angle = ray_hit_to_angle(renderer.mouse_pos, vp, renderer.cam_->get_world_pos(), projection, view);
 	auto mp = ray_hit_to_path(renderer.mouse_pos, vp, projection, view, renderer.cam_->zoom_);
 	auto wgs84_coords = ray_hit_to_lla_ellipsoid(renderer.mouse_pos, vp, projection, view);
@@ -96,7 +97,6 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	std::string s_mgeo = std::format("(mouse coords) -> {}N - {}E | zoom -> ({}) | mhit_angle -> ({:02.4f}) | mpath ->({}) | visible plates -> ({})",
 		e.to_string(), n.to_string(), renderer.cam_->zoom_, hit_angle, mp, iv);
 	de2::get_instance().set_title(s_mgeo);
-
 };
 void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 	std::vector<std::string> completed_requests;
@@ -112,6 +112,7 @@ void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 			world.add_component(e, plate_name{ it->first });
 			world.add_component(e, m);
 			cn_cache.put(it->first, std::static_pointer_cast<plate>(ep->m)->cn);
+			c_cache.put(it->first, std::static_pointer_cast<plate>(ep->m)->corners);
 			completed_requests.push_back(it->first);
 		}
 	}
@@ -125,6 +126,13 @@ corner_normals& spheroid::get_corner_normals(std::string plate_path) {
 	}
 	return cn_cache.get(plate_path);
 }
+std::array<glm::vec3, 4> & spheroid::get_corners(std::string plate_path) {
+	if (!c_cache.exists(plate_path)) {
+		c_cache.put(plate_path, calculate_corners(plate_path, resolution_));
+	}
+	return c_cache.get(plate_path);
+}
+
 
 std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer) {
 	std::queue<std::string> plates_to_check;
@@ -135,21 +143,23 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 	auto projection = renderer.get_projection();
 	std::vector<glm::vec2> corner_points;
 
+	//TODO: for god sake implement AABB and save our souls!
 	//|---------------------------------|
-	//|l16            l17            l20|
-	//|l14,l15                   l18,l19|
+	//|l7             l8              l9|
 	//|                                 |
-	//|   l10                    l13    |
-	//|l8,l9                     l11,l12|
 	//|                                 |
-	//|   l3                       l7   |
-	//|l1,l2          l4           l5,l6|
+	//|l4             l5              l6|
+	//|                                 |
+	//|                                 |
+	//|l1             l2              l3|
 	//|---------------------------------|
-	glm::vec2 l1{ 0, 0 }, l4{ vp.x / 2, 0 }, l6{ vp.x, 0 }, l8{ 0, vp.y / 2 }, l12{ vp.x, vp.y / 2 };
-	glm::vec2 l16{ 0, vp.y }, l17{ vp.x / 2, vp.y }, l20{ vp.x, vp.y };
+
+	glm::vec2 l7{ 0, vp.y }, l8{ vp.x / 2, vp.y }, l9{ vp.x, vp.y };
+	glm::vec2 l4{ 0, vp.y / 2}, l5{ vp.x / 2, vp.y / 2 }, l6{ vp.x, vp.y / 2 };
+	glm::vec2 l1{ 0, 0 }, l2{ vp.x / 2, 0 }, l3{ vp.x, 0 };
 
 
-	corner_points.insert(corner_points.end(), { l1, l4, l6, l16, l17, l20 });
+	corner_points.insert(corner_points.end(), { l1, l2, l3, l4, l5, l6, l7, l8, l9 });
 	//seed
 	plates_to_check.push("a");
 	plates_to_check.push("b");
@@ -162,6 +172,9 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 
 		auto cn = get_corner_normals(plate_path);
 		bool is_visible = false;
+		if (plate_path == "a") {
+			int stop = 1;
+		}
 		for (size_t i = 0; i < 4; i++) {
 			auto ca = glm::angle(cn[i], glm::normalize(-cam));
 			
@@ -173,7 +186,7 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 
 		if (!is_visible) {
 			//now other way around
-			box pb = path_to_box(plate_path);
+			square pb = path_to_square(plate_path);
 			for (auto cp : corner_points) {
 				auto geo = ray_hit_to_lla(cp, vp, projection, view);
 				auto merc = lla_to_merc(geo, std::pow(2, plate_path.size()) * 256);
@@ -183,7 +196,6 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 				}
 			}
 		}
-
 
 		if (is_visible) {
 			visible_hierarchy.emplace(plate_path);
@@ -207,7 +219,7 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 //PLATE
 plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path), resolution_(resolution) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
-	b = path_to_box(plate_path);
+	b = path_to_square(plate_path);
 	int s = 0;
 	//  -map_size-
 	// |---------|
@@ -272,6 +284,8 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 
 	//pre calculate corner normals;
 	cn = calculate_corner_normals(plate_path_, resolution_);
+	corners = calculate_corners(plate_path_, resolution_);
+
 }
 
 //EARTH PLATE
@@ -289,3 +303,4 @@ map_quest<disk_store>& earth_plate::get_provider() {
 	static map_quest<disk_store> provider;
 	return provider;
 }
+
