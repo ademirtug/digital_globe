@@ -23,16 +23,13 @@ public:
 #include "de2.h"
 #include "spheroid.h"
 
-using namespace std;
-using namespace ecs_s;
 double constexpr earth_a = 6378137.0f;
 double constexpr earth_b = 6356752.3f;
 
 int main()
 {
-	auto& eng = de2::get_instance();
-	eng.init();
-	eng.programs["c_t_direct"] = std::make_shared<program>("c_t_direct", "shaders/c_t_direct.vert", "shaders/c_t_direct.frag");
+	de2::get_instance().init();
+	de2::get_instance().programs["c_t_direct"] = std::make_shared<program>("c_t_direct", "shaders/c_t_direct.vert", "shaders/c_t_direct.frag");
 
 	spheroid s(earth_a, earth_b);
 	registry world;
@@ -47,7 +44,7 @@ int main()
 		renderer.process(world, ns);	
 		});
 
-	eng.run();
+	de2::get_instance().run();
 
 	return 0;
 }
