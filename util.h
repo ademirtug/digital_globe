@@ -20,8 +20,6 @@ struct square {
 			&& p.y >= y && p.y <= y + a);
 	}
 };
-
-
 struct corner_normals {
 	std::array<glm::vec3, 4> data{ glm::vec3{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 
@@ -29,10 +27,9 @@ struct corner_normals {
 		return data[idx];
 	}
 };
-
 struct dms {
 	dms(double input) {
-		degrees = std::trunc(input);
+		degrees = input / 1;
 		double degrees_decimal = input - degrees;
 		minutes = degrees_decimal * 60 / 1;
 		double  minutes_decimal = degrees_decimal * 60 - minutes;
@@ -46,13 +43,11 @@ struct dms {
 
 //ray casting
 bool solve_quadratic(double a, double b, double c, float& t0, float& t1);
-glm::vec3 sphere_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction);
 glm::vec3 point_to_world(glm::vec4 pt, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
-glm::vec3 ray_hit_to_lla(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
 glm::vec2 ray_hit_to_merc(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
 glm::vec3 ellipsoid_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::vec3 radius);
 glm::vec3 ray_hit_ellipsoid(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
-glm::vec3 ray_hit_to_lla_ellipsoid(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
+glm::vec3 ray_hit_to_lla(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view);
 glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir = -1.0f);
 std::string ray_hit_to_path(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, size_t zoom);
 double ray_hit_to_angle(glm::vec2 xy, glm::vec2 viewport, glm::vec3 camera_pos, glm::mat4 projection, glm::mat4 view);
@@ -60,7 +55,6 @@ double ray_hit_to_angle(glm::vec2 xy, glm::vec2 viewport, glm::vec3 camera_pos, 
 
 //GIS functions
 double N(double phi);
-glm::vec3 lla_to_ecef(glm::vec3 lla);
 glm::vec3 ecef_to_lla(glm::vec3 ecef);
 glm::vec3 geo_to_ecef(glm::vec3 geo);
 double merc_x_to_lon(double x, double map_size = 1024);
@@ -79,35 +73,3 @@ std::string merc_to_path(glm::vec2 merc, double zoom);
 glm::vec3 calc_normal(glm::vec3 pt1, glm::vec3 pt2, glm::vec3 pt3);
 corner_normals calculate_corner_normals(std::string plate_path, size_t resolution);
 std::array<glm::vec3, 4> calculate_corners(std::string plate_path, size_t resolution);
-
-struct rect_prism {
-	std::array<glm::vec3, 4> corners;
-	std::array<glm::vec3, 4> corners_end;
-	glm::vec3 normal{ 0, 0, 0 };
-	double depth{ 0 };
-	rect_prism(std::array<glm::vec3, 4> corners, double depth) : corners(corners), depth(depth) {
-		normal = glm::normalize(calc_normal(corners[0], corners[1], corners[2]));
-		normal *= depth;
-		for (size_t i = 0; i < 4; i++) {
-			corners_end[i] = corners[i] + normal;
-		}
-	}
-
-	bool contains(glm::vec3 x) {
-		glm::vec3 p1 = corners[0];
-		glm::vec3 p2 = corners_end[0];
-		glm::vec3 p4 = corners[1];
-		glm::vec3 p5 = corners[2];
-
-		auto i = p2 - p1;;
-		auto j = p4 - p1;
-		auto k = p5 - p1;
-		auto v = x - p1;
-
-		bool b1 = (0 < glm::dot(v, i))&& (glm::dot(v, i) < glm::dot(i, i));
-		bool b2 = (0 < glm::dot(v, j))&& (glm::dot(v, j) < glm::dot(j, j));
-		bool b3 = (0 < glm::dot(v, k))&& (glm::dot(v, k) < glm::dot(k, k));
-
-		return b1 && b2 && b3;
-	}
-};

@@ -89,7 +89,7 @@ void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
 	//coords under mouse cursor
 	double hit_angle = ray_hit_to_angle(renderer.mouse_pos, vp, renderer.cam_->get_world_pos(), projection, view);
 	auto mp = ray_hit_to_path(renderer.mouse_pos, vp, projection, view, renderer.cam_->zoom_);
-	auto wgs84_coords = ray_hit_to_lla_ellipsoid(renderer.mouse_pos, vp, projection, view);
+	auto wgs84_coords = ray_hit_to_lla(renderer.mouse_pos, vp, projection, view);
 
 	dms e(wgs84_coords.x);
 	dms n(wgs84_coords.y);
@@ -102,11 +102,9 @@ void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 	std::vector<std::string> completed_requests;
 	for (auto it = requests_made_.begin(); it != requests_made_.end(); ++it) {
 		if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
-			//TODO: object may never appear in the list after all, that means this function will block main thread!!!
-			auto m = de2::get_instance().load_model<earth_plate>(it->first, it->first, resolution_);
+			auto m = it->second.get();
 			m->upload();
 			m->attach_program(de2::get_instance().programs["c_t_direct"]);
-
 			auto ep = std::static_pointer_cast<earth_plate>(m);
 			ecs_s::entity e = world.new_entity();
 			world.add_component(e, plate_name{ it->first });
@@ -116,6 +114,7 @@ void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
 			completed_requests.push_back(it->first);
 		}
 	}
+
 	for (auto plate_path : completed_requests) {
 		requests_made_.erase(plate_path);
 	}
@@ -220,7 +219,6 @@ std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer)
 plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path), resolution_(resolution) {
 	size_t map_size = (size_t)std::pow(2, plate_path.size()) * 256;
 	b = path_to_square(plate_path);
-	int s = 0;
 	//  -map_size-
 	// |---------|
 	// |  c | d  |

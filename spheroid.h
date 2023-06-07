@@ -46,10 +46,10 @@ private:
 
 	std::set<std::string> get_visible_hierarchy(renderer_system& renderer);
 	void evaluate_completed_requests(ecs_s::registry& world);
-	using rtype = decltype(std::declval<de2>().load_model_async<model>());
+	//using rtype = decltype(std::declval<de2>().load_model_async<model>());
 	double earth_a{ .0f }, c{ .0f };
-	std::map<std::string, rtype> requests_made_;
-	std::vector<rtype> vertices;
+	std::map<std::string, decltype(std::declval<de2>().load_model_async<model>())> requests_made_;
+	std::vector<decltype(std::declval<de2>().load_model_async<model>())> vertices;
 	//corner normals cache;
 	lru_cache<std::string, corner_normals> cn_cache;
 	lru_cache<std::string, std::array<glm::vec3, 4>> c_cache;
