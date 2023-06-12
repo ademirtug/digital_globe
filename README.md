@@ -50,6 +50,6 @@ int main()
 }
 ```
 
-![Screen Shot 1](s1.png?raw=true "screen shot 1")
+![Screen Shot 3](s3.png?raw=true "screen shot 3")
 
-![Screen Shot 2](s2.png?raw=true "screen shot 2")
+![Screen Shot 1](s1.png?raw=true "screen shot 1")
