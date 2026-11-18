@@ -1,0 +1,57 @@
+{
+  "version": 4,
+  "configurations": [
+    {
+      "name": "Windows",
+      "includePath": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/build/Debug/_deps/wxwidgets-src/include",
+        "${workspaceFolder}/build/Debug/_deps/wxwidgets-build/lib/vc_x64_lib/mswud",
+        "${env:WXWIN}/include"
+      ],
+      "defines": [
+        "_DEBUG",
+        "NOMINMAX",
+        "WIN32_LEAN_AND_MEAN",
+        "_CRT_SECURE_NO_WARNINGS",
+        "__WXMSW__",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "cppStandard": "c++20",
+      "intelliSenseMode": "windows-msvc-x64"
+    },
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/include"
+      ],
+      "compileCommands": "${workspaceFolder}/build/Debug/compile_commands.json",
+      "cppStandard": "c++20",
+      "intelliSenseMode": "linux-gcc-x64"
+    },
+    {
+      "name": "wxWidgets",
+      "includePath": [
+        "${workspaceFolder}",
+        "C:\\dev\\wx\\lib\\vc14x_x64_dll\\mswud",
+        "C:\\dev\\wx\\include"
+      ],
+      "defines": [
+        "UNICODE",
+        "_UNICODE",
+        "__WXMSW__",
+        "_DEBUG",
+        "WXUSINGDLL"
+      ],
+      "cppStandard": "c++20",
+      "customConfigurationVariables": {
+        "wxWidgetsTools": "managed"
+      },
+      "intelliSenseMode": "windows-msvc-x64",
+      "compilerPath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-﻿#include "util.h"
+#include "util.h"
 #include <algorithm>
 #include <string>
 #include "spheroid.h"
@@ -26,37 +26,16 @@ square path_to_square(const std::string& plate_path) {
 	return b;
 }
 std::string merc_to_path(glm::vec2 merc, double zoom) {
-	std::string plate_path;
-	// |------------------|
-	// |  c(10)  | d(11)  | up
-	// |------------------|
-	// |  a(00)  | b(01)  | down
-	// |------------------|
-	//   left      right
-	// 
-	//for zoom = 1, map_size = 1024 x 1024
-	//for point {750, 263} = bc
-	//x = 750 / 256 = 2 = b10
-	//y = 263 / 256 = 1 = b01
-	//x determines left or right
-	//y determines up or down
-	//so path is {y[1], x[1]} + {y[0], x[0]} =  {01} + {10} = bc
-	
-	//TODO: is x = std::pow(2, zoom) * 256 a singularity? 100?
-	merc.x = merc.x == std::pow(2, zoom) * 256 ? merc.x - 1 : merc.x;
-	merc.y = merc.y == std::pow(2, zoom) * 256 ? merc.y - 1 : merc.y;
-
-	std::bitset<32> bx = merc.x / 256;
-	std::bitset<32> by = merc.y / 256;
-	int x = merc.x / 256;
-	int y = merc.y / 256;
-	int stop = 1;
-	for (size_t i = 0; i <= zoom; i++) {
-		char c = 0;
-		c |= bx[zoom - i] + (by[zoom - i] << 1);
-		plate_path += c + 97;
+	if (!std::isfinite(merc.x) || !std::isfinite(merc.y) || !std::isfinite(zoom) || zoom < 0 || zoom > 30) return "";
+	size_t level = size_t(zoom) + 1;
+	size_t count = size_t(1) << level;
+	auto tile = [count](double p) { return size_t(std::clamp(p / 256, 0.0, double(count - 1))); };
+	size_t x = tile(merc.x), y = tile(merc.y);
+	std::string path;
+	for (size_t i = level; i-- > 0;) {
+		path += char('a' + ((x >> i) & 1) + 2 * ((y >> i) & 1));
 	}
-	return plate_path;
+	return path;
 }
 
 std::array<glm::vec3, 4> calculate_corners(std::string plate_path, size_t resolution) {
@@ -64,9 +43,9 @@ std::array<glm::vec3, 4> calculate_corners(std::string plate_path, size_t resolu
 	square s = path_to_square(plate_path);
 
 	auto p0 = merc_to_ecef({s.x, s.y }, map_size);
-	auto p1 = merc_to_ecef({s.x + 256, s.y}, map_size);
-	auto p2 = merc_to_ecef({ s.x, s.y + 256 }, map_size);
-	auto p3 = merc_to_ecef({ s.x + 256, s.y + 256 }, map_size);
+	auto p1 = merc_to_ecef({s.x + s.a, s.y}, map_size);
+	auto p2 = merc_to_ecef({ s.x, s.y + s.a }, map_size);
+	auto p3 = merc_to_ecef({ s.x + s.a, s.y + s.a }, map_size);
 	std::array<glm::vec3, 4> corners{ p0, p1, p2, p3 };
 	return corners;
 	
@@ -131,6 +110,7 @@ double N(double phi){
 //note: don't reinvent the wheel
 //https://danceswithcode.net/engineeringnotes/geodetic_to_ecef/geodetic_to_ecef.html
 glm::vec3 ecef_to_lla(glm::vec3 ecef) {
+	if (!std::isfinite(ecef.x) || !std::isfinite(ecef.y) || !std::isfinite(ecef.z) || glm::dot(ecef, ecef) == 0) return glm::vec3(std::numeric_limits<float>::quiet_NaN());
 
 	glm::vec3 geo{ 0, 0, 0 };			//Results go here (Lat, Lon, Altitude)
 	double  a = 6378137.0;              //WGS-84 semi-major axis
@@ -184,12 +164,13 @@ glm::vec3 ecef_to_lla(glm::vec3 ecef) {
 		geo.x *= -1.0;     //Lat
 	}
 	//convert to angles
-	geo *= 180 / glm::pi<double>();
+	geo.x = glm::degrees(geo.x);
+	geo.y = glm::degrees(geo.y);
 	return(geo);    //Return Lat, Lon, Altitude in that order
 }
-glm::vec3 geo_to_ecef(glm::vec3 geo) {
-	glm::vec3 ecef;
-	double e2 = 6.6943799901377997e-3;
+glm::dvec3 geo_to_ecef(glm::dvec3 geo) {
+	glm::dvec3 ecef;
+	double e2 = 1 - earth_b * earth_b / (earth_a * earth_a);
 
 	double lat = geo.x;
 	double lon = geo.y;
@@ -198,7 +179,7 @@ glm::vec3 geo_to_ecef(glm::vec3 geo) {
 	ecef.x = (n + alt) * cos(lat) * cos(lon);    //ECEF x
 	ecef.y = (n + alt) * cos(lat) * sin(lon);    //ECEF y
 	ecef.z = (n * (1 - e2) + alt) * sin(lat);    //ECEF z
-	ecef *= -1;
+
 
 	return ecef;
 }
@@ -208,28 +189,11 @@ double lon_to_mercator_x(double lon, double map_size){
 	//lon range is -180 to 180 -> 0 to 360
 	return map_size * ((lon + 180) / 360);
 }
-double lat_to_mercator_y(double lat, double map_size){
-	//merc projection range
-	lat = std::clamp(lat, -85.08, 85.08);
-
-	double e2 = 1 - ((earth_b / earth_a) * (earth_b / earth_a));
-	double e = sqrt(e2);
-	double phi = lat * glm::pi<double>() / 180;
-	double sinphi = sin(phi);
-	double con = e * sinphi;
-	con = pow((1.0 - con) / (1.0 + con), e / 2);
-	double ts = tan(0.5 * (glm::pi<double>() * 0.5 - phi)) / con;
-	double distance = 0 - earth_a * log(ts);
-	//0 to circumference
-	distance += circumference / 2;
-	//now take the complement.
-	//distance = circumference - distance;
-	distance = (distance / circumference) * map_size;
-	//sanity check
-	distance = distance < 0 ? 0 : distance;
-	distance = distance > map_size ? map_size : distance;
-
-	return distance;
+double lat_to_mercator_y(double lat, double map_size) {
+	// Plate paths use bottom-left origin; OSM XYZ uses top-left origin.
+	lat = std::clamp(lat, -85.0511287798066, 85.0511287798066);
+	double phi = glm::radians(lat);
+	return std::clamp((0.5 + std::log(std::tan(glm::pi<double>() / 4 + phi / 2)) / (2 * glm::pi<double>())) * map_size, 0.0, map_size);
 }
 glm::vec2 lla_to_merc(glm::vec3 lla, double map_size) {
 	return { lon_to_mercator_x(lla.y, map_size), lat_to_mercator_y(lla.x, map_size) };
@@ -239,118 +203,324 @@ double merc_x_to_lon(double merc_x, double map_size) {
 	double lon = (360.0 / map_size * merc_x) - 180;
 	return lon;
 }
-double merc_y_to_lat(double merc_y, double map_size){
-	double y = circumference / map_size * (map_size / 2 - merc_y);
-	double e2 = 1 - ((earth_b / earth_a) * (earth_b / earth_a));
-	double e = sqrt(e2);
-	double ts = exp(-y / earth_a);
-	double phi = (glm::pi<double>() / 2) - 2 * atan(ts);
-	double dphi = 1.0;
-	int i = 0;
-
-	while ((abs(dphi) > 0.000000001) && (i < 25)) {
-		double con = e * sin(phi);
-		dphi = glm::pi<double>() / 2.0 - 2.0 * atan(ts * pow((1.0 - con) / (1.0 + con), e / 2.0)) - phi;
-		phi += dphi;
-		i++;
-	}
-	return (phi * 180.0 / glm::pi<double>());
+double merc_y_to_lat(double y, double map_size) {
+	return glm::degrees(std::atan(std::sinh(2 * glm::pi<double>() * y / map_size - glm::pi<double>())));
 }
-glm::vec3 merc_to_ecef(glm::vec2 merc, double map_size){
+glm::dvec3 merc_to_ecef(glm::dvec2 merc, double map_size){
 	double lat = merc_y_to_lat(merc.y, map_size);
 	double lon = merc_x_to_lon(merc.x, map_size);
 	return geo_to_ecef({ lat * glm::pi<double>() / 180, lon * glm::pi<double>() / 180, 0 });
 }
 glm::vec2 ecef_to_merc(glm::vec3 ecef, double map_size) {
-	//auto lla = ecef_to_lla(ecef);
-	//return { lon_to_mercator_x(lla.y, map_size), lat_to_mercator_y(lla.x, map_size)};
-	return { 0, 0 };
+	return lla_to_merc(ecef_to_lla(ecef), map_size);
 }
-
-
 
 //RAY CASTING
 bool solve_quadratic(double a, double b, double c, float& t0, float& t1) {
-	double discriminant = (b * b) - (4 * a * c);
-	if (discriminant < 0) //no solution
-		return false;
-
-	if (discriminant == 0) { //1 solution
-		t0 = -b / 2.0f * a;
-	}
-	else if (discriminant > 0) {//2 solutions;
-		auto droot = std::sqrt(discriminant);
-		t0 = (-b - droot) / (2.0f * a);
-		t1 = (-b + droot) / (2.0f * a);
-	}
+	if (!std::isfinite(a) || !std::isfinite(b) || !std::isfinite(c) || a == 0) return false;
+	double discriminant = b * b - 4 * a * c;
+	if (discriminant < 0) return false;
+	double q = -0.5 * (b + std::copysign(std::sqrt(discriminant), b));
+	double first = q == 0 ? -b / (2 * a) : q / a;
+	double second = q == 0 ? first : c / q;
+	t0 = float(std::min(first, second));
+	t1 = float(std::max(first, second));
 	return true;
 }
 
-glm::vec3 ellipsoid_intersection(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::vec3 radius)
-{
-	glm::vec3 ir2 = glm::vec3(1.0) / (radius * radius);
-	double a = dot(ray_direction * ray_direction, ir2);
-	double b = 2.0 * glm::dot(ray_direction * ray_origin, ir2);
-	double c = glm::dot(ir2, ray_origin * ray_origin) - 1.0;
-
-	float t0{ 0 }, t1{ 0 };
-	if (!solve_quadratic(a, b, c, t0, t1))
-		return glm::vec3(0, 0, 0);
-
-	glm::vec3 hit1 = ray_origin + ray_direction * t0;
-	glm::vec3 hit2 = ray_origin + ray_direction * t1;
-	//reverse
-	hit1 *= -1;
-
-	return t0 > 0 ? hit1 : hit2;
+glm::dvec3 ellipsoid_intersection(glm::dvec3 ray_origin, glm::dvec3 ray_direction, glm::dvec3 radius) {
+	glm::dvec3 origin = glm::dvec3(ray_origin) / glm::dvec3(radius);
+	glm::dvec3 direction = glm::dvec3(ray_direction) / glm::dvec3(radius);
+	double a = glm::dot(direction, direction), b = glm::dot(direction, origin), c = glm::dot(origin, origin) - 1;
+	double discriminant = b * b - a * c;
+	if (a > 0 && discriminant >= 0 && std::isfinite(discriminant)) {
+		double q = -b - std::copysign(std::sqrt(discriminant), b);
+		double t0 = q == 0 ? -b / a : q / a, t1 = q == 0 ? t0 : c / q;
+		if (t0 > t1) std::swap(t0, t1);
+		double t = t0 >= 0 ? t0 : t1;
+		if (t >= 0) return glm::dvec3(ray_origin) + t * glm::dvec3(ray_direction);
+	}
+	return glm::vec3(std::numeric_limits<float>::quiet_NaN());
 }
 
-glm::vec3 cast_ray(glm::vec2 mouse, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, float dir) {
-	glm::vec2 ndc_mouse{ ((mouse.x * 2) - viewport.x) / viewport.x, -((mouse.y * 2) - viewport.y) / viewport.y};
-	glm::vec4 ray_clip{ ndc_mouse, dir, 1.0f };
-	glm::vec4 ray_eye = glm::inverse(projection) * ray_clip;
-	glm::vec4 ray_world = glm::inverse(view) * ray_eye;
-	ray_world /= ray_world.w;
-	return ray_world;
+glm::dvec3 cast_ray(glm::dvec2 mouse, glm::dvec2 viewport, glm::dmat4 projection, glm::dmat4 view, double dir) {
+	if (viewport.x <= 0 || viewport.y <= 0) return glm::vec3(std::numeric_limits<float>::quiet_NaN());
+	glm::dvec4 clip{ 2.0 * mouse.x / viewport.x - 1, 1 - 2.0 * mouse.y / viewport.y, dir, 1 };
+	glm::dvec4 world = glm::inverse(glm::dmat4(projection) * glm::dmat4(view)) * clip;
+	return glm::dvec3(world) / world.w;
 }
+
 glm::vec3 point_to_world(glm::vec4 pt, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
-	glm::vec2 ndc_mouse{ ((pt.x * 2) - viewport.x) / viewport.x, -((pt.y * 2) - viewport.y) / viewport.y };
-	glm::vec4 pt_clip{ ndc_mouse, pt.z, pt.w };
-	glm::vec4 pt_eye = glm::inverse(projection) * pt_clip;
-	glm::vec4 pt_world = glm::inverse(view) * pt_eye;
-	pt_world /= pt_world.w;
-	return pt_world;
+	return cast_ray(pt, viewport, projection, view, pt.z);
 }
 
-glm::vec3 ray_hit_ellipsoid(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
+glm::dvec3 ray_hit_ellipsoid(glm::dvec2 xy, glm::dvec2 viewport, glm::dmat4 projection, glm::dmat4 view) {
 	auto from = cast_ray(xy, viewport, projection, view, -1.0f);
 	auto to = cast_ray(xy, viewport, projection, view, 1.0f);
-	return ellipsoid_intersection(from, to - from, glm::vec3{earth_a, earth_a, earth_b });
+	return ellipsoid_intersection(from, to - from, { earth_a, earth_a, earth_b });
 }
-glm::vec3 ray_hit_to_lla(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
-	auto lla = ecef_to_lla(ray_hit_ellipsoid(xy, viewport, projection, view));
-	lla.x *= -1;
-	return lla;
+
+glm::vec3 ray_hit_to_lla(glm::dvec2 xy, glm::dvec2 viewport, glm::dmat4 projection, glm::dmat4 view) {
+	return ecef_to_lla(ray_hit_ellipsoid(xy, viewport, projection, view));
 }
+
 double ray_hit_to_angle(glm::vec2 xy, glm::vec2 viewport, glm::vec3 camera_pos, glm::mat4 projection, glm::mat4 view) {
-	auto edge_hit = ray_hit_ellipsoid(xy, viewport, projection, view);
-	glm::vec3 cam = glm::vec4(camera_pos, 0.0) * view;
-	return glm::angle(glm::normalize(edge_hit), glm::normalize(cam));
+	auto hit = ray_hit_ellipsoid(xy, viewport, projection, view);
+	if (!std::isfinite(hit.x)) return std::numeric_limits<double>::quiet_NaN();
+	return std::acos(std::clamp(glm::dot(glm::normalize(glm::dvec3(hit)), glm::normalize(glm::dvec3(camera_pos))), -1.0, 1.0));
 }
+
 glm::vec2 ray_hit_to_merc(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view) {
-	return { 0, 0 };
+	return lla_to_merc(ray_hit_to_lla(xy, viewport, projection, view), 1024);
 }
+
 std::string ray_hit_to_path(glm::vec2 xy, glm::vec2 viewport, glm::mat4 projection, glm::mat4 view, size_t zoom) {
-	std::string plate_path;
 	auto lla = ray_hit_to_lla(xy, viewport, projection, view);
-	auto merc = lla_to_merc(lla, std::pow(2, zoom + 1) * 256);
-	plate_path = merc_to_path(merc, zoom);
-
-	return plate_path;
+	return merc_to_path(lla_to_merc(lla, std::ldexp(256.0, int(zoom) + 1)), double(zoom));
 }
-
 
 //MISC UTIL
+plate_bounds calculate_bounds(const std::string& path, double a, double b) {
+	auto tile = path_to_square(path);
+	double size = std::ldexp(256.0, int(path.size()));
+	double south = merc_y_to_lat(double(tile.y), size);
+	double north = merc_y_to_lat(double(tile.y + tile.a), size);
+	double west = merc_x_to_lon(double(tile.x), size);
+	double east = merc_x_to_lon(double(tile.x + tile.a), size);
+	std::vector<double> latitudes{ south, north }, longitudes{ west, east };
+	if (south < 0 && north > 0) latitudes.push_back(0);
+	for (double lon = -180; lon <= 180; lon += 90) {
+		if (lon > west && lon < east) longitudes.push_back(lon);
+	}
+	plate_bounds bounds{ glm::dvec3(std::numeric_limits<double>::max()), glm::dvec3(std::numeric_limits<double>::lowest()) };
+	double e2 = 1 - b * b / (a * a);
+	for (double lat : latitudes) {
+		double phi = glm::radians(lat);
+		double n = a / std::sqrt(1 - e2 * std::sin(phi) * std::sin(phi));
+		for (double lon : longitudes) {
+			double lambda = glm::radians(lon);
+			glm::dvec3 p{ n * std::cos(phi) * std::cos(lambda), n * std::cos(phi) * std::sin(lambda), n * (1 - e2) * std::sin(phi) };
+			bounds.min = glm::min(bounds.min, p);
+			bounds.max = glm::max(bounds.max, p);
+		}
+	}
+	// Leave room for float vertex rounding at Earth scale.
+	bounds.min -= glm::dvec3(2);
+	bounds.max += glm::dvec3(2);
+
+	double phi = glm::radians((south + north) / 2), lambda = glm::radians((west + east) / 2);
+	bounds.axes = {
+		glm::dvec3(-std::sin(lambda), std::cos(lambda), 0),
+		glm::dvec3(-std::sin(phi) * std::cos(lambda), -std::sin(phi) * std::sin(lambda), std::cos(phi)),
+		glm::dvec3(std::cos(phi) * std::cos(lambda), std::cos(phi) * std::sin(lambda), std::sin(phi))
+	};
+	glm::dvec3 lo, hi;
+	// Extrema of dot(axis, ECEF(lat,lon)). For a fixed longitude its latitude
+	// derivative is M(lat) * (-k*sin(lat) + axis.z*cos(lat)). Include its zeros
+	// and the longitude extrema, not just the corners or the parent's mesh.
+	// This encloses the entire curved patch, including every finer descendant.
+	for (int i = 0; i < 3; i++) {
+		auto axis = bounds.axes[i];
+		std::vector<double> lons{ glm::radians(west), glm::radians(east) };
+		for (int j = -2; j <= 2; j++) {
+			double lon = std::atan2(axis.y, axis.x) + j * glm::pi<double>();
+			if (lon > lons[0] && lon < lons[1]) lons.push_back(lon);
+		}
+		lo[i] = std::numeric_limits<double>::max();
+		hi[i] = std::numeric_limits<double>::lowest();
+		for (double lon : lons) {
+			double k = axis.x * std::cos(lon) + axis.y * std::sin(lon);
+			std::vector<double> lats{ glm::radians(south), glm::radians(north) };
+			for (int j = -1; j <= 1; j++) {
+				double lat = std::atan2(axis.z, k) + j * glm::pi<double>();
+				if (lat > lats[0] && lat < lats[1]) lats.push_back(lat);
+			}
+			for (double lat : lats) {
+				double n = a / std::sqrt(1 - e2 * std::sin(lat) * std::sin(lat));
+				double d = n * (k * std::cos(lat) + axis.z * (1 - e2) * std::sin(lat));
+				lo[i] = std::min(lo[i], d); hi[i] = std::max(hi[i], d);
+			}
+		}
+	}
+	bounds.center = bounds.axes * ((lo + hi) * 0.5);
+	bounds.extent = (hi - lo) * 0.5 + glm::dvec3(2);
+	double closest_lat = std::clamp(0.0, south, north);
+	// Upper bound on BOTH orthogonal Mercator tangents over this patch.
+	bounds.max_texel_metres = 2 * glm::pi<double>() / 256 * a * a / b * std::cos(glm::radians(closest_lat));
+	return bounds;
+}
+
+double plate_bounds::support(glm::dvec3 direction) const {
+	double value = glm::dot(direction, center);
+	for (int i = 0; i < 3; i++) value += extent[i] * std::abs(glm::dot(direction, axes[i]));
+	return value;
+}
+
+plate_view::plate_view(glm::dvec3 eye, const glm::dmat4& clip, glm::dvec3 radii) : horizon(eye / (radii * radii)) {
+	glm::dvec4 rows[4];
+	for (int i = 0; i < 4; i++) rows[i] = { clip[0][i], clip[1][i], clip[2][i], clip[3][i] };
+	for (int axis = 0; axis < 3; axis++) {
+		planes[2 * axis] = rows[3] - rows[axis];
+		planes[2 * axis + 1] = rows[3] + rows[axis];
+	}
+}
+
+bool plate_view::is_visible(const plate_bounds& bounds) const {
+	if (bounds.support(horizon) < 1) return false;
+	for (const auto& plane : planes) if (bounds.support(glm::dvec3(plane)) + plane.w < 0) return false;
+	return true;
+}
+
+bool plate_bounds::is_visible(glm::dvec3 eye, const glm::dmat4& clip, glm::dvec3 radii) const {
+	return plate_view(eye, clip, radii).is_visible(*this);
+}
+
+namespace {
+	bool plate_projection(const plate_bounds& bounds, const glm::dmat4& clip, glm::dvec2& lo, glm::dvec2& hi, double& min_w) {
+		lo = glm::dvec2(std::numeric_limits<double>::max()); hi = -lo;
+		glm::dvec4 w{ clip[0][3], clip[1][3], clip[2][3], clip[3][3] };
+		min_w = -bounds.support(-glm::dvec3(w)) + w.w;
+		if (min_w <= 0) return false;
+		for (int corner = 0; corner < 8; corner++) {
+			auto p = bounds.center;
+			for (int axis = 0; axis < 3; axis++) p += bounds.axes[axis] * bounds.extent[axis] * ((corner & (1 << axis)) ? 1.0 : -1.0);
+			auto q = clip * glm::dvec4(p, 1);
+			auto ndc = glm::dvec2(q) / q.w;
+			lo = glm::min(lo, ndc); hi = glm::max(hi, ndc);
+		}
+		return true;
+	}
+}
+
+double plate_texel_size(const plate_bounds& bounds, const glm::dmat4& clip, glm::dvec2 viewport) {
+	glm::dvec2 lo, hi;
+	double min_w;
+	if (!plate_projection(bounds, clip, lo, hi, min_w)) return std::numeric_limits<double>::infinity();
+	// Bound the perspective Jacobian for every point in the box. The difference
+	// from its central NDC value is a rank-one matrix, bounded by its norm.
+	glm::dvec3 x{ clip[0][0], clip[1][0], clip[2][0] }, y{ clip[0][1], clip[1][1], clip[2][1] }, w{ clip[0][3], clip[1][3], clip[2][3] };
+	auto midpoint = (lo + hi) * 0.5;
+	auto u = (x - midpoint.x * w) * viewport.x * 0.5;
+	auto v = (y - midpoint.y * w) * viewport.y * 0.5;
+	double uu = glm::dot(u, u), vv = glm::dot(v, v), uv = glm::dot(u, v);
+	double norm = std::sqrt((uu + vv + std::sqrt((uu - vv) * (uu - vv) + 4 * uv * uv)) * 0.5);
+	double variation = glm::length((hi - lo) * viewport * 0.25) * glm::length(w);
+	return bounds.max_texel_metres * (norm + variation) / min_w;
+}
+
+double plate_screen_area(const plate_bounds& bounds, const glm::dmat4& clip, glm::dvec2 viewport) {
+	glm::dvec2 lo, hi;
+	double min_w;
+	if (!plate_projection(bounds, clip, lo, hi, min_w)) return viewport.x * viewport.y;
+	auto span = glm::max(glm::dvec2(0), glm::min(hi, glm::dvec2(1)) - glm::max(lo, glm::dvec2(-1)));
+	return span.x * span.y * viewport.x * viewport.y / 4;
+}
+
+std::vector<plate_request> plan_plate_requests(const std::map<std::string, plate_demand>& demand, const std::set<std::string>& ready) {
+	std::map<std::string, plate_request> wanted;
+	for (const auto& [leaf, item] : demand) {
+		std::string best;
+		for (auto path = leaf; !path.empty(); path.pop_back()) if (ready.contains(path)) { best = path; break; }
+		if (best.size() >= item.source.size()) continue;
+		if (best.empty()) {
+			auto root = leaf.substr(0, 1);
+			auto& fallback = wanted[root];
+			fallback.path = root; fallback.fallback = true; fallback.priority += item.pixels;
+		}
+		auto& detail = wanted[item.source];
+		detail.path = item.source;
+		detail.priority += item.pixels * (1 - std::exp2(-double(item.source.size() - best.size())));
+	}
+	std::vector<plate_request> requests;
+	for (const auto& [path, request] : wanted) requests.push_back(request);
+	std::sort(requests.begin(), requests.end(), [](const auto& a, const auto& b) {
+		if (a.fallback != b.fallback) return a.fallback;
+		return a.priority == b.priority ? a.path < b.path : a.priority > b.priority;
+	});
+	return requests;
+}
+
+std::map<std::string, std::string> select_plate_textures(const std::set<std::string>& leaves, const std::set<std::string>& ready) {
+	std::map<std::string, std::string> selected;
+	for (const auto& path : leaves) {
+		for (auto source = path; !source.empty(); source.pop_back()) {
+			if (!ready.contains(source)) continue;
+			selected.emplace(path, source);
+			break;
+		}
+	}
+	return selected;
+}
+
+glm::vec4 plate_texture_region(const std::string& path, const std::string& source) {
+	if (source.empty() || !path.starts_with(source)) throw std::invalid_argument("texture source must be an ancestor of the plate");
+	double count = std::ldexp(1.0, int(path.size() - source.size()));
+	auto region = path_to_square(path.substr(source.size()));
+	float scale = float(1 / count);
+	// x/y are the texture offset; z/w are the scale. Texture V points downward.
+	return { region.x / (256 * count), 1 - region.y / (256 * count) - scale, scale, scale };
+}
+
+double projected_texel_size(glm::dvec3 point, const glm::dmat4& clip, glm::dvec2 viewport, size_t zoom, double a, double b) {
+	double e2 = 1 - b * b / (a * a);
+	double longitude = std::atan2(point.y, point.x);
+	double latitude = std::atan2(point.z, (1 - e2) * std::hypot(point.x, point.y));
+	double sin_lat = std::sin(latitude), cos_lat = std::cos(latitude);
+	double factor = 1 - e2 * sin_lat * sin_lat;
+	double n = a / std::sqrt(factor);
+	double m = a * (1 - e2) / std::pow(factor, 1.5);
+	double radians_per_texel = 2 * glm::pi<double>() / std::ldexp(256.0, int(zoom));
+	// Tangents of the ellipsoid with respect to Web Mercator image pixels.
+	glm::dvec3 du = n * cos_lat * radians_per_texel * glm::dvec3(-std::sin(longitude), std::cos(longitude), 0);
+	glm::dvec3 dv = m * cos_lat * radians_per_texel * glm::dvec3(-sin_lat * std::cos(longitude), -sin_lat * std::sin(longitude), cos_lat);
+	auto p = clip * glm::dvec4(point, 1);
+	if (p.w <= 0 || viewport.x <= 0 || viewport.y <= 0) return 0;
+	auto project_tangent = [&](glm::dvec3 tangent) {
+		auto d = clip * glm::dvec4(tangent, 0);
+		return glm::dvec2(viewport.x, -viewport.y) * (glm::dvec2(d) * p.w - glm::dvec2(p) * d.w) / (2 * p.w * p.w);
+	};
+	auto u = project_tangent(du), v = project_tangent(dv);
+	double trace = glm::dot(u, u) + glm::dot(v, v);
+	double determinant = u.x * v.y - u.y * v.x;
+	// Largest singular value: the most stretched direction of one source pixel.
+	return std::sqrt((trace + std::sqrt(std::max(0.0, trace * trace - 4 * determinant * determinant))) / 2);
+}
+
+double view_texel_size(const glm::dmat4& clip, glm::dvec2 viewport, double a, double b) {
+	if (viewport.x <= 0 || viewport.y <= 0) return 0;
+	auto inverse = glm::inverse(clip);
+	glm::dvec3 radii{ a, a, b };
+	double largest = 0;
+	// Screen samples use framebuffer pixels, so a HiDPI display requests more detail.
+	for (int y = 0; y <= 20; y++) for (int x = 0; x <= 32; x++) {
+		glm::dvec2 ndc{ 2.0 * x / 32 - 1, 1 - 2.0 * y / 20 };
+		auto near_point = inverse * glm::dvec4(ndc, -1, 1);
+		auto far_point = inverse * glm::dvec4(ndc, 1, 1);
+		glm::dvec3 origin = glm::dvec3(near_point) / near_point.w;
+		glm::dvec3 direction = glm::normalize(glm::dvec3(far_point) / far_point.w - origin);
+		auto o = origin / radii, d = direction / radii;
+		double qa = glm::dot(d, d), qb = glm::dot(o, d), qc = glm::dot(o, o) - 1;
+		double discriminant = qb * qb - qa * qc;
+		if (discriminant < 0) continue;
+		double t = (-qb - std::sqrt(discriminant)) / qa;
+		if (!std::isfinite(t) || t < 0) continue;
+		auto point = origin + t * direction;
+		double latitude = std::atan2(point.z, (b * b / (a * a)) * std::hypot(point.x, point.y));
+		if (std::abs(latitude) > glm::radians(85.0511287798066)) continue;
+		largest = std::max(largest, projected_texel_size(point, clip, viewport, 0, a, b));
+	}
+	return largest;
+}
+
+size_t select_map_zoom(double texel_pixels, size_t current, size_t maximum) {
+	if (!std::isfinite(texel_pixels) || texel_pixels <= 0) return 1;
+	// One source pixel should cover at most one framebuffer pixel.
+	size_t wanted = size_t(std::clamp(std::ceil(std::log2(texel_pixels)), 1.0, double(maximum)));
+	// Keep the finer level near a boundary instead of flickering during rotation.
+	if (current > wanted && current <= maximum && std::ldexp(texel_pixels, 1 - int(current)) > 0.75) return current;
+	return wanted;
+}
+
 double get_visible_angle_by_zoom(double zoom) {
 	std::array<double, 19> angles = { 1.70, 1.65, 1.60, 1.30, 0.90, 
 		/*5*/0.30, 0.15, 0.07, 0.0350, 0.0150, 

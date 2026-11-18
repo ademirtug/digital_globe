@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [{
+    "label": "Build digital_globe", "type": "shell",
+    "command": "bash", "args": ["${workspaceFolder}/scripts/build.sh", "Debug"],
+    "windows": {"command": "powershell.exe", "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/scripts/build.ps1", "-Configuration", "Debug"]},
+    "options": {"cwd": "${workspaceFolder}"}, "problemMatcher": ["$gcc", "$msCompile"],
+    "group": {"kind": "build", "isDefault": true}
+  },
+  {
+    "label": "wxWidgets: Build (Debug)",
+    "type": "wxwidgets",
+    "configuration": "Debug",
+    "group": "build",
+    "problemMatcher": [
+      "$msCompile"
+    ]
+  },
+  {
+    "label": "wxWidgets: Build (Release)",
+    "type": "wxwidgets",
+    "configuration": "Release",
+    "group": "build",
+    "problemMatcher": [
+      "$msCompile"
+    ]
+  }
+]
+}

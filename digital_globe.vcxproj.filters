@@ -12,6 +12,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="app_settings.cpp"><Filter>source</Filter></ClCompile>
+    <ClCompile Include="app_menu.cpp"><Filter>source</Filter></ClCompile>
+    <ClInclude Include="app_settings.h"><Filter>headers</Filter></ClInclude>
+    <ClInclude Include="app_menu.h"><Filter>headers</Filter></ClInclude>
+    <ClInclude Include="app_resources.h"><Filter>headers</Filter></ClInclude>
+    <ResourceCompile Include="app.rc" />
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="headers">
       <UniqueIdentifier>{f3c14d49-9eb7-4fd2-add5-670815a1233f}</UniqueIdentifier>
     </Filter>

@@ -1,0 +1,2 @@
+// Standard wxWidgets Windows manifest and resources. Menus and dialogs are portable C++ code.
+#include <wx/msw/wx.rc>

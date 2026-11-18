@@ -4,6 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # User-specific files
+.deps/
+/mapdata/
 *.rsuser
 *.suo
 *.user
@@ -361,3 +363,35 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+/build/
+/.wxroot
+/.wxroot.*
+
+# Local tooling metadata and scratch documentation
+/docs/
+.agents/
+.agent/
+.codex/
+.claude/
+.cursor/
+.gemini/
+.windsurf/
+.cline/
+.roo/
+.opencode/
+AGENTS.md
+AGENTS.override.md
+CLAUDE.md
+CLAUDE.local.md
+CODEX.md
+GEMINI.md
+.cursorrules
+.cursorignore
+.windsurfrules
+.clinerules
+.roomodes
+.roorules/
+.aider*
+/.github/copilot-instructions.md
+/.github/instructions/

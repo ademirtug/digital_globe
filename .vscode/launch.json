@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Digital Globe (Windows)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Debug/bin/digital_globe.exe",
+      "cwd": "${workspaceFolder}/build/Debug/bin",
+      "args": [],
+      "preLaunchTask": "Build digital_globe"
+    },
+    {
+      "name": "Digital Globe (Linux)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Debug/bin/digital_globe",
+      "cwd": "${workspaceFolder}/build/Debug/bin",
+      "args": [],
+      "MIMode": "gdb",
+      "preLaunchTask": "Build digital_globe"
+    },
+    {
+      "name": "wxWidgets: Debug",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "preLaunchTask": "wxWidgets: Build (Debug)",
+      "program": "${workspaceFolder}/build/Debug/bin/digital_globe.exe",
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false
+    },
+    {
+      "name": "wxWidgets: Release",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "preLaunchTask": "wxWidgets: Build (Release)",
+      "program": "${workspaceFolder}/build/Release/bin/digital_globe.exe",
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false
+    }
+  ]
+}

@@ -1,124 +1,134 @@
-﻿#include "spheroid.h"
+#include "spheroid.h"
 //http://github.com/ademirtug/ecs_s/
-#include "../../ecs_s/ecs_s.hpp"
+#include "ecs_s/ecs_s.hpp"
 #include "util.h"
 #include "map_provider.h"
 #include <glm/gtx/vector_angle.hpp>
 
 void spheroid::process(ecs_s::registry& world, renderer_system& renderer) {
-	//task: find visible plates
-	constexpr double max_visible_angle = glm::pi<double>() / 3;
+	auto preferences = app_settings::instance().snapshot();
+	auto revision = app_settings::instance().tile_revision();
+	if (revision != settings_revision_) {
+		for (auto& [path, request] : requests_made_) *request.wanted = false;
+		requests_made_.clear(); retry_after_.clear();
+		resident_images_.clear(); loaded_plates_.clear();
+		world.truncate_component<visible>();
+		for (auto& [path, entity] : drawn_plates_) world.get_component_value_for<std::shared_ptr<model>>(entity)->tex.reset();
+		lod_clip_ = glm::dmat4(0.0);
+		settings_revision_ = revision;
+	}
 	auto vp = de2::get_instance().viewport;
 	auto projection = renderer.get_projection();
-	auto view = renderer.get_view();
-	auto start = std::chrono::high_resolution_clock::now();
-
-	std::set<std::string> visible_hierarchy = get_visible_hierarchy(renderer);
-
-	std::set<std::string> plates_to_request = visible_hierarchy;
-	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
-		if (visible_hierarchy.find(pn.name) != visible_hierarchy.end()) {
-			plates_to_request.erase(pn.name);
+	auto view = renderer.cam_->view_matrix();
+	bool changed = update_visible_plates(renderer);
+	bool completed = evaluate_completed_requests();
+	auto now = std::chrono::steady_clock::now();
+	bool retry = std::any_of(retry_after_.begin(), retry_after_.end(), [now](const auto& item) { return item.second <= now; });
+	if (changed || completed || retry) {
+		std::set<std::string> leaves, ready;
+		for (const auto& [leaf, demand] : visible_plates_) {
+			leaves.insert(leaf);
+			for (auto path = leaf; !path.empty(); path.pop_back()) {
+				if (resident_images_.contains(path)) ready.insert(path);
+				else if (loaded_plates_.exists(path)) {
+					loaded_plates_.get(path);
+					ready.insert(path);
+				}
+			}
 		}
-	});
-
-	auto tp1 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-
-	//make async requests for missing plates in visible_hierarchy
-	for (auto plate_path : plates_to_request) {
-		if (requests_made_.find(plate_path) == requests_made_.end()) {
-			//std::cout << "plate requested-> " << plate_path << std::endl;
-			requests_made_[plate_path] = de2::get_instance().load_model_async<earth_plate>(plate_path, plate_path, resolution_);
+		auto requests = plan_plate_requests(visible_plates_, ready);
+		std::set<std::string> wanted;
+		for (const auto& request : requests) wanted.insert(request.path);
+		for (auto& [path, request] : requests_made_) *request.wanted = wanted.contains(path);
+		for (auto it = retry_after_.begin(); it != retry_after_.end();) {
+			if (it->second <= now) it = retry_after_.erase(it); else ++it;
 		}
-	}
-
-	evaluate_completed_requests(world);
-
-	//remove all entities that is not in visible_hierarchy
-	std::vector<ecs_s::entity> entities_to_remove;
-	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
-		if (visible_hierarchy.find(pn.name) == visible_hierarchy.end()) {
-			entities_to_remove.push_back(e);
+		for (const auto& request : requests) {
+			// Two workers, two outstanding jobs: no backlog of obsolete network work.
+			if (requests_made_.size() >= 2) break;
+			const auto& path = request.path;
+			if (requests_made_.contains(path) || retry_after_.contains(path)) continue;
+			auto wanted = std::make_shared<std::atomic_bool>(true);
+			auto result = de2::get_instance().async([path, wanted, style = preferences.style, offline = preferences.offline]() -> std::shared_ptr<texture> {
+				if (!wanted->load()) return {};
+				return earth_plate::get_provider().get(path, style, offline);
+			});
+			requests_made_.emplace(path, image_request{ wanted, std::move(result) });
 		}
-	});
-	for (auto e : entities_to_remove) {
-		world.remove_entity(e);
-	}
 
-	auto tp2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-
-	//filter plates that has been uploaded and ready to draw
-	std::set<std::string> ready_plates;
-	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
-		if (std::find(visible_hierarchy.begin(), visible_hierarchy.end(), pn.name) != visible_hierarchy.end()) {
-			ready_plates.emplace(pn.name);
+		// Only meshes leaving the view are removed. Their loaded images stay cached.
+		for (auto it = drawn_plates_.begin(); it != drawn_plates_.end();) {
+			if (leaves.contains(it->first)) { ++it; continue; }
+			world.remove_entity(it->second);
+			it = drawn_plates_.erase(it);
 		}
-	});
-
-	//iterate over all the plates and get a full quad tree
-	std::set<std::string> plates_to_draw;
-	std::map<std::string, size_t> node_count;
-	for (auto plate_path : ready_plates) {
-		std::string plate_root = plate_path.substr(0, plate_path.size() - 1);
-		if (node_count.find(plate_root) == node_count.end())
-			node_count[plate_root] = 0;
-
-		node_count[plate_path] = 1;
-		node_count[plate_root]++;
-	}
-	for (auto kv : node_count) {
-		if (kv.second < 4 && node_count[kv.first.substr(0, kv.first.size() - 1)] > 3) {
-			plates_to_draw.emplace(kv.first);
+		for (const auto& path : leaves) {
+			if (drawn_plates_.contains(path)) continue;
+			auto tile = std::make_shared<texture_model>();
+			tile->m = std::make_shared<plate>(path, resolution_);
+			tile->attach_program(de2::get_instance().programs["c_t_direct"]);
+			tile->upload();
+			auto e = world.new_entity();
+			world.add_component(e, plate_name{ path });
+			world.add_component(e, std::static_pointer_cast<model>(tile));
+			drawn_plates_.emplace(path, e);
 		}
-	}
-	if (plates_to_draw.size() == 0)
-		plates_to_draw = visible_hierarchy;
 
-	
-	int iv = 0;
-	world.truncate_component<visible>();
-	world.view<plate_name>([&](ecs_s::entity& e, plate_name& pn) {
-		if (std::find(plates_to_draw.begin(), plates_to_draw.end(), pn.name) != plates_to_draw.end()) {
+		// Uniform leaf geometry prevents cracks. Each region independently uses its
+		// best loaded image; a missing edge tile never downgrades the entire globe.
+		auto textures = select_plate_textures(leaves, ready);
+		world.truncate_component<visible>();
+		std::map<std::string, std::shared_ptr<texture>> resident;
+		size_t lowest = tile_zoom_, highest = 0;
+		for (const auto& [path, source] : textures) {
+			auto e = drawn_plates_.at(path);
+			auto& tile = world.get_component_value_for<std::shared_ptr<model>>(e);
+			auto image = resident_images_.contains(source) ? resident_images_.at(source) : loaded_plates_.get(source);
+			image->upload(); // Offscreen completions stay CPU-only until actually used.
+			tile->tex = image;
+			resident.emplace(source, image);
+			auto region = plate_texture_region(path, source);
+			tile->texture_offset = { region.x, region.y };
+			tile->texture_scale = { region.z, region.w };
 			world.add_component(e, visible{});
-			iv++;
+			lowest = std::min(lowest, source.size());
+			highest = std::max(highest, source.size());
 		}
-	});
-
-	auto tp3 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-
-	//coords under mouse cursor
-	double hit_angle = ray_hit_to_angle(renderer.mouse_pos, vp, renderer.cam_->get_world_pos(), projection, view);
-	auto mp = ray_hit_to_path(renderer.mouse_pos, vp, projection, view, renderer.cam_->zoom_);
-	auto wgs84_coords = ray_hit_to_lla(renderer.mouse_pos, vp, projection, view);
-
-	dms e(wgs84_coords.x);
-	dms n(wgs84_coords.y);
-	//set title
-	std::string s_mgeo = std::format("(mouse coords) -> {}N - {}E | zoom -> ({}) | mhit_angle -> ({:02.4f}) | mpath ->({}) | visible plates -> ({})",
-		e.to_string(), n.to_string(), renderer.cam_->zoom_, hit_angle, mp, iv);
-	de2::get_instance().set_title(s_mgeo);
-};
-void spheroid::evaluate_completed_requests(ecs_s::registry& world) {
-	std::vector<std::string> completed_requests;
-	for (auto it = requests_made_.begin(); it != requests_made_.end(); ++it) {
-		if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
-			auto m = it->second.get();
-			m->upload();
-			m->attach_program(de2::get_instance().programs["c_t_direct"]);
-			auto ep = std::static_pointer_cast<earth_plate>(m);
-			ecs_s::entity e = world.new_entity();
-			world.add_component(e, plate_name{ it->first });
-			world.add_component(e, m);
-			cn_cache.put(it->first, std::static_pointer_cast<plate>(ep->m)->cn);
-			c_cache.put(it->first, std::static_pointer_cast<plate>(ep->m)->corners);
-			completed_requests.push_back(it->first);
-		}
+		resident_images_ = std::move(resident);
+		if (textures.empty()) lowest = 0;
+		lowest_zoom_ = lowest; highest_zoom_ = highest; visible_count_ = textures.size();
 	}
 
-	for (auto plate_path : completed_requests) {
-		requests_made_.erase(plate_path);
+	auto coords = ray_hit_to_lla(renderer.mouse_pos, vp, projection, view);
+	std::string location;
+	if (renderer.mouse_pos.x >= 0 && renderer.mouse_pos.y >= 0 && renderer.mouse_pos.x < vp.x && renderer.mouse_pos.y < vp.y &&
+		std::isfinite(coords.x) && std::isfinite(coords.y)) {
+		if (preferences.decimal_coordinates)
+			location = std::format("{:.5f}{} - {:.5f}{}", std::abs(coords.x), coords.x < 0 ? "S" : "N", std::abs(coords.y), coords.y < 0 ? "W" : "E");
+		else location = std::format("{}{} - {}{}", dms(coords.x).to_string(), coords.x < 0 ? "S" : "N",
+			dms(coords.y).to_string(), coords.y < 0 ? "W" : "E");
 	}
+	de2::get_instance().set_status(location);
 }
+
+bool spheroid::evaluate_completed_requests() {
+	bool completed = false;
+	for (auto it = requests_made_.begin(); it != requests_made_.end();) {
+		if (it->second.result.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready) { ++it; continue; }
+		completed = true;
+		try {
+			auto image = it->second.result.get();
+			if (image) loaded_plates_.put(it->first, image);
+		}
+		catch (const std::exception& error) {
+			std::cerr << "tile " << it->first << ": " << error.what() << '\n';
+			retry_after_[it->first] = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+		}
+		it = requests_made_.erase(it);
+	}
+	return completed;
+}
+
 corner_normals& spheroid::get_corner_normals(std::string plate_path) {
 	if (!cn_cache.exists(plate_path)) {
 		cn_cache.put(plate_path, calculate_corner_normals(plate_path, resolution_)); 
@@ -133,86 +143,35 @@ std::array<glm::vec3, 4> & spheroid::get_corners(std::string plate_path) {
 }
 
 
-std::set<std::string> spheroid::get_visible_hierarchy(renderer_system& renderer) {
-	std::queue<std::string> plates_to_check;
-	std::set<std::string> visible_hierarchy;
-	auto vp = de2::get_instance().viewport;
-	glm::vec3 cam = glm::vec4(renderer.cam_->get_world_pos(), 0.0) * renderer.get_view();
-	auto view = renderer.get_view();
-	auto projection = renderer.get_projection();
-	std::vector<glm::vec2> corner_points;
-
-	//TODO: for god sake implement AABB and save our souls!
-	//|---------------------------------|
-	//|l7             l8              l9|
-	//|                                 |
-	//|                                 |
-	//|l4             l5              l6|
-	//|                                 |
-	//|                                 |
-	//|l1             l2              l3|
-	//|---------------------------------|
-
-	glm::vec2 l7{ 0, vp.y }, l8{ vp.x / 2, vp.y }, l9{ vp.x, vp.y };
-	glm::vec2 l4{ 0, vp.y / 2}, l5{ vp.x / 2, vp.y / 2 }, l6{ vp.x, vp.y / 2 };
-	glm::vec2 l1{ 0, 0 }, l2{ vp.x / 2, 0 }, l3{ vp.x, 0 };
-
-
-	corner_points.insert(corner_points.end(), { l1, l2, l3, l4, l5, l6, l7, l8, l9 });
-	//seed
-	plates_to_check.push("a");
-	plates_to_check.push("b");
-	plates_to_check.push("c");
-	plates_to_check.push("d");
-
-	while (!plates_to_check.empty()) {
-		std::string plate_path = plates_to_check.front();
-		plates_to_check.pop();
-
-		auto cn = get_corner_normals(plate_path);
-		bool is_visible = false;
-		if (plate_path == "a") {
-			int stop = 1;
+bool spheroid::update_visible_plates(renderer_system& renderer) {
+	glm::dmat4 clip = glm::dmat4(renderer.get_projection()) * renderer.cam_->view_matrix();
+	glm::dvec2 viewport = de2::get_instance().viewport;
+	if (clip == lod_clip_ && viewport == lod_viewport_) return false;
+	texel_pixels_ = view_texel_size(clip, viewport, earth_a, c);
+	tile_zoom_ = select_map_zoom(texel_pixels_, tile_zoom_);
+	lod_clip_ = clip;
+	lod_viewport_ = viewport;
+	plate_view view(renderer.cam_->world_position(), clip, { earth_a, earth_a, c });
+	std::map<std::string, plate_demand> selected;
+	std::queue<std::string> pending;
+	for (auto root : { "a", "b", "c", "d" }) pending.push(root);
+	while (!pending.empty()) {
+		auto path = pending.front(); pending.pop();
+		if (!bounds_cache.exists(path)) bounds_cache.put(path, calculate_bounds(path, earth_a, c));
+		const auto& bounds = bounds_cache.get(path);
+		if (!view.is_visible(bounds)) continue;
+		if (path.size() < tile_zoom_) {
+			for (char child : { 'a', 'b', 'c', 'd' }) pending.push(path + child);
+			continue;
 		}
-		for (size_t i = 0; i < 4; i++) {
-			auto ca = glm::angle(cn[i], glm::normalize(-cam));
-			
-			if (ca < get_visible_angle_by_zoom(renderer.cam_->zoom_)) {
-				is_visible = true;
-				break;
-			}
-		}
-
-		if (!is_visible) {
-			//now other way around
-			square pb = path_to_square(plate_path);
-			for (auto cp : corner_points) {
-				auto geo = ray_hit_to_lla(cp, vp, projection, view);
-				auto merc = lla_to_merc(geo, std::pow(2, plate_path.size()) * 256);
-				if (pb.hit_test(merc)) {
-					is_visible = true;
-					break;
-				}
-			}
-		}
-
-		if (is_visible) {
-			visible_hierarchy.emplace(plate_path);
-			if (plate_path.size() < renderer.cam_->zoom_+1) {
-				//keep seeding
-				plates_to_check.push(plate_path + "a");
-				plates_to_check.push(plate_path + "b");
-				plates_to_check.push(plate_path + "c");
-				plates_to_check.push(plate_path + "d");
-
-				visible_hierarchy.emplace(plate_path + "a");
-				visible_hierarchy.emplace(plate_path + "b");
-				visible_hierarchy.emplace(plate_path + "c");
-				visible_hierarchy.emplace(plate_path + "d");
-			}
-		}
+		auto previous = visible_plates_.find(path);
+		size_t current = previous == visible_plates_.end() ? 0 : previous->second.source.size();
+		double density = plate_texel_size(bounds, clip, viewport);
+		size_t level = std::isfinite(density) ? select_map_zoom(density, current, tile_zoom_) : tile_zoom_;
+		selected.emplace(path, plate_demand{ path.substr(0, level), plate_screen_area(bounds, clip, viewport) });
 	}
-	return visible_hierarchy;
+	visible_plates_ = std::move(selected);
+	return true;
 }
 
 //PLATE
@@ -238,10 +197,12 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 	// |-----------0-----1-----2
 	for (size_t y = 0; y <= resolution_; y++) {
 		for (size_t x = 0; x <= resolution_; x++) {
-			double step = b.a / resolution_;
+			double step = double(b.a) / resolution_;
+			auto position = merc_to_ecef({ b.x + x * step, b.y + y * step }, map_size);
+			positions.push_back(position);
 			 
 			vertices.push_back({
-				merc_to_ecef({ b.x + x * step, b.y + y * step }, map_size),/*3D position*/
+				position,/*3D position*/
 				//{ b.x + x * step, b.y + y * step, 0 },/*2D position*/
 				{ 0.0, 0.0, 0.0 },/*normal*/
 				{ (x * step / b.a),  1 - (y * step / b.a)}/*uv*/
@@ -249,6 +210,7 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 		}
 	}
 
+	origin = positions[positions.size() / 2];
 	size_t point_per_row = resolution_ + 1;
 	for (size_t y = 0; y < resolution_; y++) {
 		for (size_t x = 0; x < resolution_; x++) {	
@@ -266,17 +228,10 @@ plate::plate(std::string plate_path, size_t resolution) : plate_path_(plate_path
 			//upper right triangle - anti-clockwise
 			indices.insert(indices.end(), { v1, v3 ,v2 });
 
-			//TODO: there is something wrong with specular lighting
-			auto n1 = calc_normal(vertices[v0].position, vertices[v1].position, vertices[v2].position);
-			auto n2 = calc_normal(vertices[v1].position, vertices[v3].position, vertices[v0].position);
-			auto n3 = calc_normal(vertices[v2].position, vertices[v0].position, vertices[v3].position);
-			auto n4 = calc_normal(vertices[v3].position, vertices[v2].position, vertices[v1].position);
-
-			vertices[v0].normal = n1;
-			vertices[v1].normal = n2;
-			vertices[v2].normal = n3;
-			vertices[v3].normal = n4;
 		}
+	}
+	for (auto& v : vertices) {
+		v.normal = glm::normalize(glm::dvec3(v.position) / glm::dvec3(earth_a * earth_a, earth_a * earth_a, earth_b * earth_b));
 	}
 	size_of_indices = indices.size();
 
@@ -295,10 +250,9 @@ earth_plate::earth_plate(std::string plate_path, size_t resolution) {
 	m->name = plate_path;
 }
 earth_plate::~earth_plate() {
-	glDeleteVertexArrays(1, &vao);
 }
-map_quest<disk_store>& earth_plate::get_provider() {
-	static map_quest<disk_store> provider;
+open_street_map<disk_store>& earth_plate::get_provider() {
+	static open_street_map<disk_store> provider;
 	return provider;
 }
 

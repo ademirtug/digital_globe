@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Digital Globe
+Comment=Explore city, terrain and satellite maps on a globe
+Exec=digital_globe
+Icon=applications-science
+Terminal=false
+Categories=Education;Geography;
